@@ -1,3 +1,5 @@
+![LickingT](https://raw.githubusercontent.com/fuckyoustan/Licking-Thermal/refs/heads/main/banner.jpeg)
+
 ## Licking Thermal 💦
 
 Yo! Licking Thermal is a Magisk module that auto kills thermal throttling whenever your run games are running and brings it back once you’re done.  Perfect if you wanna squeeze every bit of power outta your phone and keep your gameplay smooth AF
