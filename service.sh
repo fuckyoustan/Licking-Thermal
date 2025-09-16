@@ -1,6 +1,6 @@
 #!/system/bin/sh
 
-Porn="/data/adb/modules/LickingT/PornArchive/PornCategories.txt"
+Porn="/data/adb/modules/LickingT/Other/List.txt"
 Condition="NotHorny"
 
 Miyabi() {
