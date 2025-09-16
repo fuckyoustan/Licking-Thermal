@@ -26,6 +26,12 @@ Yo! Licking Thermal is a Magisk module that auto kills thermal throttling whenev
 1. Flash this module through Magisk
 2. Edit list.txt in the module if the app package you using is not available
 
+## Installation
+
+[<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png"
+    alt="Get it on GitHub"
+    height="80">](https://github.com/fuckyoustan/Licking-Thermal/releases)
+
 ## ⚠️ BIG WARNING
 1. THIS MODULE KILLS YOUR DEVICE'S TEMP PROTECTION.
 2. RISK OF OVERHEATING, MELTING YOUR GUTS, OR TURNING YOUR BATTERY INTO A BALLOON
