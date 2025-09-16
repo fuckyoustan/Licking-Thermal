@@ -21,7 +21,7 @@ Yo! Licking Thermal is a Magisk module that auto kills thermal throttling whenev
 - 🔔 Live Status Notifs  
   Pops a notification every time thermal gets disabled or restored so you know it’s working
 
-## 📥 Installation
+## 📥 Download
 
 [<img src="https://github.com/machiav3lli/oandbackupx/blob/034b226cea5c1b30eb4f6a6f313e4dadcbb0ece4/badge_github.png"
     alt="Get it on GitHub"
