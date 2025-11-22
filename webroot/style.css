@@ -1,0 +1,379 @@
+/* Material You Inspired Theme */
+:root {
+  --md-sys-color-primary: #6750A4;
+  --md-sys-color-primary-container: #EADDFF;
+  --md-sys-color-secondary: #625B71;
+  --md-sys-color-secondary-container: #E8DEF8;
+  --md-sys-color-tertiary: #7D5260;
+  --md-sys-color-tertiary-container: #FFD8E4;
+  --md-sys-color-surface: #FFFBFE;
+  --md-sys-color-surface-dim: #E6E1E5;
+  --md-sys-color-surface-bright: #FFFBFE;
+  --md-sys-color-surface-container-lowest: #FFFFFF;
+  --md-sys-color-surface-container-low: #F7F2F6;
+  --md-sys-color-surface-container: #F3EDF2;
+  --md-sys-color-surface-container-high: #ECE6EB;
+  --md-sys-color-surface-container-highest: #E6E0E4;
+  --md-sys-color-on-surface: #1C1B1F;
+  --md-sys-color-on-surface-variant: #49454F;
+  --md-sys-color-outline: #79747E;
+  --md-sys-color-outline-variant: #CAC4D0;
+  --md-sys-color-shadow: #000000;
+  --md-sys-color-scrim: #000000;
+  --md-sys-color-inverse-surface: #313033;
+  --md-sys-color-inverse-on-surface: #F4EFF4;
+  --md-sys-color-inverse-primary: #D0BCFF;
+  --md-sys-color-primary-fixed: #F6EDFF;
+  --md-sys-color-primary-fixed-dim: #EADDFF;
+  --md-sys-color-on-primary-fixed: #21005D;
+  --md-sys-color-on-primary-container: #21005D;
+  --md-sys-color-secondary-fixed: #E8DEF8;
+  --md-sys-color-secondary-fixed-dim: #CCC2DC;
+  --md-sys-color-on-secondary-fixed: #1D192B;
+  --md-sys-color-on-secondary-container: #1D192B;
+  --md-sys-color-tertiary-fixed: #FFD8E4;
+  --md-sys-color-tertiary-fixed-dim: #EFB8C8;
+  --md-sys-color-on-tertiary-fixed: #31111D;
+  --md-sys-color-on-tertiary-container: #31111D;
+  --md-ref-typeface-plain: "Roboto", system-ui, sans-serif;
+  --radius: 12px;
+  --elevation-1: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15);
+  --elevation-2: 0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --md-sys-color-primary: #D0BCFF;
+    --md-sys-color-primary-container: #4F378B;
+    --md-sys-color-secondary: #CCC2DC;
+    --md-sys-color-secondary-container: #4A4458;
+    --md-sys-color-tertiary: #EFB8C8;
+    --md-sys-color-tertiary-container: #633B48;
+    --md-sys-color-surface: #1C1B1F;
+    --md-sys-color-surface-dim: #141316;
+    --md-sys-color-surface-bright: #3B3A3E;
+    --md-sys-color-surface-container-lowest: #111115;
+    --md-sys-color-surface-container-low: #1F1D21;
+    --md-sys-color-surface-container: #242327;
+    --md-sys-color-surface-container-high: #2E2C30;
+    --md-sys-color-surface-container-highest: #39373B;
+    --md-sys-color-on-surface: #E6E1E5;
+    --md-sys-color-on-surface-variant: #CAC4D0;
+    --md-sys-color-outline: #938F99;
+    --md-sys-color-outline-variant: #49454F;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-inverse-surface: #E6E1E5;
+    --md-sys-color-inverse-on-surface: #313033;
+    --md-sys-color-inverse-primary: #6750A4;
+    --md-sys-color-primary-fixed: #EADDFF;
+    --md-sys-color-primary-fixed-dim: #B8ADDC;
+    --md-sys-color-on-primary-fixed: #21005D;
+    --md-sys-color-on-primary-container: #EADDFF;
+    --md-sys-color-secondary-fixed: #E8DEF8;
+    --md-sys-color-secondary-fixed-dim: #B6A8CC;
+    --md-sys-color-on-secondary-fixed: #1D192B;
+    --md-sys-color-on-secondary-container: #E8DEF8;
+    --md-sys-color-tertiary-fixed: #FFD8E4;
+    --md-sys-color-tertiary-fixed-dim: #D2B1C0;
+    --md-sys-color-on-tertiary-fixed: #31111D;
+    --md-sys-color-on-tertiary-container: #FFD8E4;
+  }
+}
+
+body {
+  margin: 0;
+  font-family: var(--md-ref-typeface-plain);
+  background-color: var(--md-sys-color-surface);
+  color: var(--md-sys-color-on-surface);
+  padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  box-sizing: border-box;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+/* Banner */
+.banner {
+  position: relative;
+  width: 100%;
+  height: 200px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 24px;
+  box-shadow: var(--elevation-2);
+}
+
+.banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.banner-overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0; 
+  right: 0;
+  padding: 24px 24px 16px;
+  background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+  color: white;
+}
+
+.banner-overlay h1 {
+  margin: 0 0 4px 0;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.banner-overlay p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+/* Card */
+.card {
+  background-color: var(--md-sys-color-surface-container-low);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 16px;
+  box-shadow: var(--elevation-1);
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0 0 12px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Info Item (Digunakan untuk Device, Thermal, dan Extra Card) */
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; 
+  padding: 12px 0;
+  border-bottom: 1px solid var(--md-sys-color-outline-variant); 
+}
+
+/* ATURAN UNTUK MEMPERBAIKI ALIGNMENT ITEM TERAKHIR */
+#thermal-monitoring .info-item:last-child,
+#extra-controls .info-item:last-child {
+  border-bottom: none; 
+}
+
+.info-label {
+  font-size: 14px;
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.info-value {
+  font-size: 14px;
+  color: var(--md-sys-color-on-surface);
+  font-weight: 500;
+  text-align: right;
+}
+
+/* Highlight untuk Suhu Tinggi */
+.thermal-high {
+    color: #FFBCAE; 
+}
+
+/* === Style Tambahan untuk Kontrol === */
+
+/* Select Dropdown */
+.md-select {
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--md-sys-color-outline);
+    background-color: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-ref-typeface-plain);
+    font-size: 14px;
+    font-weight: 500;
+    appearance: none; 
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='%2379747E'%3E%3Cpath d='M480-360 280-560h400L480-360Z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 32px; 
+    cursor: pointer;
+}
+
+/* Switch (Toggle) */
+.md-switch-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 52px;
+    height: 32px;
+}
+
+.md-switch-wrapper input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.md-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--md-sys-color-surface-container-highest);
+    transition: .4s;
+    border: 2px solid var(--md-sys-color-outline);
+    border-radius: 32px;
+}
+
+.md-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 6px;
+    bottom: 6px;
+    background-color: var(--md-sys-color-outline);
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .md-switch-slider {
+    background-color: var(--md-sys-color-primary-container);
+    border-color: var(--md-sys-color-primary);
+}
+
+input:focus + .md-switch-slider {
+    box-shadow: 0 0 1px var(--md-sys-color-primary);
+}
+
+input:checked + .md-switch-slider:before {
+    transform: translateX(20px);
+    background-color: var(--md-sys-color-primary);
+}
+
+/* Textarea for List */
+.md-textarea {
+    width: 100%;
+    min-height: 150px;
+    padding: 12px;
+    margin-top: 8px;
+    box-sizing: border-box;
+    border-radius: var(--radius);
+    border: 1px solid var(--md-sys-color-outline);
+    background-color: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+    font-family: var(--md-ref-typeface-plain);
+    font-size: 14px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+/* Buttons */
+.button-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
+
+.md-button {
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    border: none;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: var(--elevation-1);
+}
+
+.md-button-primary {
+    /* MODIFIKASI WARNA: Menggunakan warna gelap untuk kontras dengan tulisan putih */
+    background-color: #4F378B; 
+    color: var(--md-sys-color-on-primary); 
+}
+
+.md-button-primary:hover {
+    background-color: #6750A4; /* Warna hover sedikit lebih terang (warna primary default) */
+}
+
+.md-button-secondary {
+    background-color: var(--md-sys-color-surface-container-high);
+    color: var(--md-sys-color-on-surface);
+}
+
+.md-button-secondary:hover {
+    background-color: var(--md-sys-color-surface-container-highest);
+}
+
+/* Developer Card */
+.dev-card {
+  /* MODIFIKASI: Align item ke atas */
+  display: flex;
+  align-items: flex-start; 
+  gap: 16px;
+}
+
+.dev-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.dev-info {
+  flex: 1;
+}
+
+.dev-name {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.dev-role {
+  font-size: 14px;
+  color: var(--md-sys-color-on-surface-variant);
+  margin: 0 0 8px 0;
+}
+
+.dev-links {
+  /* MODIFIKASI: Memastikan tombol berada di bawah info teks dan cukup lebar */
+  display: flex;
+  flex-wrap: wrap; /* Memungkinkan tombol untuk membungkus jika layar kecil */
+  gap: 12px; 
+  margin-top: 10px; 
+}
+
+.dev-link {
+    /* MODIFIKASI: Padding yang lebih besar untuk tombol yang lebih nyaman */
+    padding: 12px 20px; 
+    background-color: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+    text-decoration: none;
+    border-radius: 24px; 
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+    cursor: pointer; 
+}
+
+.dev-link:hover {
+  background-color: var(--md-sys-color-secondary);
+  color: white;
+}
+
+/* Description */
+.description {
+  line-height: 1.6;
+  color: var(--md-sys-color-on-surface-variant);
+}
