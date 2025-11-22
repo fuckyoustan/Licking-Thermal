@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Licking Thermal</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="banner">
+      <img src="banner.jpg" alt="Banner">
+      <div class="banner-overlay">
+        <h1>Licking Thermal</h1>
+        <p>Lick it the fuckin thermal asshole until it squirts!</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2 class="card-title">Device Information</h2>
+      <div id="device-info">
+        <div class="info-item">
+          <span class="info-label">Model</span>
+          <span class="info-value" id="device-model">Loading...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Android Version</span>
+          <span class="info-value" id="device-android">Loading...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Kernel</span>
+          <span class="info-value" id="device-kernel">Loading...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Chipset/Platform</span>
+          <span class="info-value" id="device-chipset">Loading...</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">CPU ABIs</span>
+          <span class="info-value" id="device-abis">Loading...</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card">
+      <h2 class="card-title">Realtime Thermal Monitoring</h2>
+      <div id="thermal-monitoring">
+        <div style="text-align: center; padding: 12px 0;">
+            <p>Loading thermal data...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+        <h2 class="card-title">EXTRA</h2>
+        <div id="extra-controls">
+            <div class="info-item">
+                <span class="info-label">MODE</span>
+                <select id="mode-select" class="md-select" onchange="handleModeChange(this.value)">
+                    <option value="automatic">Automatic</option>
+                    <option value="static">Static</option>
+                </select>
+            </div>
+            
+            <div class="info-item">
+                <span class="info-label">Kill HAL</span>
+                <label class="md-switch-wrapper">
+                    <input type="checkbox" id="hal-switch" onchange="handleHalChange(this.checked)">
+                    <span class="md-switch-slider"></span>
+                </label>
+            </div>
+        </div>
+    </div>
+    <div class="card">
+        <h2 class="card-title">List Package</h2>
+        <p class="info-label">List of App Packages (One package per line)</p>
+        <textarea id="porn-archive-textarea" class="md-textarea" placeholder="Loading file contents..."></textarea>
+        
+        <div class="button-group">
+            <button class="md-button md-button-secondary" onclick="updatePornArchive()">Refresh</button>
+            <button class="md-button md-button-primary" onclick="savePornArchive()">Save Changes</button>
+        </div>
+    </div>
+    <div class="card">
+      <h2 class="card-title">Developer</h2>
+      <div class="dev-card">
+        <img src="shit.jpg" alt="Developer" class="dev-avatar">
+        <div class="dev-info">
+          <h3 class="dev-name">@fuckyoustan</h3>
+          <p class="dev-role">Follow my work and get updates</p>
+          <div class="dev-links">
+            <a href="https://github.com/fuckyoustan" class="dev-link" target="_blank" onclick="openExternalLink('https://github.com/fuckyoustan', event)">GitHub</a>
+            <a href="https://t.me/EverythingAboutArchive" class="dev-link" target="_blank" onclick="openExternalLink('tg://resolve?domain=EverythingAboutArchive', event)">Telegram</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
