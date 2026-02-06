@@ -1,0 +1,55 @@
+name: OpenCode Agent
+
+permissions:
+  id-token: write
+  contents: write
+  issues: write
+  pull-requests: write
+
+on:
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+jobs:
+  opencode:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    if: |
+      (contains(github.event.comment.body, '/oc') || 
+       contains(github.event.comment.body, '/opencode')) &&
+      !contains(github.actor, '[bot]')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Configure Git identity
+        run: |
+          git config --global user.name "OpenCode Agent"
+          git config --global user.email "opencode-agent[bot]@users.noreply.github.com"
+
+      - name: Run OpenCode Agent
+        uses: anomalyco/opencode/github@latest
+        env: {} 
+        with:
+          model: opencode/big-pickle
+          agent: general
+          prompt: |
+            {
+              "temperature": 0.05,
+              "steps": 8,
+              "reasoningEffort": "low",
+              "textVerbosity": "low",
+              "top_p": 0.9
+            }
+            You are a fast and precise coding agent. 
+            Think VERY briefly in <thinking> tags (max 100 words total). 
+            Stick strictly to files and request — no assumptions or invented code. 
+            If uncertain, say so immediately. 
+            Output ONLY necessary changes/diffs — be ultra-concise, no extra explanations.
