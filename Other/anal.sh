@@ -84,7 +84,7 @@ for puki in /sys/devices/*.mali; do
 [ -e "$puki/tripping" ] && chmod 644 "$puki/tripping"
 done
 }
-HitomiTanaka(){ 
+HitomiTanaka() { 
 find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' \) -exec chmod 644 {} +
 }
 AliceaFox() {
@@ -112,11 +112,8 @@ setprop "$prop" "running" 2>/dev/null
 done
 }
 EvaAngelina() {
-find /system/lib* /vendor -type f \( -iname "*thermal*" -o -iname "*throttl*" \) 2>/dev/null | while read -r FUCK; do
-case "$FUCK" in
-*.rc) ;;
-*) umount "$FUCK" ;;
-esac
+find /system/lib /system/lib64 /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while IFS= read -r FUCK; do
+umount "$FUCK"
 done
 }
 SaoriHara
