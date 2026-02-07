@@ -27,7 +27,7 @@ resetprop -n "$penis" "$kontol" 2>/dev/null
 setprop "$penis" "$kontol" 2>/dev/null
 done
 }
-SweetyFox(){ 
+SweetyFox() { 
 find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' \) -exec chmod 000 {} +
 }
 LolaTaylor() {
