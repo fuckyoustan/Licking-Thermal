@@ -45,14 +45,11 @@ done
 AvaAddams() {
 SHIT="/data/adb/modules/LickingT/FuckingThermal"
 echo > "$SHIT"
-find /system/lib* /vendor -type f \( -iname "*thermal*" -o -iname "*throttl*" \) 2>/dev/null | while read -r FUCK; do
-case "$FUCK" in
-*.rc) ;;
-*) mount --bind "$SHIT" "$FUCK" ;;
-esac
+find /system/lib /system/lib64 /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r FUCK; do
+mount --bind "$SHIT" "$FUCK"
 done
 }
-SweetyFox(){ 
+SweetyFox() { 
 find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' \) -exec chmod 000 {} +
 }
 LolaTaylor() {
