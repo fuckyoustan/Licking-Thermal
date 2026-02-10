@@ -4,6 +4,8 @@ while [ -z "$(getprop sys.boot_completed)" ]; do
     sleep 5
 done
 
+HAL=0
+MODE=auto
 MODPATH="/data/adb/modules/LickingT"
 PROP="$MODPATH/module.prop"
 CONF="$MODPATH/thermal.conf"
@@ -32,70 +34,54 @@ description() {
         Horny)
             echo "$current_desc" | grep -q "Running" || sed -Ei "s/^description=(\[.*][[:space:]]*)?/description=[ ✨ Running ] /g" "$PROP"
             ;;
+        NotHorny)
+            echo "$current_desc" | grep -q "Balance Mode" || sed -Ei "s/^description=(\[.*][[:space:]]*)?/description=[ 😴 Balance Mode ] /g" "$PROP"
+            ;;
         *)
-            echo "$current_desc" | grep -q "Idle" || sed -Ei "s/^description=(\[.*][[:space:]]*)?/description=[ 😴 Idle ] /g" "$PROP"
+            echo "$current_desc" | grep -q "Not Working" || sed -Ei "s/^description=(\[.*][[:space:]]*)?/description=[ ❌ Not Working ] /g" "$PROP"
             ;;
     esac
 }
-HAL=0
-MODE=auto
-last_conf_hash=""
-last_mode=""
-
 while true; do
-    current_conf_hash=""
-    [ -f "$CONF" ] && {
+    if [ -f "$CONF" ]; then
         . "$CONF"
-        current_conf_hash="$(cat "$CONF" 2>/dev/null | md5sum | cut -d' ' -f1)"
-    }
-    
+    fi
     current_mode="$(read_mode)"
-    
-    [ "$current_conf_hash" != "$last_conf_hash" ] || [ "$MODE" != "$last_mode" ] || {
-        sleep 10
-        continue
-    }
-    
-    last_conf_hash="$current_conf_hash"
-    last_mode="$MODE"
-    
     if [ "$MODE" = "auto" ]; then
         Hyper="NO"
         PornApp="$(get_PornApp)"
-        while IFS= read -r pkg || [ -n "$pkg" ]; do
-            case "$PornApp" in
-                *$pkg*) Hyper="YES"; break ;;
-            esac
+        while read -r pkg || [ -n "$pkg" ]; do
+            echo "$PornApp" | grep -Eiq "$pkg" && {
+                Hyper="YES"
+                break
+            }
         done < "$PORN"
-        
         if [ "$Hyper" = "YES" ] && [ "$current_mode" != "Horny" ]; then
             write_mode "Horny"
             if [ "$HAL" = "1" ]; then
                 sh "$MODPATH/PornArchive/MILF.sh" &
-                am start -a android.intent.action.MAIN -e toasttext "Aggressive LickT for $pkg" -n $TOAST_PKG/.MainActivity &
+                am start -a android.intent.action.MAIN -e toasttext "Aggressive LickT for $pkg" -n $TOAST_PKG/.MainActivity
             else
                 sh "$MODPATH/PornArchive/amature.sh" &
-                am start -a android.intent.action.MAIN -e toasttext "Amature LickT for $pkg" -n $TOAST_PKG/.MainActivity &
+                am start -a android.intent.action.MAIN -e toasttext "Amature LickT for $pkg" -n $TOAST_PKG/.MainActivity
             fi
-            wait
         elif [ "$Hyper" = "NO" ] && [ "$current_mode" != "NotHorny" ]; then
             write_mode "NotHorny"
             sh "$MODPATH/PornArchive/anal.sh" &
-            am start -a android.intent.action.MAIN -e toasttext "Balance mode active" -n $TOAST_PKG/.MainActivity &
-            wait
+            am start -a android.intent.action.MAIN -e toasttext "Balance mode active" -n $TOAST_PKG/.MainActivity
         fi
-    elif [ "$MODE" = "static" ] && [ "$current_mode" != "Horny" ]; then
-        write_mode "Horny"
-        if [ "$HAL" = "1" ]; then
-            sh "$MODPATH/PornArchive/MILF.sh" &
-            am start -a android.intent.action.MAIN -e toasttext "Aggressive LickT active" -n $TOAST_PKG/.MainActivity &
-        else
-            sh "$MODPATH/PornArchive/amature.sh" &
-            am start -a android.intent.action.MAIN -e toasttext "Amature LickT active" -n $TOAST_PKG/.MainActivity &
+    elif [ "$MODE" = "static" ]; then
+        if [ "$current_mode" != "Horny" ]; then
+            write_mode "Horny"
+            if [ "$HAL" = "1" ]; then
+                sh "$MODPATH/PornArchive/MILF.sh" &
+                am start -a android.intent.action.MAIN -e toasttext "Aggressive LickT active" -n $TOAST_PKG/.MainActivity
+            else
+                sh "$MODPATH/PornArchive/amature.sh" &
+                am start -a android.intent.action.MAIN -e toasttext "Amature LickT active" -n $TOAST_PKG/.MainActivity
+            fi
         fi
-        wait
     fi
-    
     description &
     wait
     sleep 10
