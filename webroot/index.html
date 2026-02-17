@@ -4,87 +4,107 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Licking Thermal</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="assets/style.css" />
 </head>
 <body>
   <div class="container">
-    <div class="banner">
-      <img src="banner.jpg" alt="Banner">
-      <div class="banner-overlay">
-        <h1>Licking Thermal</h1>
-        <p>Lick it the fuckin thermal asshole until it squirts!</p>
+    <div class="card card-combined">
+      <div class="card-header-banner">
+        <img src="assets/banner.jpg" alt="Banner">
+        <div id="status-indicator" class="banner-chip chip-left">Loading...</div>
+        <div id="pid-indicator" class="banner-chip chip-right">Service PID: NULL</div>
+        <div class="banner-overlay">
+          </div>
       </div>
-    </div>
 
-    <div class="card">
-      <h2 class="card-title">Device Information</h2>
-      <div id="device-info">
-        <div class="info-item">
-          <span class="info-label">Model</span>
-          <span class="info-value" id="device-model">Loading...</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Android Version</span>
-          <span class="info-value" id="device-android">Loading...</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Kernel</span>
-          <span class="info-value" id="device-kernel">Loading...</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">Chipset/Platform</span>
-          <span class="info-value" id="device-chipset">Loading...</span>
-        </div>
-        <div class="info-item">
-          <span class="info-label">CPU ABIs</span>
-          <span class="info-value" id="device-abis">Loading...</span>
-        </div>
-      </div>
-    </div>
-    
-    <div class="card">
-      <h2 class="card-title">Realtime Thermal Monitoring</h2>
-      <div id="thermal-monitoring">
-        <div style="text-align: center; padding: 12px 0;">
-            <p>Loading thermal data...</p>
+      <div class="p-6">
+        <div id="device-info">
+          <div class="info-item"><span class="info-label">Model</span><span class="info-value" id="device-model">Loading...</span></div>
+          <div class="info-item"><span class="info-label">Android Version</span><span class="info-value" id="device-android">Loading...</span></div>
+          <div class="info-item"><span class="info-label">Kernel</span><span class="info-value" id="device-kernel">Loading...</span></div>
+          <div class="info-item"><span class="info-label">Chipset/Platform</span><span class="info-value" id="device-chipset">Loading...</span></div>
+          <div class="info-item"><span class="info-label">CPU ABIs</span><span class="info-value" id="device-abis">Loading...</span></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-        <h2 class="card-title">EXTRA</h2>
-        <div id="extra-controls">
-            <div class="info-item">
-                <span class="info-label">MODE</span>
-                <select id="mode-select" class="md-select" onchange="handleModeChange(this.value)">
-                    <option value="automatic">Automatic</option>
-                    <option value="static">Static</option>
-                </select>
-            </div>
-            
-            <div class="info-item">
-                <span class="info-label">Kill HAL</span>
-                <label class="md-switch-wrapper">
-                    <input type="checkbox" id="hal-switch" onchange="handleHalChange(this.checked)">
-                    <span class="md-switch-slider"></span>
-                </label>
-            </div>
+      <h2 class="card-title">EXTRA</h2>
+      <div id="extra-controls">
+        <div class="info-item">
+          <div class="label-with-icon">
+            <span class="info-label">Aggressive Mode</span>
+            <span class="info-icon svg-icon" onclick="showInfo('aggressive')">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+            </span>
+          </div>
+          <label class="md-switch-wrapper">
+            <input type="checkbox" id="hal-switch" onchange="handleHalChange(this.checked)">
+            <span class="md-switch-slider"></span>
+          </label>
         </div>
+      
+        <div class="info-item">
+          <div class="label-with-icon">
+            <span class="info-label">Mode Options</span>
+            <span class="info-icon svg-icon" onclick="showInfo('modeOptions')">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+            </span>
+          </div>
+          <select id="mode-select" class="md-select" onchange="handleModeChange(this.value)">
+            <option value="automatic">Automatic</option>
+            <option value="static">Static</option>
+          </select>
+        </div>
+
+        <div class="info-item">
+          <div class="label-with-icon">
+            <span class="info-label">Zone Policy</span>
+            <span class="info-icon svg-icon" onclick="showInfo('zonePolicy')">
+              <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+            </span>
+          </div>
+          <select id="policy-select" class="md-select" onchange="handlePolicyChange(this.value)">
+            <option value="">Loading...</option>
+          </select>
+        </div>
+
+        <div class="info-item battery-spoof-container">
+          <div class="battery-spoof-header">
+            <div class="label-with-icon">
+              <span class="info-label">Battery Spoofing</span>
+               <span class="info-icon svg-icon" onclick="showInfo('batterySpoof')">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" viewBox="0 -960 960 960" width="20"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+              </span>
+            </div>
+            <span class="info-value"><span id="battery-spoof-val">1</span>°C</span>
+          </div>
+          <div class="slider-wrapper">
+            <input type="range" id="battery-spoof-slider" class="md-slider" min="1" max="45" value="1" oninput="document.getElementById('battery-spoof-val').innerText = this.value">
+          </div>
+          <div class="button-group" style="margin-top: 8px;">
+            <button class="md-button md-button-secondary" onclick="resetBatterySpoof()">Reset</button>
+            <button class="md-button md-button-primary" onclick="applyBatterySpoof()">Apply</button>
+          </div>
+        </div>
+
+      </div>
     </div>
+
     <div class="card">
-        <h2 class="card-title">List Package</h2>
-        <p class="info-label">List of App Packages (One package per line)</p>
-        <textarea id="porn-archive-textarea" class="md-textarea" placeholder="Loading file contents..."></textarea>
-        
-        <div class="button-group">
-            <button class="md-button md-button-secondary" onclick="updatePornArchive()">Refresh</button>
-            <button class="md-button md-button-primary" onclick="savePornArchive()">Save Changes</button>
-        </div>
+      <h2 class="card-title">List Package</h2>
+      <p class="info-label">List of App Packages (One package per line)</p>
+      <textarea id="porn-archive-textarea" class="md-textarea" placeholder="Loading file contents..."></textarea>
+      <div class="button-group">
+        <button class="md-button md-button-secondary" onclick="updatePornArchive()">Refresh</button>
+        <button class="md-button md-button-primary" onclick="savePornArchive()">Save Changes</button>
+      </div>
     </div>
+
     <div class="card">
       <h2 class="card-title">Developer</h2>
       <div class="dev-card">
-        <img src="shit.jpg" alt="Developer" class="dev-avatar">
+        <img src="assets/shit.jpg" alt="Developer" class="dev-avatar">
         <div class="dev-info">
           <h3 class="dev-name">@fuckyoustan</h3>
           <p class="dev-role">Follow my work and get updates</p>
@@ -97,6 +117,18 @@
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <div id="info-modal" class="modal-overlay" onclick="closeModalOnClickOutside(event)">
+    <div class="modal-card card">
+      <h3 class="modal-title" id="modal-title">Title</h3>
+      <div class="modal-content-scroll">
+        <p class="modal-text" id="modal-text">Content goes here...</p>
+      </div>
+      <div class="button-group modal-actions">
+        <button class="md-button md-button-primary" onclick="closeModal()">Got it</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="assets/script.js"></script>
 </body>
 </html>
