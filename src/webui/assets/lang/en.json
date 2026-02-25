@@ -1,0 +1,49 @@
+{
+  "moduleVer": "Module Version",
+  "deviceModel": "Device Model",
+  "androidVer": "Android Version",
+  "kernel": "Kernel",
+  "chipset": "Chipset",
+  "thermalConfig": "Thermal Config",
+  "aggMode": "Aggressive Mode",
+  "opMode": "Operation Mode",
+  "thermPolicy": "Thermal Policy",
+  "battSpoof": "Battery Spoofing",
+  "btnReset": "Reset",
+  "btnApply": "Apply",
+  "supportTitle": "Support & Thanks",
+  "supportDesc": "Click here to support the project or get updates!",
+  "targetApps": "Target Apps",
+  "searchPlaceholder": "Search apps...",
+  "loadingApps": "Looking for apps...",
+  "navHome": "Home",
+  "navApps": "Apps",
+  "selectLang": "Select Language",
+  "btnGotIt": "Got it",
+  "devDescFull": "System Modifier & WebUI Developer. I create things that make your device run smoother and hotter.",
+  "noApps": "No apps found.",
+  "statusActive": "Working ✨",
+  "statusBalanced": "Balanced 😴",
+  "statusDisabled": "Disabled ❌",
+  "toastSaved": "Saved successfully",
+  "toastSpoofed": "Battery locked at {val}°C",
+  "toastReset": "Battery temp is back to normal",
+  "infoModals": {
+    "aggressive": {
+      "title": "Aggressive Mode",
+      "text": "Highly recommended for a massive performance boost! Turn it off immediately if you play games with strict anti-cheat to avoid bans."
+    },
+    "modeOptions": {
+      "title": "Operation Mode",
+      "text": "Auto: Thermal limits are only disabled for the apps you pick in the Apps tab.\n\nStatic: Permanently disabled all the time."
+    },
+    "zonePolicy": {
+      "title": "Thermal Policy",
+      "text": "Sets how the kernel reacts when temps hit a certain limit. Just leave it on default if you're not sure."
+    },
+    "batterySpoof": {
+      "title": "Battery Spoofing",
+      "text": "⚠️ DANGER ⚠️\nFakes your battery temp reading so the system won't drop frames. Might degrade battery life over time. ONLY USE THIS WHILE GAMING, and RESET it when you're done!"
+    }
+  }
+}
