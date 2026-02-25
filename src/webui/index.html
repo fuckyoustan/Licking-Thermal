@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Licking Thermal</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Roboto:wght@400;500;700&family=Shadows+Into+Light+Two&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
+  <link rel="stylesheet" href="assets/style.css">
+  
+  <script type="importmap">
+    {
+      "imports": {
+        "kernelsu": "https://esm.run/kernelsu"
+      }
+    }
+  </script>
+</head>
+<body>
+
+  <header>
+    <div class="header-title">
+      <img src="assets/shit.jpg" alt="Dev" class="header-avatar" id="dev-profile-btn" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'42\' height=\'42\'><circle cx=\'21\' cy=\'21\' r=\'21\' fill=\'%23333\'/></svg>'">
+      <span class="brand-text">Licking Thermal</span>
+    </div>
+    <button class="icon-button" id="btn-language">
+      <span class="material-symbols-outlined">Language</span>
+    </button>
+  </header>
+
+  <main id="mainMenu" class="menu-panel">
+    
+    <div class="banner">
+      <img src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%231a1b22\'/></svg>'">
+      <div id="status-indicator" class="banner-chip chip-left" style="color: var(--primary);">Loading...</div>
+      <div id="pid-indicator" class="banner-chip chip-right">PID: NULL</div>
+    </div>
+
+    <div class="device-info-card">
+      <div class="device-info-item">
+        <div class="device-info-label"><span class="material-symbols-outlined">stars</span> <span data-i18n="moduleVer">Module Version</span></div>
+        <div class="device-info-value" id="module-version" style="color: var(--primary);">Loading...</div>
+      </div>
+      <div class="device-info-item">
+        <div class="device-info-label"><span class="material-symbols-outlined">smartphone</span> <span data-i18n="deviceModel">Device Model</span></div>
+        <div class="device-info-value" id="device-model">Loading...</div>
+      </div>
+      <div class="device-info-item">
+        <div class="device-info-label"><span class="material-symbols-outlined">android</span> <span data-i18n="androidVer">Android Version</span></div>
+        <div class="device-info-value" id="device-android">Loading...</div>
+      </div>
+      <div class="device-info-item">
+        <div class="device-info-label"><span class="material-symbols-outlined">memory</span> <span data-i18n="kernel">Kernel</span></div>
+        <div class="device-info-value" id="device-kernel" style="text-align: right; max-width: 50%;">Loading...</div>
+      </div>
+      <div class="device-info-item">
+        <div class="device-info-label"><span class="material-symbols-outlined">laptop_mac</span> <span data-i18n="chipset">Chipset</span></div>
+        <div class="device-info-value" id="device-chipset" style="text-align: right; max-width: 50%;">Loading...</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon"><span class="material-symbols-outlined">tune</span></div>
+        <h2 class="card-title" data-i18n="thermalConfig">Thermal Config</h2>
+      </div>
+
+      <div class="setting-row-compact">
+        <div onclick="showInfo('aggressive')" class="cursor-pointer setting-label-group">
+          <p class="text-sm text-white"><span data-i18n="aggMode">Aggressive Mode</span> <span class="material-symbols-outlined info-icon">info</span></p>
+        </div>
+        <label class="custom-switch">
+          <input type="checkbox" id="hal-switch">
+          <span class="switch-slider"></span>
+        </label>
+      </div>
+
+      <div class="setting-column-compact">
+        <div onclick="showInfo('modeOptions')" class="cursor-pointer setting-label-header">
+          <p class="text-sm text-white"><span data-i18n="opMode">Operation Mode</span> <span class="material-symbols-outlined info-icon">info</span></p>
+        </div>
+        <div class="select-wrapper">
+          <select id="mode-select" class="pingpimp-select full-width">
+            <option value="automatic">Auto (By App)</option>
+            <option value="static">Static (Always On)</option>
+          </select>
+          <span class="material-symbols-outlined select-arrow">expand_more</span>
+        </div>
+      </div>
+
+      <div class="setting-column-compact">
+        <div onclick="showInfo('zonePolicy')" class="cursor-pointer setting-label-header">
+          <p class="text-sm text-white"><span data-i18n="thermPolicy">Thermal Policy</span> <span class="material-symbols-outlined info-icon">info</span></p>
+        </div>
+        <div class="select-wrapper">
+          <select id="policy-select" class="pingpimp-select full-width">
+            <option value="">Loading...</option>
+          </select>
+          <span class="material-symbols-outlined select-arrow">expand_more</span>
+        </div>
+      </div>
+      
+      <div style="padding-top: 12px; margin-top: 4px;">
+        <div class="flex items-center justify-between cursor-pointer" onclick="showInfo('batterySpoof')" style="margin-bottom: 6px;">
+          <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;"><span data-i18n="battSpoof">Battery Spoofing</span> <span class="material-symbols-outlined info-icon">info</span></p>
+          <span style="font-weight: 700; font-size: 0.9rem; color: #ffffff;" id="battery-spoof-val">1°C</span>
+        </div>
+        
+        <div class="slider-container">
+          <input type="range" id="battery-spoof-slider" class="md3-slider" min="1" max="45" value="1">
+        </div>
+        
+        <div class="flex items-center justify-between" style="gap: 12px; margin-top: 16px;">
+          <button class="pill-btn" id="btn-reset"><span data-i18n="btnReset">Reset</span></button>
+          <button class="pill-btn primary" id="btn-apply"><span data-i18n="btnApply">Apply</span></button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card support-card" id="btn-support" style="margin-bottom: 2rem;">
+      <div class="flex items-center" style="gap: 16px;">
+        <div class="card-icon" style="background-color: var(--primaryContainer); color: var(--onPrimaryContainer);">
+          <span class="material-symbols-outlined">favorite</span>
+        </div>
+        <div>
+          <h3 style="margin: 0 0 4px; font-size: 1rem; color: var(--onSurface);" data-i18n="supportTitle">Support & Thanks</h3>
+          <span class="text-sss" style="margin: 0;" data-i18n="supportDesc">Click here to support the project or get updates!</span>
+        </div>
+        <span class="material-symbols-outlined" style="margin-left: auto; color: var(--onSurfaceVariant);">chevron_right</span>
+      </div>
+    </div>
+  </main>
+
+  <main id="gameListMenu" class="menu-panel kanjud">
+    <input type="text" id="app-search" data-i18n="searchPlaceholder" placeholder="Search apps..." class="app-search-input" style="margin-top: 1rem;">
+    <div id="appList">
+      <div style="text-align: center; padding: 2rem 0; color: var(--onSurfaceVariant); font-size: 0.85rem;" data-i18n="loadingApps">Looking for apps...</div>
+    </div>
+  </main>
+
+  <div id="bottomToolbar">
+    <button id="openMain" class="active">
+      <span class="material-symbols-outlined">home</span> <span data-i18n="navHome">Home</span>
+    </button>
+    <button id="openGameList">
+      <span class="material-symbols-outlined">checklist</span> <span data-i18n="navApps">Apps</span>
+    </button>
+  </div>
+
+  <div class="modal-overlay" id="languageDialog">
+    <div class="language-dialog-container">
+      <div class="language-header">
+        <h3 style="margin: 0; font-size: 1.1rem; color: var(--onSurface);" data-i18n="selectLang">Select Language</h3>
+        <button class="icon-button" id="closeLangDialog" style="margin: 0;">
+          <span class="material-symbols-outlined">close</span>
+        </button>
+      </div>
+      <div style="padding: 8px;">
+        <div class="language-option" data-lang="en">
+          <span>English</span> <span class="material-symbols-outlined check-icon">check_circle</span>
+        </div>
+        <div class="language-option" data-lang="id">
+          <span>Bahasa Indonesia</span> <span class="material-symbols-outlined check-icon">check_circle</span>
+        </div>
+        <div class="language-option" data-lang="jv">
+          <span>Basa Jawa</span> <span class="material-symbols-outlined check-icon">check_circle</span>
+        </div>
+        <div class="language-option" data-lang="ja">
+          <span>日本語</span> <span class="material-symbols-outlined check-icon">check_circle</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="info-modal" class="modal-overlay">
+    <div class="modal-container">
+      <h3 id="modal-title" class="modal-title">Info</h3>
+      <p id="modal-text" class="modal-desc">Detail info.</p>
+      <div style="display: flex; justify-content: flex-end;">
+        <button class="pill-btn primary" style="flex: none; padding: 10px 24px;" id="close-info-modal"><span data-i18n="btnGotIt">Got it</span></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="devModal">
+    <div class="modal-container dev-modal-container">
+      <div class="dev-modal-banner">
+        <img src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%231a1b22\'/></svg>'">
+      </div>
+      <div class="dev-modal-content">
+        <img src="assets/shit.jpg" alt="Dev" class="dev-modal-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'72\' height=\'72\'><circle cx=\'36\' cy=\'36\' r=\'36\' fill=\'%23333\'/></svg>'">
+        <h3 style="margin: 10px 0 4px; font-size: 1.25rem; font-weight: 700; color: var(--onSurface);">@fuckyoustan</h3>
+        <p style="margin: 0 0 20px; font-size: 0.85rem; color: var(--onSurfaceVariant); line-height: 1.5;" data-i18n="devDescFull">
+          System Modifier & WebUI Developer. I create things that make your device run smoother and hotter.
+        </p>
+        <div class="flex items-center justify-between" style="gap: 12px;">
+          <button class="pill-btn" id="modal-btn-github">
+            <span class="material-symbols-outlined">code</span> GitHub
+          </button>
+          <button class="pill-btn primary" id="modal-btn-telegram">
+            <span class="material-symbols-outlined">send</span> Telegram
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="assets/script.js"></script>
+</body>
+  </html>
