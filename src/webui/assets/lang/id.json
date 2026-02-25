@@ -1,0 +1,49 @@
+{
+  "moduleVer": "Versi Modul",
+  "deviceModel": "Model Perangkat",
+  "androidVer": "Versi Android",
+  "kernel": "Kernel",
+  "chipset": "Chipset",
+  "thermalConfig": "Konfigurasi Termal",
+  "aggMode": "Mode Agresif",
+  "opMode": "Mode Operasi",
+  "thermPolicy": "Thermal Policy",
+  "battSpoof": "Spoofing Baterai",
+  "btnReset": "Reset",
+  "btnApply": "Terapkan",
+  "supportTitle": "Dukungan & Terima Kasih",
+  "supportDesc": "Ketuk di sini untuk mendukung proyek atau cek pembaruan!",
+  "targetApps": "Target Aplikasi",
+  "searchPlaceholder": "Cari aplikasi...",
+  "loadingApps": "Mencari aplikasi...",
+  "navHome": "Utama",
+  "navApps": "Aplikasi",
+  "selectLang": "Pilih Bahasa",
+  "btnGotIt": "Mengerti",
+  "devDescFull": "Modifikator Sistem & Pengembang WebUI. Saya menciptakan hal-hal yang membuat perangkat Anda berjalan lebih lancar dan panas.",
+  "noApps": "Aplikasi tidak ditemukan.",
+  "statusActive": "Aktif Bekerja ✨",
+  "statusBalanced": "Mode Seimbang 😴",
+  "statusDisabled": "Mati ❌",
+  "toastSaved": "Berhasil disimpan",
+  "toastSpoofed": "Baterai dikunci di {val}°C",
+  "toastReset": "Suhu baterai kembali normal",
+  "infoModals": {
+    "aggressive": {
+      "title": "Mode Agresif",
+      "text": "Sangat disarankan untuk mendongkrak performa secara maksimal! Segera matikan jika bermain game dengan anti-cheat ketat untuk menghindari ban/hukuman."
+    },
+    "modeOptions": {
+      "title": "Mode Operasi",
+      "text": "Otomatis: Batas termal hanya dimatikan untuk aplikasi yang Anda pilih di tab Aplikasi.\n\nStatis: Batas termal dinonaktifkan secara permanen sepanjang waktu."
+    },
+    "zonePolicy": {
+      "title": "Thermal Policy",
+      "text": "Mengatur bagaimana sistem kernel bereaksi saat suhu mencapai batas tertentu. Biarkan pada pengaturan bawaan jika Anda tidak mengerti."
+    },
+    "batterySpoof": {
+      "title": "Spoofing Baterai",
+      "text": "⚠️ BAHAYA ⚠️\nMemalsukan pembacaan suhu baterai agar sistem tidak menurunkan frame (drop fps) saat panas. Dapat menurunkan umur baterai seiring waktu. HANYA GUNAKAN SAAT BERMAIN GAME, dan RESET saat sudah selesai!"
+    }
+  }
+}

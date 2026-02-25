@@ -1,0 +1,49 @@
+{
+  "moduleVer": "Versi Modul",
+  "deviceModel": "Model HP",
+  "androidVer": "Versi Android",
+  "kernel": "Kernel",
+  "chipset": "Chipset",
+  "thermalConfig": "Setelan Termal",
+  "aggMode": "Mode Agresif",
+  "opMode": "Mode Operasi",
+  "thermPolicy": "Aturan Suhu",
+  "battSpoof": "Akali Suhu Baterai",
+  "btnReset": "Bale'ke",
+  "btnApply": "Terapke",
+  "supportTitle": "Dukungan & Suwun",
+  "supportDesc": "Klik kene nggo dukung proyek iki utawa ngecek update!",
+  "targetApps": "Target Aplikasi",
+  "searchPlaceholder": "Golek aplikasi...",
+  "loadingApps": "Lagi nggoleki aplikasi...",
+  "navHome": "Ngarep",
+  "navApps": "Aplikasi",
+  "selectLang": "Milih Basa",
+  "btnGotIt": "Oke, Paham",
+  "devDescFull": "Tukang modif sistem & tukang gawe WebUI. Aku nggawe alat ben HP-mu luwih lancar senajan rodok panas.",
+  "noApps": "Aplikasine ra ketemu.",
+  "statusActive": "Lagi Mlaku ✨",
+  "statusBalanced": "Santai 😴",
+  "statusDisabled": "Mati ❌",
+  "toastSaved": "Sukses disimpen",
+  "toastSpoofed": "Baterai dikunci neng {val}°C",
+  "toastReset": "Suhu baterai wis mbalik normal",
+  "infoModals": {
+    "aggressive": {
+      "title": "Mode Agresif",
+      "text": "Disaranake banget nggo dongkrak performa ben makin joss! Ndang pateni wae nek kowe main game sing ana anti-cheat e ketat ben ra kena ban."
+    },
+    "modeOptions": {
+      "title": "Mode Operasi",
+      "text": "Otomatis: Batesan suhu mung dipateni nggo aplikasi sing mbok pilih neng tab Aplikasi.\n\nStatis: Dipateni terus-terusan tanpa mandeg."
+    },
+    "zonePolicy": {
+      "title": "Aturan Suhu",
+      "text": "Ngatur piye carane kernel nanggepi pas suhu HP wis tekan watese. Jarke bae nang setelan gawan (default) nek kowe ra mudeng."
+    },
+    "batterySpoof": {
+      "title": "Akali Suhu Baterai",
+      "text": "⚠️ BAHAYA ⚠️\nNgapusi wacan suhu baterai ben HP-mu ra drop FPS-e pas panas. Iki iso ngrusak umur baterai nek kesuwen. MUNG GUNAKAKE PAS MAIN GAME, lan langsung di-RESET nek wis bar!"
+    }
+  }
+}

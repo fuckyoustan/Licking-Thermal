@@ -1,0 +1,49 @@
+{
+  "moduleVer": "モジュールバージョン",
+  "deviceModel": "デバイスモデル",
+  "androidVer": "Androidバージョン",
+  "kernel": "カーネル",
+  "chipset": "チップセット",
+  "thermalConfig": "熱設定",
+  "aggMode": "アグレッシブモード",
+  "opMode": "動作モード",
+  "thermPolicy": "サーマルポリシー",
+  "battSpoof": "バッテリー偽装",
+  "btnReset": "リセット",
+  "btnApply": "適用",
+  "supportTitle": "サポートと感謝",
+  "supportDesc": "ここをタップしてプロジェクトを支援するか、更新を確認してください！",
+  "targetApps": "対象アプリ",
+  "searchPlaceholder": "アプリを検索...",
+  "loadingApps": "アプリを探しています...",
+  "navHome": "ホーム",
+  "navApps": "アプリ",
+  "selectLang": "言語を選択",
+  "btnGotIt": "了解",
+  "devDescFull": "システムモディファイア & WebUI開発者。デバイスをよりスムーズに、そして熱く動作させるものを作っています。",
+  "noApps": "アプリが見つかりません。",
+  "statusActive": "動作中 ✨",
+  "statusBalanced": "バランス 😴",
+  "statusDisabled": "無効 ❌",
+  "toastSaved": "正常に保存されました",
+  "toastSpoofed": "バッテリーを {val}℃ にロックしました",
+  "toastReset": "バッテリー温度が正常に戻りました",
+  "infoModals": {
+    "aggressive": {
+      "title": "アグレッシブモード",
+      "text": "パフォーマンスを大幅に向上させるために強くお勧めします！厳しいアンチチートを採用しているゲームをプレイする場合は、BANを避けるためすぐにオフにしてください。"
+    },
+    "modeOptions": {
+      "title": "動作モード",
+      "text": "自動: 「アプリ」タブで選択したアプリのみ熱制限が無効になります。\n\n静的: 常に熱制限が完全に無効になります。"
+    },
+    "zonePolicy": {
+      "title": "サーマルポリシー",
+      "text": "温度が特定の制限に達したときのカーネルの反応を設定します。よくわからない場合はデフォルトのままにしてください。"
+    },
+    "batterySpoof": {
+      "title": "バッテリー偽装",
+      "text": "⚠️ 危険 ⚠️\nシステムがフレームを落とさないように、バッテリー温度の読み取りを偽装します。長期的にはバッテリーの寿命を縮める可能性があります。ゲーム中のみ使用し、終わったら必ずリセットしてください！"
+    }
+  }
+}
