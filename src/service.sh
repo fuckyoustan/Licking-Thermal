@@ -15,18 +15,22 @@ TOAST_FILE="/data/local/tmp/ToastProvider"
 TOAST_PKG="bellavita.toast"
 [ -f "$TOAST_FILE" ] && TOAST_PKG="$(cat "$TOAST_FILE")"
 [ -f "$STATE_FILE" ] || echo "NotHorny" > "$STATE_FILE"
+
 read_mode() {
     cat "$STATE_FILE" 2>/dev/null
 }
+
 write_mode() {
     printf "%s" "$1" > "$STATE_FILE"
 }
+
 get_PornApp() {
     dumpsys window 2>/dev/null | grep "Session Session{" | awk '{print $3}' | awk -F':' '{print $1}' | while read -r pid; do
         [ -r "/proc/$pid/cmdline" ] || continue
         tr '\0' ' ' < /proc/"$pid"/cmdline
     done
 }
+
 description() {
     state="$(read_mode)"
     current_desc="$(grep '^description=' "$PROP" 2>/dev/null)"
@@ -42,11 +46,13 @@ description() {
             ;;
     esac
 }
+
 while true; do
     if [ -f "$CONF" ]; then
         . "$CONF"
     fi
     current_mode="$(read_mode)"
+    
     if [ "$MODE" = "auto" ]; then
         Hyper="NO"
         PornApp="$(get_PornApp)"
@@ -56,32 +62,35 @@ while true; do
                 break
             }
         done < "$PORN"
+        
         if [ "$Hyper" = "YES" ] && [ "$current_mode" != "Horny" ]; then
             write_mode "Horny"
             if [ "$HAL" = "1" ]; then
-                sh "$MODPATH/PornArchive/MILF.sh" &
+                LickT --milf &
                 am start -a android.intent.action.MAIN -e toasttext "Aggressive LickT for $pkg" -n $TOAST_PKG/.MainActivity
             else
-                sh "$MODPATH/PornArchive/amature.sh" &
+                LickT --amature &
                 am start -a android.intent.action.MAIN -e toasttext "Amature LickT for $pkg" -n $TOAST_PKG/.MainActivity
             fi
         elif [ "$Hyper" = "NO" ] && [ "$current_mode" != "NotHorny" ]; then
             write_mode "NotHorny"
-            sh "$MODPATH/PornArchive/anal.sh" &
+            LickT --anal &
             am start -a android.intent.action.MAIN -e toasttext "Balance mode active" -n $TOAST_PKG/.MainActivity
         fi
+        
     elif [ "$MODE" = "static" ]; then
         if [ "$current_mode" != "Horny" ]; then
             write_mode "Horny"
             if [ "$HAL" = "1" ]; then
-                sh "$MODPATH/PornArchive/MILF.sh" &
+                LickT --milf &
                 am start -a android.intent.action.MAIN -e toasttext "Aggressive LickT active" -n $TOAST_PKG/.MainActivity
             else
-                sh "$MODPATH/PornArchive/amature.sh" &
+                LickT --amature &
                 am start -a android.intent.action.MAIN -e toasttext "Amature LickT active" -n $TOAST_PKG/.MainActivity
             fi
         fi
     fi
+    
     description
     sleep 10
 done
