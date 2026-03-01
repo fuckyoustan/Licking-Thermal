@@ -1,4 +1,4 @@
-import { exec as ksuExec, toast, listPackages, getPackagesInfo } from 'kernelsu';
+import { exec as ksuExec, toast, getPackagesInfo } from 'kernelsu';
 
 const CONFIG_FILE_PATH = "/data/adb/modules/LickingT/thermal.conf";
 const PORN_ARCHIVE_PATH = "/data/adb/modules/LickingT/PornArchive/PornCategories.txt";
@@ -86,7 +86,7 @@ async function updateBannerIndicators() {
     const state = await exec(`cat ${STATUS_FILE_PATH} || echo "Unknown"`);
     if (state.trim() === "Horny") {
       statusEl.innerText = currentTranslations.statusActive || "Working ✨";
-      statusEl.style.color = "var(--primary)";
+      statusEl.style.color = "var(--primary, #D0BCFF)";
     } else if (state.trim() === "NotHorny") {
       statusEl.innerText = currentTranslations.statusBalanced || "Balanced 😴";
       statusEl.style.color = "white";
@@ -164,12 +164,62 @@ async function loadAppsData() {
   try {
     const content = await exec(`cat ${PORN_ARCHIVE_PATH} || true`);
     activePackages = new Set(content.split('\n').map(l => l.trim()).filter(Boolean));
-    const pkgList = await listPackages("user");
-    cachedApps = await getPackagesInfo(pkgList);
+
+    const t = await exec("pm list packages -3");
+    let thirdPartyPkgs = new Set();
+    if (t) {
+        t.split("\n").forEach(e => {
+            const pkg = e.replace("package:", "").trim();
+            if (pkg) thirdPartyPkgs.add(pkg);
+        });
+    }
+
+    const allPkgsOut = await exec("pm list packages -U");
+    let rawPackages = [];
+
+    if (allPkgsOut) {
+        allPkgsOut.split("\n").forEach(line => {
+            const match = line.match(/^package:(.+)\s+uid:(\d+)$/);
+            if (match) {
+                rawPackages.push({
+                    packageName: match[1],
+                    uid: match[2],
+                    appLabel: match[1]
+                });
+            }
+        });
+    }
+
+    await Promise.all(rawPackages.map(async (pkgObj) => {
+        try {
+            const query = JSON.stringify([pkgObj.packageName]);
+            let info = await getPackagesInfo(query);
+
+            if (typeof info === 'string') {
+                info = JSON.parse(info);
+            }
+
+            if (Array.isArray(info) && info.length > 0) {
+                const appData = info[0];
+                const label = appData.appLabel || appData.label || appData.appName;
+                if (label) {
+                    pkgObj.appLabel = label;
+                }
+            }
+        } catch (err) {}
+    }));
+
+    cachedApps = [];
+    rawPackages.forEach(pkg => {
+        if (thirdPartyPkgs.has(pkg.packageName)) {
+            cachedApps.push(pkg);
+        }
+    });
+
     renderAppList();
   } catch(e) {
     const container = document.getElementById("appList");
-    if(container) container.innerHTML = `<div style="color:#ff6b6b; padding:1rem; text-align:center;">Error: ${e.message}</div>`;
+    if(container) container.innerHTML = `<div style="color:#ff6b6b; padding:1rem; text-align:center;">Error loading apps: ${e.message}</div>`;
   }
 }
 
@@ -196,53 +246,101 @@ function renderAppList() {
 
   container.innerHTML = "";
   if (filtered.length === 0) {
-    container.innerHTML = `<div style='text-align:center; padding: 2rem; color: var(--onSurfaceVariant); font-size: 0.85rem;'>${currentTranslations.noApps || "No apps found."}</div>`;
+    container.innerHTML = `<div style='text-align:center; padding: 2rem; color: var(--onSurfaceVariant, #CAC4D0); font-size: 0.85rem;'>${currentTranslations.noApps || "No apps found."}</div>`;
     return;
   }
 
   const fragment = document.createDocumentFragment();
-  filtered.forEach(info => {
-    const pkg = info.packageName;
-    const label = info.appLabel || pkg;
-    const isChecked = activePackages.has(pkg);
-    
-    const item = document.createElement('label');
-    item.className = 'isolate-app-item cursor-pointer';
-    
-    const fallbackSvg = "data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2379747E%22 stroke-width=%221.5%22%3e%3cpath d=%22M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z%22/%3e%3ccircle cx=%2212%22 cy=%2212%22 r=%223%22/%3e%3c/svg%3e";
 
-    item.innerHTML = `
-      <div class="isolate-content-wrapper">
-        <img src="ksu://icon/${pkg}" class="isolate-app-icon" alt="icon" onerror="this.src='${fallbackSvg}'">
-        <div class="isolate-text-group">
-          <span class="isolate-app-label" style="${isChecked ? 'color: var(--primary);' : ''}">${label}</span>
-          <span class="isolate-app-pkg">${pkg}</span>
-        </div>
-      </div>
-      <div class="custom-switch">
-        <input type="checkbox" class="app-switch sr-only" data-pkg="${pkg}" ${isChecked ? 'checked' : ''}>
-        <span class="switch-slider"></span>
-      </div>
-    `;
+  filtered.forEach(pkg => {
+    const isChecked = activePackages.has(pkg.packageName);
+    const labelText = pkg.appLabel || pkg.packageName;
     
-    const checkbox = item.querySelector('.app-switch');
-    checkbox.addEventListener('change', async (e) => {
-      try {
-        if (e.target.checked) activePackages.add(pkg);
-        else activePackages.delete(pkg);
-        
-        const cleanWrite = Array.from(activePackages).join('\n');
-        await exec(`printf %s '${cleanWrite.replace(/'/g,"'\\''")}' > ${PORN_ARCHIVE_PATH}`);
-        toast(e.target.checked ? `➕ ${label}` : `➖ ${label}`);
-        renderAppList();
-      } catch(err) { 
-        toast(`Failed to save: ${err.message}`); 
-        e.target.checked = !e.target.checked; 
-      }
+    const item = document.createElement('div');
+    item.className = 'isolate-app-item';
+    
+    const wrapper = document.createElement('div');
+    wrapper.className = 'isolate-content-wrapper';
+    
+    const img = document.createElement('img');
+    img.className = 'isolate-app-icon';
+    img.src = `ksu://icon/${pkg.packageName}`;
+    img.alt = 'icon';
+
+    img.onerror = async () => {
+        if (img.dataset.fallbackAttempted) return;
+        img.dataset.fallbackAttempted = "true";
+        try {
+            if (window.ksu && typeof window.ksu.getPackagesIcons === 'function') {
+                let result = window.ksu.getPackagesIcons(JSON.stringify([pkg.packageName]));
+                if (result instanceof Promise) result = await result;
+                if (result) {
+                    const icons = typeof result === 'string' ? JSON.parse(result) : result;
+                    if (icons && icons[pkg.packageName]) {
+                       img.src = "data:image/png;base64," + icons[pkg.packageName];
+                       return;
+                    }
+                }
+            }
+        } catch(e) {}
+        img.src = "data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%2379747E%22 stroke-width=%221.5%22%3e%3cpath d=%22M4 6a2 2 0 012-2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V6z%22/%3e%3ccircle cx=%2212%22 cy=%2212%22 r=%223%22/%3e%3c/svg%3e";
+    };
+
+    const textGroup = document.createElement('div');
+    textGroup.className = 'isolate-text-group';
+
+    const labelEl = document.createElement('span');
+    labelEl.className = 'isolate-app-label';
+    labelEl.textContent = labelText;
+    if (isChecked) labelEl.style.color = "var(--primary, #D0BCFF)";
+
+    const pkgEl = document.createElement('span');
+    pkgEl.className = 'isolate-app-pkg';
+    pkgEl.textContent = pkg.packageName;
+
+    textGroup.appendChild(labelEl);
+    textGroup.appendChild(pkgEl);
+
+    wrapper.appendChild(img);
+    wrapper.appendChild(textGroup);
+
+    const switchLabel = document.createElement('label');
+    switchLabel.className = 'custom-switch';
+
+    const input = document.createElement('input');
+    input.type = 'checkbox';
+    input.className = 'app-switch';
+    input.checked = isChecked;
+
+    const slider = document.createElement('span');
+    slider.className = 'switch-slider';
+
+    switchLabel.appendChild(input);
+    switchLabel.appendChild(slider);
+
+    input.addEventListener('change', async () => {
+        try {
+            if (input.checked) {
+                activePackages.add(pkg.packageName);
+            } else {
+                activePackages.delete(pkg.packageName);
+            }
+            
+            const cleanWrite = Array.from(activePackages).join('\n');
+            await exec(`printf %s '${cleanWrite.replace(/'/g,"'\\''")}' > ${PORN_ARCHIVE_PATH}`);
+            toast(input.checked ? `➕ ${labelText}` : `➖ ${labelText}`);
+            renderAppList();
+        } catch (err) {
+            toast(`Failed to save: ${err.message}`);
+            input.checked = !input.checked;
+        }
     });
-    
+
+    item.appendChild(wrapper);
+    item.appendChild(switchLabel);
     fragment.appendChild(item);
   });
+
   container.appendChild(fragment);
 }
 
@@ -254,8 +352,7 @@ function updateSliderProgress(slider) {
   const max = parseFloat(slider.max) || 45;
   const percentage = ((value - min) / (max - min)) * 100;
   
-  // FIX WARNA ABU-ABU: Berikan warna langsung ke property style.background
-  slider.style.background = `linear-gradient(to right, var(--primaryContainer) ${percentage}%, var(--surfaceContainerHighest) ${percentage}%)`;
+  slider.style.background = `linear-gradient(to right, var(--primaryContainer, #4F378B) ${percentage}%, var(--surfaceContainerHighest, #36343B) ${percentage}%)`;
 }
 
 async function initBatterySpoof() {
@@ -269,7 +366,7 @@ async function initBatterySpoof() {
       valDisplay.innerText = val + "°C"; 
       updateSliderProgress(slider);
     } else if (slider) {
-      updateSliderProgress(slider); // Fallback color update if script failed reading
+      updateSliderProgress(slider);
     }
   } catch(e) {}
 }
@@ -366,7 +463,6 @@ function init() {
 
   document.getElementById("app-search")?.addEventListener("input", renderAppList);
 
-  updateDeviceInfo();
   updateExtraCard();
   updateThermalPolicies();
   loadAppsData();
