@@ -25,7 +25,7 @@
       <span class="brand-text">Licking Thermal</span>
     </div>
     <button class="icon-button" id="btn-language">
-      <span class="material-symbols-outlined">Language</span>
+      <span class="material-symbols-outlined">translate</span>
     </button>
   </header>
 
@@ -33,31 +33,8 @@
     
     <div class="banner">
       <img src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%231a1b22\'/></svg>'">
-      <div id="status-indicator" class="banner-chip chip-left" style="color: var(--primary);">Loading...</div>
+      <div id="status-indicator" class="banner-chip chip-left" style="color: var(--primary, #D0BCFF);">Loading...</div>
       <div id="pid-indicator" class="banner-chip chip-right">PID: NULL</div>
-    </div>
-
-    <div class="device-info-card">
-      <div class="device-info-item">
-        <div class="device-info-label"><span class="material-symbols-outlined">stars</span> <span data-i18n="moduleVer">Module Version</span></div>
-        <div class="device-info-value" id="module-version" style="color: var(--primary);">Loading...</div>
-      </div>
-      <div class="device-info-item">
-        <div class="device-info-label"><span class="material-symbols-outlined">smartphone</span> <span data-i18n="deviceModel">Device Model</span></div>
-        <div class="device-info-value" id="device-model">Loading...</div>
-      </div>
-      <div class="device-info-item">
-        <div class="device-info-label"><span class="material-symbols-outlined">android</span> <span data-i18n="androidVer">Android Version</span></div>
-        <div class="device-info-value" id="device-android">Loading...</div>
-      </div>
-      <div class="device-info-item">
-        <div class="device-info-label"><span class="material-symbols-outlined">memory</span> <span data-i18n="kernel">Kernel</span></div>
-        <div class="device-info-value" id="device-kernel" style="text-align: right; max-width: 50%;">Loading...</div>
-      </div>
-      <div class="device-info-item">
-        <div class="device-info-label"><span class="material-symbols-outlined">laptop_mac</span> <span data-i18n="chipset">Chipset</span></div>
-        <div class="device-info-value" id="device-chipset" style="text-align: right; max-width: 50%;">Loading...</div>
-      </div>
     </div>
 
     <div class="card">
@@ -120,14 +97,14 @@
 
     <div class="card support-card" id="btn-support" style="margin-bottom: 2rem;">
       <div class="flex items-center" style="gap: 16px;">
-        <div class="card-icon" style="background-color: var(--primaryContainer); color: var(--onPrimaryContainer);">
+        <div class="card-icon" style="background-color: var(--primaryContainer, #4F378B); color: var(--onPrimaryContainer, #EADDFF);">
           <span class="material-symbols-outlined">favorite</span>
         </div>
         <div>
-          <h3 style="margin: 0 0 4px; font-size: 1rem; color: var(--onSurface);" data-i18n="supportTitle">Support & Thanks</h3>
+          <h3 style="margin: 0 0 4px; font-size: 1rem; color: var(--onSurface, #E6E1E5);" data-i18n="supportTitle">Support & Thanks</h3>
           <span class="text-sss" style="margin: 0;" data-i18n="supportDesc">Click here to support the project or get updates!</span>
         </div>
-        <span class="material-symbols-outlined" style="margin-left: auto; color: var(--onSurfaceVariant);">chevron_right</span>
+        <span class="material-symbols-outlined" style="margin-left: auto; color: var(--onSurfaceVariant, #CAC4D0);">chevron_right</span>
       </div>
     </div>
   </main>
@@ -135,7 +112,7 @@
   <main id="gameListMenu" class="menu-panel kanjud">
     <input type="text" id="app-search" data-i18n="searchPlaceholder" placeholder="Search apps..." class="app-search-input" style="margin-top: 1rem;">
     <div id="appList">
-      <div style="text-align: center; padding: 2rem 0; color: var(--onSurfaceVariant); font-size: 0.85rem;" data-i18n="loadingApps">Looking for apps...</div>
+      <div style="text-align: center; padding: 2rem 0; color: var(--onSurfaceVariant, #CAC4D0); font-size: 0.85rem;" data-i18n="loadingApps">Looking for apps...</div>
     </div>
   </main>
 
@@ -151,7 +128,7 @@
   <div class="modal-overlay" id="languageDialog">
     <div class="language-dialog-container">
       <div class="language-header">
-        <h3 style="margin: 0; font-size: 1.1rem; color: var(--onSurface);" data-i18n="selectLang">Select Language</h3>
+        <h3 style="margin: 0; font-size: 1.1rem; color: var(--onSurface, #E6E1E5);" data-i18n="selectLang">Select Language</h3>
         <button class="icon-button" id="closeLangDialog" style="margin: 0;">
           <span class="material-symbols-outlined">close</span>
         </button>
@@ -163,11 +140,11 @@
         <div class="language-option" data-lang="id">
           <span>Bahasa Indonesia</span> <span class="material-symbols-outlined check-icon">check_circle</span>
         </div>
-        <div class="language-option" data-lang="jv">
-          <span>Basa Jawa</span> <span class="material-symbols-outlined check-icon">check_circle</span>
-        </div>
         <div class="language-option" data-lang="ja">
           <span>日本語</span> <span class="material-symbols-outlined check-icon">check_circle</span>
+        </div>
+        <div class="language-option" data-lang="jv">
+          <span>Basa Jawa</span> <span class="material-symbols-outlined check-icon">check_circle</span>
         </div>
       </div>
     </div>
@@ -190,8 +167,8 @@
       </div>
       <div class="dev-modal-content">
         <img src="assets/shit.jpg" alt="Dev" class="dev-modal-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'72\' height=\'72\'><circle cx=\'36\' cy=\'36\' r=\'36\' fill=\'%23333\'/></svg>'">
-        <h3 style="margin: 10px 0 4px; font-size: 1.25rem; font-weight: 700; color: var(--onSurface);">@fuckyoustan</h3>
-        <p style="margin: 0 0 20px; font-size: 0.85rem; color: var(--onSurfaceVariant); line-height: 1.5;" data-i18n="devDescFull">
+        <h3 style="margin: 10px 0 4px; font-size: 1.25rem; font-weight: 700; color: var(--onSurface, #E6E1E5);">@fuckyoustan</h3>
+        <p style="margin: 0 0 20px; font-size: 0.85rem; color: var(--onSurfaceVariant, #CAC4D0); line-height: 1.5;" data-i18n="devDescFull">
           System Modifier & WebUI Developer. I create things that make your device run smoother and hotter.
         </p>
         <div class="flex items-center justify-between" style="gap: 12px;">
@@ -208,4 +185,4 @@
 
   <script type="module" src="assets/script.js"></script>
 </body>
-  </html>
+</html>
