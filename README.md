@@ -1,4 +1,4 @@
-![LickingT](https://raw.githubusercontent.com/fuckyoustan/Licking-Thermal/refs/heads/main/banner.jpeg)
+![LickingT](https://raw.githubusercontent.com/fuckyoustan/Licking-Thermal/refs/heads/main/banner.jpg)
 
 ## Licking Thermal 💦
 
