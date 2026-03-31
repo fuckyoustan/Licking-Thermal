@@ -1,10 +1,10 @@
 import { exec as ksuExec, toast, getPackagesInfo } from 'kernelsu';
 
 const CONFIG_FILE_PATH = "/data/adb/modules/LickingT/thermal.conf";
-const PORN_ARCHIVE_PATH = "/data/adb/modules/LickingT/PornArchive/PornCategories.txt";
+const PORN_ARCHIVE_PATH = "/data/adb/modules/LickingT/PornCategories.txt";
+const APP_CONFIGS_PATH = "/data/adb/modules/LickingT/AppConfigs.txt"; 
 const STATUS_FILE_PATH = "/data/adb/modules/LickingT/CurrentState";
 const SERVICE_FILE_PATH = "/data/adb/modules/LickingT/service.sh";
-const SPOOF_STATE_PATH = "/data/adb/modules/LickingT/battery_spoof_state";
 
 /* === I18N (TRANSLATION) === */
 let currentTranslations = {};
@@ -12,8 +12,7 @@ let currentTranslations = {};
 const infoContentFallback = {
   aggressive: { title: "Aggressive Mode", text: "Highly recommended for a performance boost." },
   modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on." },
-  zonePolicy: { title: "Thermal Policy", text: "Sets how the system reacts to temps." },
-  batterySpoof: { title: "Battery Spoofing", text: "⚠️ Fakes battery temp. Use while gaming only!" }
+  zonePolicy: { title: "Thermal Policy", text: "Sets how the system reacts to temps." }
 };
 
 async function loadLanguage(lang) {
@@ -102,24 +101,21 @@ async function updateBannerIndicators() {
   } catch(e) {}
 }
 
-async function updateDeviceInfo() {
-  try {
-    const ver = await exec("grep '^version=' /data/adb/modules/LickingT/module.prop 2>/dev/null || echo 'version=Unknown'");
-    document.getElementById("module-version").innerText = ver.replace("version=", "").trim();
-    document.getElementById("device-model").innerText = await exec("getprop ro.product.model || true") || "Unknown";
-    document.getElementById("device-android").innerText = await exec("getprop ro.build.version.release || true") || "Unknown";
-    document.getElementById("device-kernel").innerText = await exec("uname -r || true");
-    document.getElementById("device-chipset").innerText = await exec("getprop ro.board.platform || getprop ro.hardware.chipname || true");
-  } catch(e) {}
-}
-
 async function setConfigValue(key, value) {
   try {
-    const tmp = `/data/local/tmp/${key}_temp.conf`;
-    await exec(`grep -v '^${key}=' ${CONFIG_FILE_PATH} > ${tmp} && mv ${tmp} ${CONFIG_FILE_PATH} || true`);
-    await exec(`echo '${key}=${value}' >> ${CONFIG_FILE_PATH}`);
+    const cmd = `
+      if [ ! -f "${CONFIG_FILE_PATH}" ]; then touch "${CONFIG_FILE_PATH}"; fi;
+      if grep -q "^${key}=" "${CONFIG_FILE_PATH}"; then
+        sed -i "s/^${key}=.*/${key}=${value}/" "${CONFIG_FILE_PATH}"
+      else
+        echo "${key}=${value}" >> "${CONFIG_FILE_PATH}"
+      fi
+    `;
+    await exec(cmd);
     toast(currentTranslations.toastSaved || `Saved successfully`);
-  } catch(e) { toast(`Failed: ${e.message}`); }
+  } catch(e) { 
+    toast(`Failed: ${e.message}`); 
+  }
 }
 
 async function updateExtraCard() {
@@ -139,15 +135,25 @@ async function updateExtraCard() {
   } catch(e) {}
 }
 
-async function updateThermalPolicies() {
+/* === THERMAL POLICIES === */
+let globalPolicies = ["stepwise"]; 
+
+async function fetchThermalPolicies() {
+  try {
+    const avail = await exec("cat /sys/class/thermal/thermal_zone0/available_policies");
+    globalPolicies = avail.split(/\s+/).filter(p => p);
+  } catch(e) {
+    globalPolicies = ["stepwise", "userspace", "power_allocator"];
+  }
+}
+
+async function updateThermalPoliciesUI() {
   const select = document.getElementById("policy-select");
   if (!select) return;
   try {
-    const avail = await exec("cat /sys/class/thermal/thermal_zone0/available_policies");
     const curr = await exec("cat /sys/class/thermal/thermal_zone0/policy");
-    const policies = avail.split(/\s+/).filter(p => p);
     select.innerHTML = "";
-    policies.forEach(p => {
+    globalPolicies.forEach(p => {
       const opt = document.createElement("option");
       opt.value = p; opt.text = p;
       if(p === curr.trim()) opt.selected = true;
@@ -156,14 +162,48 @@ async function updateThermalPolicies() {
   } catch(e) { select.innerHTML = "<option value=''>Not supported</option>"; }
 }
 
-/* === APP LIST === */
+/* === APP LIST & PER-APP CONFIG === */
 let cachedApps = [];
 let activePackages = new Set();
+let appConfigs = {}; 
+let currentEditingPkg = null;
+
+async function saveAppConfigs() {
+  let customLines = [];
+  for (const pkg of activePackages) {
+    const conf = appConfigs[pkg];
+    if (conf && conf.isCustomized) {
+      customLines.push(`${pkg}:${conf.agg ? '1' : '0'}:${conf.policy}`);
+    }
+  }
+  
+  const cleanCustomWrite = customLines.join('\n');
+  const cleanPornWrite = Array.from(activePackages).join('\n');
+  
+  try {
+    await exec(`printf %s '${cleanCustomWrite.replace(/'/g,"'\\''")}' > ${APP_CONFIGS_PATH}`);
+    await exec(`printf %s '${cleanPornWrite.replace(/'/g,"'\\''")}' > ${PORN_ARCHIVE_PATH}`);
+  } catch (err) {
+    toast(`Failed to save config: ${err.message}`);
+  }
+}
 
 async function loadAppsData() {
   try {
     const content = await exec(`cat ${PORN_ARCHIVE_PATH} || true`);
     activePackages = new Set(content.split('\n').map(l => l.trim()).filter(Boolean));
+
+    const configContent = await exec(`cat ${APP_CONFIGS_PATH} || true`);
+    configContent.split('\n').forEach(line => {
+      const parts = line.trim().split(':');
+      if (parts.length === 3) {
+        appConfigs[parts[0]] = {
+          agg: parts[1] === '1',
+          policy: parts[2],
+          isCustomized: true
+        };
+      }
+    });
 
     const t = await exec("pm list packages -3");
     let thirdPartyPkgs = new Set();
@@ -194,26 +234,18 @@ async function loadAppsData() {
         try {
             const query = JSON.stringify([pkgObj.packageName]);
             let info = await getPackagesInfo(query);
-
-            if (typeof info === 'string') {
-                info = JSON.parse(info);
-            }
-
+            if (typeof info === 'string') info = JSON.parse(info);
             if (Array.isArray(info) && info.length > 0) {
                 const appData = info[0];
                 const label = appData.appLabel || appData.label || appData.appName;
-                if (label) {
-                    pkgObj.appLabel = label;
-                }
+                if (label) pkgObj.appLabel = label;
             }
         } catch (err) {}
     }));
 
     cachedApps = [];
     rawPackages.forEach(pkg => {
-        if (thirdPartyPkgs.has(pkg.packageName)) {
-            cachedApps.push(pkg);
-        }
+        if (thirdPartyPkgs.has(pkg.packageName)) cachedApps.push(pkg);
     });
 
     renderAppList();
@@ -256,6 +288,10 @@ function renderAppList() {
     const isChecked = activePackages.has(pkg.packageName);
     const labelText = pkg.appLabel || pkg.packageName;
     
+    if (!appConfigs[pkg.packageName]) {
+      appConfigs[pkg.packageName] = { agg: false, policy: globalPolicies[0] || 'stepwise', isCustomized: false };
+    }
+    
     const item = document.createElement('div');
     item.className = 'isolate-app-item';
     
@@ -292,90 +328,73 @@ function renderAppList() {
     const labelEl = document.createElement('span');
     labelEl.className = 'isolate-app-label';
     labelEl.textContent = labelText;
-    if (isChecked) labelEl.style.color = "var(--primary, #D0BCFF)";
 
     const pkgEl = document.createElement('span');
     pkgEl.className = 'isolate-app-pkg';
     pkgEl.textContent = pkg.packageName;
 
-    textGroup.appendChild(labelEl);
-    textGroup.appendChild(pkgEl);
+    textGroup.append(labelEl, pkgEl);
+    
+    if (isChecked) {
+      const badge = document.createElement('span');
+      badge.className = 'app-badge-enabled';
+      badge.textContent = 'ENABLED';
+      textGroup.appendChild(badge);
+    }
 
-    wrapper.appendChild(img);
-    wrapper.appendChild(textGroup);
+    wrapper.append(img, textGroup);
 
-    const switchLabel = document.createElement('label');
-    switchLabel.className = 'custom-switch';
+    const chevron = document.createElement('span');
+    chevron.className = 'material-symbols-outlined chevron-right';
+    chevron.textContent = 'chevron_right';
 
-    const input = document.createElement('input');
-    input.type = 'checkbox';
-    input.className = 'app-switch';
-    input.checked = isChecked;
+    item.append(wrapper, chevron);
 
-    const slider = document.createElement('span');
-    slider.className = 'switch-slider';
-
-    switchLabel.appendChild(input);
-    switchLabel.appendChild(slider);
-
-    input.addEventListener('change', async () => {
-        try {
-            if (input.checked) {
-                activePackages.add(pkg.packageName);
-            } else {
-                activePackages.delete(pkg.packageName);
-            }
-            
-            const cleanWrite = Array.from(activePackages).join('\n');
-            await exec(`printf %s '${cleanWrite.replace(/'/g,"'\\''")}' > ${PORN_ARCHIVE_PATH}`);
-            toast(input.checked ? `➕ ${labelText}` : `➖ ${labelText}`);
-            renderAppList();
-        } catch (err) {
-            toast(`Failed to save: ${err.message}`);
-            input.checked = !input.checked;
-        }
+    item.addEventListener('click', () => {
+      openGameSettings(pkg, isChecked, img.src);
     });
 
-    item.appendChild(wrapper);
-    item.appendChild(switchLabel);
     fragment.appendChild(item);
   });
 
   container.appendChild(fragment);
 }
 
-/* === BATTERY SPOOFING SLIDER === */
-function updateSliderProgress(slider) {
-  if(!slider) return;
-  const value = parseFloat(slider.value);
-  const min = parseFloat(slider.min) || 1;
-  const max = parseFloat(slider.max) || 45;
-  const percentage = ((value - min) / (max - min)) * 100;
-  
-  slider.style.background = `linear-gradient(to right, var(--primaryContainer, #4F378B) ${percentage}%, var(--surfaceContainerHighest, #36343B) ${percentage}%)`;
-}
+function openGameSettings(pkg, isChecked, iconSrc) {
+  currentEditingPkg = pkg.packageName;
+  const conf = appConfigs[pkg.packageName];
 
-async function initBatterySpoof() {
-  try {
-    const savedVal = await exec(`cat ${SPOOF_STATE_PATH} 2>/dev/null || echo "1"`);
-    const val = parseInt(savedVal.trim());
-    const slider = document.getElementById("battery-spoof-slider");
-    const valDisplay = document.getElementById("battery-spoof-val");
-    if (!isNaN(val) && val >= 1 && val <= 45 && slider && valDisplay) { 
-      slider.value = val; 
-      valDisplay.innerText = val + "°C"; 
-      updateSliderProgress(slider);
-    } else if (slider) {
-      updateSliderProgress(slider);
-    }
-  } catch(e) {}
+  document.getElementById('as-app-name').textContent = pkg.appLabel || pkg.packageName;
+  document.getElementById('as-app-pkg').textContent = pkg.packageName;
+  document.getElementById('as-app-icon').src = iconSrc;
+
+  document.getElementById('as-main-switch').checked = isChecked;
+  document.getElementById('as-agg-switch').checked = conf.agg;
+  
+  const customSwitch = document.getElementById('as-custom-switch');
+  customSwitch.checked = conf.isCustomized;
+  
+  const group = document.getElementById('custom-config-group');
+  if (conf.isCustomized) group.classList.remove('disabled-group');
+  else group.classList.add('disabled-group');
+
+  const policySelect = document.getElementById('as-policy-select');
+  policySelect.innerHTML = "";
+  globalPolicies.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p; opt.text = p;
+    if (p === conf.policy) opt.selected = true;
+    policySelect.appendChild(opt);
+  });
+
+  document.getElementById('appSettingsOverlay').classList.add('active');
 }
 
 
 /* =========================================
    INISIALISASI AMAN
 ========================================= */
-function init() {
+async function init() {
   const savedLang = localStorage.getItem('licking_lang') || 'en';
   loadLanguage(savedLang);
 
@@ -426,47 +445,70 @@ function init() {
     if(!e.target.value) return;
     try {
       await exec(`for z in /sys/class/thermal/thermal_zone*; do chmod 644 "$z/policy"; echo "${e.target.value}" > "$z/policy"; done`);
-      toast(currentTranslations.toastSaved || `Policy updated`);
-    } catch(err) { toast(`Failed: ${err.message}`); }
-  });
-
-  const batterySlider = document.getElementById("battery-spoof-slider");
-  const valDisplay = document.getElementById('battery-spoof-val');
-  
-  batterySlider?.addEventListener("input", (e) => {
-    if(valDisplay) valDisplay.innerText = e.target.value + '°C';
-    updateSliderProgress(e.target);
-  });
-
-  document.getElementById("btn-apply")?.addEventListener("click", async () => {
-    if(!batterySlider) return;
-    const val = batterySlider.value;
-    try {
-      await exec(`cmd battery set -f temp ${parseInt(val) * 10} 2>/dev/null`);
-      await exec(`echo "${val}" > ${SPOOF_STATE_PATH}`);
-      toast(currentTranslations.toastSpoofed ? currentTranslations.toastSpoofed.replace("{val}", val) : `Battery locked at ${val}°C`);
-    } catch(e) { toast(`Spoof error: ${e.message}`); }
-  });
-
-  document.getElementById("btn-reset")?.addEventListener("click", async () => {
-    try {
-      await exec("cmd battery reset");
-      await exec(`rm -f ${SPOOF_STATE_PATH} 2>/dev/null`);
-      if(batterySlider) {
-        batterySlider.value = 1;
-        updateSliderProgress(batterySlider);
-      }
-      if(valDisplay) valDisplay.innerText = "1°C";
-      toast(currentTranslations.toastReset || "Battery temp is back to normal");
-    } catch(e) { toast("Reset error"); }
+      await exec(`echo "${e.target.value}" > /data/adb/modules/LickingT/zpolicy`);
+      toast(currentTranslations.toastSaved || `Policy saved and updated`);
+    } catch(err) { 
+      toast(`Failed: ${err.message}`); 
+    }
   });
 
   document.getElementById("app-search")?.addEventListener("input", renderAppList);
 
+  // --- EVENT LISTENERS UNTUK OVERLAY SETTINGS ---
+  document.getElementById('btn-close-settings')?.addEventListener('click', () => {
+    document.getElementById('appSettingsOverlay').classList.remove('active');
+    currentEditingPkg = null;
+    renderAppList(); 
+  });
+
+  document.getElementById('as-main-switch')?.addEventListener('change', async (e) => {
+    if(!currentEditingPkg) return;
+    try {
+      if (e.target.checked) activePackages.add(currentEditingPkg);
+      else activePackages.delete(currentEditingPkg);
+      
+      await saveAppConfigs(); 
+      toast(e.target.checked ? `Enabled for this app` : `Disabled for this app`);
+    } catch (err) {
+      toast(`Failed: ${err.message}`);
+      e.target.checked = !e.target.checked;
+    }
+  });
+
+  document.getElementById('as-custom-switch')?.addEventListener('change', async (e) => {
+    if(!currentEditingPkg) return;
+    const isCustom = e.target.checked;
+    appConfigs[currentEditingPkg].isCustomized = isCustom;
+    
+    const group = document.getElementById('custom-config-group');
+    if (isCustom) group.classList.remove('disabled-group');
+    else group.classList.add('disabled-group');
+    
+    await saveAppConfigs();
+    toast(isCustom ? `Custom settings unlocked` : `Using global settings`);
+  });
+
+  document.getElementById('as-agg-switch')?.addEventListener('change', async (e) => {
+    if(!currentEditingPkg) return;
+    appConfigs[currentEditingPkg].agg = e.target.checked;
+    appConfigs[currentEditingPkg].isCustomized = true;
+    await saveAppConfigs();
+    toast(`Aggressive Mode ${e.target.checked ? 'ON' : 'OFF'}`);
+  });
+
+  document.getElementById('as-policy-select')?.addEventListener('change', async (e) => {
+    if(!currentEditingPkg) return;
+    appConfigs[currentEditingPkg].policy = e.target.value;
+    appConfigs[currentEditingPkg].isCustomized = true;
+    await saveAppConfigs();
+    toast(`Policy updated to ${e.target.value}`);
+  });
+
   updateExtraCard();
-  updateThermalPolicies();
+  await fetchThermalPolicies();
+  updateThermalPoliciesUI();
+  
   loadAppsData();
-  initBatterySpoof();
   updateBannerIndicators();
   
   setInterval(updateBannerIndicators, 5000);
@@ -476,4 +518,4 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();
-}
+    }
