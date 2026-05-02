@@ -54,6 +54,19 @@
             <span class="switch-slider"></span>
           </label>
         </div>
+        
+        <div class="setting-item setting-row">
+          <div onclick="showInfo('kernelPanic')" class="cursor-pointer setting-label-group">
+            <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;">
+              <span data-i18n="disablePanic">Disable Kernel Panic</span> 
+              <span class="material-symbols-outlined info-icon">info</span>
+            </p>
+          </div>
+          <label class="custom-switch">
+            <input type="checkbox" id="panic-switch">
+            <span class="switch-slider"></span>
+          </label>
+        </div>
 
         <div class="setting-item setting-row">
           <div onclick="showInfo('modeOptions')" class="cursor-pointer setting-label-group">
@@ -177,7 +190,7 @@
     </div>
 
     <div class="as-content">
-      <div class="as-section-title">Application</div>
+      <div class="as-section-title" data-i18n="asSectionApp">Application</div>
       
       <div class="as-app-info">
         <img src="" alt="App Icon" id="as-app-icon" class="as-icon">
@@ -189,7 +202,7 @@
 
       <div class="as-setting-row">
         <div class="as-setting-label">
-          <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);">Enable Tweaks</span>
+          <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="asEnableTweaks">Enable Tweaks</span>
         </div>
         <label class="custom-switch">
           <input type="checkbox" id="as-main-switch">
@@ -197,15 +210,15 @@
         </label>
       </div>
 
-      <div class="as-section-title" style="margin-top: 12px;">Preferences</div>
+      <div class="as-section-title" style="margin-top: 12px;" data-i18n="asSectionPref">Preferences</div>
 
       <div class="as-setting-row" style="margin-bottom: 24px;">
         <div class="card-icon" style="background: transparent; color: var(--primaryContainer, #4F378B); width: 28px; height: 28px; margin-right: 16px;">
           <span class="material-symbols-outlined" style="font-size: 28px;">settings</span>
         </div>
         <div class="as-setting-label">
-          <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);">Custom Config</span>
-          <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;">Override global thermal settings</span>
+          <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="asCustomConfig">Custom Config</span>
+          <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asCustomConfigDesc">Override global thermal settings</span>
         </div>
         <label class="custom-switch">
           <input type="checkbox" id="as-custom-switch">
@@ -219,8 +232,8 @@
             <span class="material-symbols-outlined" style="font-size: 28px;">bolt</span>
           </div>
           <div class="as-setting-label">
-            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);">Aggressive Mode</span>
-            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;">Push performance to the limit</span>
+            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="aggMode">Aggressive Mode</span>
+            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asAggModeDesc">Push performance to the limit</span>
           </div>
           <label class="custom-switch">
             <input type="checkbox" id="as-agg-switch">
@@ -233,8 +246,8 @@
             <span class="material-symbols-outlined" style="font-size: 28px;">thermostat</span>
           </div>
           <div class="as-setting-label">
-            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);">Thermal Policy</span>
-            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;">System reaction to heat</span>
+            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="thermPolicy">Thermal Policy</span>
+            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asPolicyDesc">System reaction to heat</span>
           </div>
           <div class="select-wrapper compact-select" style="width: 140px;">
             <select id="as-policy-select" class="pingpimp-select">
@@ -243,10 +256,9 @@
           </div>
         </div>
       </div>
-
     </div>
   </div>
 
   <script type="module" src="assets/script.js"></script>
 </body>
-          </html>
+</html>
