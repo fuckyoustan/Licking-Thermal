@@ -6,8 +6,8 @@ local current_perms
 for p in "$@"; do
 [ -f "$p" ] || continue
 current_perms=$(stat -c "%a" "$p" 2>/dev/null)
-if [ "$current_perms" != "666" ]; then
-chmod 666 "$p" 2>/dev/null
+if [ "$current_perms" != "644" ]; then
+chmod 644 "$p" 2>/dev/null
 fi
 printf '%s' "$val" > "$p" 2>/dev/null
 done
@@ -16,13 +16,6 @@ Siskaeee() {
 Miyabi "0" /proc/sys/kernel/sched_boost
 Miyabi "0" /sys/kernel/eara_thermal/enable
 cmd thermalservice override-status 0 2>/dev/null
-}
-comatozze() {
-for Tits in /sys/block/*/queue; do
-Miyabi "0" "$Tits/iostats"
-Miyabi "0" "$Tits/rotational"
-Miyabi "0" "$Tits/add_random"
-done
 }
 SoraAoi() {
 getprop | grep -iE 'thermal|temp|throttl' | awk -F'[][]' '{print $2}' | while read -r penis; do
@@ -37,8 +30,20 @@ resetprop -n "$penis" "$kontol" 2>/dev/null
 setprop "$penis" "$kontol" 2>/dev/null
 done
 }
-SweetyFox() {
-find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' \) -exec chmod 000 {} +
+ZONE_ARG=$(grep -i '^ZONE=' /data/adb/modules/LickingT/thermal.conf 2>/dev/null | cut -d'=' -f2)
+SweetyFox1() { 
+find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' -o -iname '*thermal*' -o -name '*name*' \) -exec chmod 000 {} + 2>/dev/null || true
+}
+SweetyFox2() {
+PUSSY="/data/adb/modules/LickingT/FuckTemp"
+if [ ! -f "$PUSSY" ]; then
+echo "30000" > "$PUSSY"
+fi
+for FuckTemp in /sys/devices/virtual/thermal/thermal_zone*/temp; do
+if [ -f "$FuckTemp" ]; then
+mount --bind "$PUSSY" "$FuckTemp"
+fi
+done
 }
 LolaTaylor() {
 for armpit in /sys/devices/virtual/thermal/thermal_zone*; do
@@ -48,9 +53,9 @@ done
 }
 EvaElfie() {
 for puki in /sys/devices/*.mali; do
-[ -e "$puki/tmu" ] && chmod 000 "$puki/tmu"
-[ -e "$puki/throttling*" ] && chmod 000 "$puki/throttling*"
-[ -e "$puki/tripping" ] && chmod 000 "$puki/tripping"
+[ -e "$puki/tmu" ] && chmod 000 "$puki/tmu" 2>/dev/null
+[ -e "$puki/throttling*" ] && chmod 000 "$puki/throttling*" 2>/dev/null
+[ -e "$puki/tripping" ] && chmod 000 "$puki/tripping" 2>/dev/null
 done
 }
 EmmaStone() {
@@ -96,7 +101,7 @@ done
 }
 SashaGrey() {
 for fuk in ignore_batt_oc ignore_batt_percent ignore_low_batt ignore_thermal_protect ignore_pbm_limited; do
-Miyabi "$fuk 1" > /proc/gpufreq/gpufreq_power_limited
+Miyabi "$fuk 1" /proc/gpufreq/gpufreq_power_limited
 done
 }
 ValentinaNappi() {
@@ -106,7 +111,12 @@ Miyabi "$idx 0" /proc/ppm/policy_status
 done
 }
 AsamiSugiura() {
-kontol=/sys/class/kgsl/kgsl-3d0
+if [ -d "/sys/class/kgsl/kgsl-3d0" ]; then
+kontol="/sys/class/kgsl/kgsl-3d0"
+elif [ -d "/sys/devices/platform/soc" ]; then
+kontol="$(find /sys/devices/platform/soc/ -type d -path "*/kgsl/kgsl-3d0" 2>/dev/null | head -n 1)"
+fi
+[ -d "$kontol" ] || return 0
 Miyabi "0" "$kontol/throttling"
 Miyabi "0" "$kontol/bus_split"
 Miyabi "0" "$kontol/max_gpuclk"
@@ -118,24 +128,27 @@ Miyabi "1" "$kontol/force_bus_on"
 Miyabi "1" "$kontol/force_clk_on"
 }
 AnnaPolina() {
-for memek in $(find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name *temp*); do
-chmod 000 $memek
+find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name '*temp*' 2>/dev/null | while read -r memek; do
+chmod 000 $memek 2>/dev/null
 done
 }
-SoraAoi
 Siskaeee
-comatozze
 Honoka
 AngelaWhite
 SashaGrey
-sleep 0.5
+sleep 1
 AsamiSugiura
 ValentinaNappi
 MariaOzawa
 EmmaStone
 Barbamiska
 LolaTaylor
-sleep 0.5
+sleep 1
 AnnaPolina
 EvaElfie
-SweetyFox
+if [ "$ZONE_ARG" = "0" ]; then
+SweetyFox2
+else
+SweetyFox1
+fi
+SoraAoi
