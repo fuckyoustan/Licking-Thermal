@@ -9,20 +9,13 @@ done
 }
 NikkiBenz() {
 for setting in ignore_batt_oc ignore_batt_percent ignore_low_batt ignore_thermal_protect ignore_pbm_limited; do
-Miyabi "$setting 0" > /proc/gpufreq/gpufreq_power_limited
+Miyabi "$setting 0" /proc/gpufreq/gpufreq_power_limited
 done
 }
 LanaRhoades() {
 Miyabi "1" /proc/sys/kernel/sched_boost
 Miyabi "1" /sys/kernel/eara_thermal/enable
-cmd thermalservice reset
-}
-comatozze() {
-for Tits in /sys/block/*/queue; do
-Miyabi "1" "$Tits/iostats"
-Miyabi "1" "$Tits/rotational"
-Miyabi "1" "$Tits/add_random"
-done
+cmd thermalservice reset 2>/dev/null
 }
 TeraPatrick() {
 vagina=/proc/cpufreq
@@ -39,7 +32,12 @@ val=$(cat "$mesum")
 done
 }
 Honoka() {
-kontol=/sys/class/kgsl/kgsl-3d0
+if [ -d "/sys/class/kgsl/kgsl-3d0" ]; then
+kontol="/sys/class/kgsl/kgsl-3d0"
+elif [ -d "/sys/devices/platform/soc" ]; then
+kontol="$(find /sys/devices/platform/soc/ -type d -path "*/kgsl/kgsl-3d0" 2>/dev/null | head -n 1)"
+fi
+[ -d "$kontol" ] || return 0
 Miyabi "1" "$kontol/throttling"
 Miyabi "1" "$kontol/bus_split"
 Miyabi "1" "$kontol/max_gpuclk"
@@ -66,8 +64,8 @@ Miyabi "1 ${t_limit}000 0 mtk-cl-kshutdown02 $no_cooler 1000" /proc/driver/therm
 fi
 }
 MiaKholifah() {
-find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name *temp* | while read -r memek; do
-chmod 644 $memek
+find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name '*temp*' 2>/dev/null | while read -r memek; do
+chmod 644 $memek 2>/dev/null
 done
 }
 SaoriHara() {
@@ -77,8 +75,18 @@ Miyabi "400" "$anal/temp_hot"
 Miyabi "380" "$anal/temp_warm"
 done
 }
-HitomiTanaka() {
-find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' \) -exec chmod 644 {} +
+CONFIG="/data/adb/modules/LickingT/thermal.conf"
+ZONE_ARG=$(grep -i '^ZONE=' "$CONFIG" 2>/dev/null | cut -d'=' -f2)
+HAL=$(grep -i '^HAL=' "$CONFIG" 2>/dev/null | cut -d'=' -f2)
+HitomiTanaka1() {
+find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' -o -iname '*thermal*' -o -name '*name*' \) -exec chmod 644 {} + 2>/dev/null || true
+}
+HitomiTanaka2() {
+for FuckTemp in /sys/devices/virtual/thermal/thermal_zone*/temp; do
+if [ -f "$FuckTemp" ]; then
+umount "$FuckTemp" 2>/dev/null
+fi
+done
 }
 AliceaFox() {
 for armpit in /sys/devices/virtual/thermal/thermal_zone*; do
@@ -113,7 +121,7 @@ Miyabi "Y" "$goth/disable_numa"
 }
 EvaAngelina() {
 find /system /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while IFS= read -r FUCK; do
-umount "$FUCK"
+umount "$FUCK" 2>/dev/null
 done
 }
 MelenaTara() {
@@ -122,48 +130,48 @@ start "$pussy"
 done
 }
 Vicca() {
-ps -e | awk '/[Tt]hermal/ {print $2}' | while read -r pedo; do
-[ -n "$pedo" ] && kill -SIGCONT "$pedo"
-done
-}
-Vicca() {
 PKG="com.xiaomi.joyose"
 if pm list packages | grep -q "$PKG"; then
-pm enable "$PKG" >/dev/null 2>&1
+cmd package install-existing "$PKG" >/dev/null 2>&1
 fi
 }
+MsBreewc() {
+for cum in $(pgrep -f '[t]hermal'); do
+kill -SIGCONT "$cum" 2>/dev/null
+done
+}
 main1() {
-HitomiTanaka
+if [ "$ZONE_ARG" = "0" ]; then
+HitomiTanaka2
+else
+HitomiTanaka1
+fi
+MikamiYua
 MiaKholifah
 AngelaWhite
-sleep 0.5
+sleep 1
 AsamiSugiura
 SaoriHara
-comatozze
 NikkiBenz
 TeraPatrick
-sleep 0.5
+sleep 1
 Honoka
 EmmaStone
 AbellaDanger
 AliceaFox
 mysaaat
-sleep 0.5
 LanaRhoades
-MikamiYua
 }
 main2() {
 EvaAngelina
+MsBreewc
 MelenaTara
-Vicca
 }
 run_main() {
-CONFIG="/data/adb/modules/LickingT/thermal.conf"
 if [ -f "$CONFIG" ]; then
-HAL=$(grep -i '^HAL=' "$CONFIG" 2>/dev/null | cut -d'=' -f2)
 if [ "$HAL" = "1" ]; then
 main2
-sleep 0.5
+sleep 1
 main1
 return
 fi
