@@ -13,7 +13,8 @@ const infoContentFallback = {
   aggressive: { title: "Aggressive Mode", text: "Highly recommended for a performance boost." },
   modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on." },
   zonePolicy: { title: "Thermal Policy", text: "Sets how the system reacts to temps." },
-  kernelPanic: { title: "Disable Kernel Panic", text: "Turn off kernel panic to solve random reboot problems or other things." }
+  thermalZone: { title: "Thermal Zone", text: "Disable: Disable thermal zone spoofing.\nSpoof to 30°C: Spoof thermal zone temperature to 30°C." },
+  kernelPanic: { title: "Disable Kernel Panic", text: "Prevents random reboots by ignoring minor system crashes. Useful for fixing stability issues." }
 };
 
 async function loadLanguage(lang) {
@@ -122,24 +123,25 @@ async function setConfigValue(key, value) {
 async function updateExtraCard() {
   try {
     const out = await exec(`cat ${CONFIG_FILE_PATH} || true`);
-    let mode = "automatic", hal = "0", disablePanic = "0"; // Tambahkan variabel default untuk panic
+    let mode = "automatic", hal = "0", disablePanic = "0", zone = "1";
     
     out.split("\n").forEach(l => {
       const t = l.trim();
       if(t.startsWith("MODE=")) mode = t.replace("MODE=","").trim().toLowerCase() === "auto" ? "automatic" : "static";
       if(t.startsWith("HAL=")) hal = t.replace("HAL=","").trim();
-      // Baca baris konfigurasi DISABLE_PANIC
-      if(t.startsWith("DISABLE_PANIC=")) disablePanic = t.replace("DISABLE_PANIC=","").trim(); 
+      if(t.startsWith("DISABLE_PANIC=")) disablePanic = t.replace("DISABLE_PANIC=","").trim();
+      if(t.startsWith("ZONE=")) zone = t.replace("ZONE=","").trim(); 
     });
     
     const modeSelect = document.getElementById("mode-select");
     const halSwitch = document.getElementById("hal-switch");
-    const panicSwitch = document.getElementById("panic-switch"); // Ambil elemen toggle panic
+    const panicSwitch = document.getElementById("panic-switch");
+    const zoneSelect = document.getElementById("zone-select");
     
     if(modeSelect) modeSelect.value = mode;
     if(halSwitch) halSwitch.checked = (hal === "1");
-    // Sesuaikan status toggle dengan data yang tersimpan
-    if(panicSwitch) panicSwitch.checked = (disablePanic === "1"); 
+    if(panicSwitch) panicSwitch.checked = (disablePanic === "1");
+    if(zoneSelect) zoneSelect.value = zone; 
   } catch(e) {}
 }
 
@@ -181,7 +183,7 @@ async function saveAppConfigs() {
   for (const pkg of activePackages) {
     const conf = appConfigs[pkg];
     if (conf && conf.isCustomized) {
-      customLines.push(`${pkg}:${conf.agg ? '1' : '0'}:${conf.policy}`);
+      customLines.push(`${pkg}:${conf.agg ? '1' : '0'}:${conf.policy}:${conf.zone || '1'}`);
     }
   }
   
@@ -208,6 +210,14 @@ async function loadAppsData() {
         appConfigs[parts[0]] = {
           agg: parts[1] === '1',
           policy: parts[2],
+          zone: '1',
+          isCustomized: true
+        };
+      } else if (parts.length === 4) {
+        appConfigs[parts[0]] = {
+          agg: parts[1] === '1',
+          policy: parts[2],
+          zone: parts[3],
           isCustomized: true
         };
       }
@@ -297,7 +307,7 @@ function renderAppList() {
     const labelText = pkg.appLabel || pkg.packageName;
     
     if (!appConfigs[pkg.packageName]) {
-      appConfigs[pkg.packageName] = { agg: false, policy: globalPolicies[0] || 'stepwise', isCustomized: false };
+      appConfigs[pkg.packageName] = { agg: false, policy: globalPolicies[0] || 'stepwise', zone: '1', isCustomized: false };
     }
     
     const item = document.createElement('div');
@@ -395,13 +405,12 @@ function openGameSettings(pkg, isChecked, iconSrc) {
     policySelect.appendChild(opt);
   });
 
+  const zoneSelect = document.getElementById('as-zone-select');
+  if (zoneSelect) zoneSelect.value = conf.zone || '1';
+
   document.getElementById('appSettingsOverlay').classList.add('active');
 }
 
-
-/* =========================================
-   INISIALISASI AMAN
-========================================= */
 async function init() {
   const savedLang = localStorage.getItem('licking_lang') || 'en';
   loadLanguage(savedLang);
@@ -444,13 +453,13 @@ async function init() {
   });
   
   document.getElementById("panic-switch")?.addEventListener('change', async (e) => {
-    const isDisablePanic = e.target.checked;
-    
+    const isDisablePanic = e.target.checked;    
     const val = isDisablePanic ? "0" : "1";
     const printkVal = isDisablePanic ? "0 0 0 0" : "1 1 1 1";
     const devkmsgVal = isDisablePanic ? "off" : "on";
 
     const panicScript = `
+      (
       write_val() {
           local file="$1"
           local value="$2"
@@ -463,7 +472,7 @@ async function init() {
       set_tweak() {
           local name="$1"
           local val="$2"
-          find /proc/sys /sys -name "$name" 2>/dev/null | while read -r path; do
+          find /proc/sys /sys -type f -name "$name" 2>/dev/null | while read -r path; do
               write_val "$path" "$val"
           done
       }
@@ -474,15 +483,12 @@ async function init() {
 
       set_tweak "printk" "${printkVal}"
       set_tweak "printk_devkmsg" "${devkmsgVal}"
+      ) >/dev/null 2>&1 &
     `;
 
     try {
       await exec(panicScript);
-      
-      // Simpan status konfigurasi ke file CONFIG_FILE_PATH
-      await setConfigValue("DISABLE_PANIC", isDisablePanic ? "1" : "0"); 
-      
-      toast(`Kernel Panic ${isDisablePanic ? 'Disabled' : 'Restored to Default'}`);
+      await setConfigValue("DISABLE_PANIC", isDisablePanic ? "1" : "0");
     } catch (err) {
       toast(`Failed: ${err.message}`);
       e.target.checked = !isDisablePanic; 
@@ -503,6 +509,15 @@ async function init() {
       toast(currentTranslations.toastSaved || `Policy saved and updated`);
     } catch(err) { 
       toast(`Failed: ${err.message}`); 
+    }
+  });
+
+  document.getElementById("zone-select")?.addEventListener('change', async (e) => {
+    if(!e.target.value) return;
+    try {
+      await setConfigValue("ZONE", e.target.value);
+    } catch(err) {
+      toast(`Failed: ${err.message}`);
     }
   });
 
@@ -557,6 +572,15 @@ async function init() {
     appConfigs[currentEditingPkg].isCustomized = true;
     await saveAppConfigs();
     toast(`${currentTranslations.toastPolicyUpdated || 'Policy updated to'} ${e.target.value}`);
+  });
+
+  document.getElementById('as-zone-select')?.addEventListener('change', async (e) => {
+    if(!currentEditingPkg) return;
+    appConfigs[currentEditingPkg].zone = e.target.value;
+    appConfigs[currentEditingPkg].isCustomized = true;
+    await saveAppConfigs();
+    const zoneText = e.target.value === '1' ? 'Disable' : 'Spoof to 30°C';
+    toast(`Thermal Zone: ${zoneText}`);
   });
 
   updateExtraCard();
