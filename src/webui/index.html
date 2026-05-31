@@ -99,6 +99,22 @@
           </div>
         </div>
 
+        <div class="setting-item setting-row">
+          <div onclick="showInfo('thermalZone')" class="cursor-pointer setting-label-group">
+            <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;">
+              <span data-i18n="thermZone">Thermal Zone</span> 
+              <span class="material-symbols-outlined info-icon">info</span>
+            </p>
+          </div>
+          <div class="select-wrapper compact-select">
+            <select id="zone-select" class="pingpimp-select">
+              <option value="1">Disable</option>
+              <option value="0">Spoof to 30°C</option>
+            </select>
+            <span class="material-symbols-outlined select-arrow">expand_more</span>
+          </div>
+        </div>
+
       </div>
     </div>
 
@@ -252,6 +268,23 @@
           <div class="select-wrapper compact-select" style="width: 140px;">
             <select id="as-policy-select" class="pingpimp-select">
               </select>
+            <span class="material-symbols-outlined select-arrow">expand_more</span>
+          </div>
+        </div>
+
+        <div class="as-setting-row">
+          <div class="card-icon" style="background: transparent; color: var(--primaryContainer, #4F378B); width: 28px; height: 28px; margin-right: 16px;">
+            <span class="material-symbols-outlined" style="font-size: 28px;">device_thermostat</span>
+          </div>
+          <div class="as-setting-label">
+            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="thermZone">Thermal Zone</span>
+            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asZoneDesc">Thermal zone spoof control</span>
+          </div>
+          <div class="select-wrapper compact-select" style="width: 140px;">
+            <select id="as-zone-select" class="pingpimp-select">
+              <option value="1">Disable</option>
+              <option value="0">Spoof to 30°C</option>
+            </select>
             <span class="material-symbols-outlined select-arrow">expand_more</span>
           </div>
         </div>
