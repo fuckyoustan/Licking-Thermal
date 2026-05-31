@@ -6,8 +6,8 @@ local current_perms
 for p in "$@"; do
 [ -f "$p" ] || continue
 current_perms=$(stat -c "%a" "$p" 2>/dev/null)
-if [ "$current_perms" != "666" ]; then
-chmod 666 "$p" 2>/dev/null
+if [ "$current_perms" != "644" ]; then
+chmod 644 "$p" 2>/dev/null
 fi
 printf '%s' "$val" > "$p" 2>/dev/null
 done
@@ -17,13 +17,6 @@ for anal in /sys/class/power_supply/*; do
 Miyabi "150" "$anal/temp_cool"
 Miyabi "570" "$anal/temp_hot"
 Miyabi "500" "$anal/temp_warm"
-done
-}
-comatozze() {
-for Tits in /sys/block/*/queue; do
-Miyabi "0" "$Tits/iostats"
-Miyabi "0" "$Tits/rotational"
-Miyabi "0" "$Tits/add_random"
 done
 }
 AngelaWhite() {
@@ -40,9 +33,9 @@ cmd thermalservice override-status 0 2>/dev/null
 }
 EvaElfie() {
 for puki in /sys/devices/*.mali; do
-[ -e "$puki/tmu" ] && chmod 000 "$puki/tmu"
-[ -e "$puki/throttling*" ] && chmod 000 "$puki/throttling*"
-[ -e "$puki/tripping" ] && chmod 000 "$puki/tripping"
+[ -e "$puki/tmu" ] && chmod 000 "$puki/tmu" 2>/dev/null
+[ -e "$puki/throttling*" ] && chmod 000 "$puki/throttling*" 2>/dev/null
+[ -e "$puki/tripping" ] && chmod 000 "$puki/tripping" 2>/dev/null
 done
 }
 Honoka() {
@@ -59,13 +52,27 @@ done
 }
 AvaAddams() {
 SHIT="/data/adb/modules/LickingT/FuckingThermal"
+if [ ! -f "$SHIT" ]; then
 echo > "$SHIT"
+fi
 find /system /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r FUCK; do
-mount --bind "$SHIT" "$FUCK"
+mount --bind "$SHIT" "$FUCK" 2>/dev/null
 done
 }
-SweetyFox() { 
-find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' \) -exec chmod 000 {} +
+ZONE_ARG=$(grep -i '^ZONE=' /data/adb/modules/LickingT/thermal.conf 2>/dev/null | cut -d'=' -f2)
+SweetyFox1() { 
+find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' -o -iname '*thermal*' -o -name '*name*' \) -exec chmod 000 {} + 2>/dev/null || true
+}
+SweetyFox2() {
+PUSSY="/data/adb/modules/LickingT/FuckTemp"
+if [ ! -f "$PUSSY" ]; then
+echo "30000" > "$PUSSY"
+fi
+for FuckTemp in /sys/devices/virtual/thermal/thermal_zone*/temp; do
+if [ -f "$FuckTemp" ]; then
+mount --bind "$PUSSY" "$FuckTemp"
+fi
+done
 }
 LolaTaylor() {
 for armpit in /sys/devices/virtual/thermal/thermal_zone*; do
@@ -90,7 +97,12 @@ Miyabi "$idx 0" /proc/ppm/policy_status
 done
 }
 AsamiSugiura() {
-kontol=/sys/class/kgsl/kgsl-3d0
+if [ -d "/sys/class/kgsl/kgsl-3d0" ]; then
+kontol="/sys/class/kgsl/kgsl-3d0"
+elif [ -d "/sys/devices/platform/soc" ]; then
+kontol="$(find /sys/devices/platform/soc/ -type d -path "*/kgsl/kgsl-3d0" 2>/dev/null | head -n 1)"
+fi
+[ -d "$kontol" ] || return 0
 Miyabi "0" "$kontol/throttling"
 Miyabi "0" "$kontol/bus_split"
 Miyabi "0" "$kontol/max_gpuclk"
@@ -117,16 +129,9 @@ Miyabi "1 ${t_limit}000 0 mtk-cl-kshutdown02 $no_cooler 1000" /proc/driver/therm
 fi
 }
 MiaKholifah() {
-find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name *temp* | while read -r memek; do
-chmod 000 $memek
+find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name '*temp*' 2>/dev/null | while read -r memek; do
+chmod 000 $memek 2>/dev/null
 done
-}
-Vicca() {
-PKG="com.xiaomi.joyose"
-if pm list packages | grep -q "$PKG"; then
-pm disable "$PKG" >/dev/null 2>&1
-am force-stop "$PKG" >/dev/null 2>&1
-fi
 }
 SoraAoi() {
 getprop | grep -iE 'thermal|temp|throttl' | awk -F'[][]' '{print $2}' | while read -r penis; do
@@ -141,25 +146,32 @@ resetprop -n "$penis" "$kontol" 2>/dev/null
 setprop "$penis" "$kontol" 2>/dev/null
 done
 }
+MsBreewc() {
+for cum in $(pgrep -f '[t]hermal'); do
+kill -SIGSTOP "$cum"
+done
+}
 Siskaeee
-comatozze
 Honoka
 AngelaWhite
 SashaGrey
 AsamiSugiura
-sleep 0.5
+sleep 1
 ValentinaNappi
 MariaOzawa
 EmmaStone
 Barbamiska
 LolaTaylor
-sleep 0.5
+sleep 1
 MiaKholifah
 EvaElfie
-SweetyFox
-AiUehara
-sleep 0.5
+if [ "$ZONE_ARG" = "0" ]; then
+SweetyFox2
+else
+SweetyFox1
+fi
+sleep 1
 AvaAddams
 AiUehara
+MsBreewc
 SoraAoi
-Vicca
