@@ -14,7 +14,8 @@ const infoContentFallback = {
   modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on." },
   zonePolicy: { title: "Thermal Policy", text: "Sets how the system reacts to temps." },
   thermalZone: { title: "Thermal Zone", text: "Disable: Disable thermal zone spoofing.\nSpoof to 30°C: Spoof thermal zone temperature to 30°C." },
-  kernelPanic: { title: "Disable Kernel Panic", text: "Prevents random reboots by ignoring minor system crashes. Useful for fixing stability issues." }
+  kernelPanic: { title: "Disable Kernel Panic", text: "Prevents random reboots by ignoring minor system crashes. Useful for fixing stability issues." },
+  fastCharge: { title: "Fast Charge", text: "Turns off some temperature sensors to force maximum charging speed." }
 };
 
 async function loadLanguage(lang) {
@@ -123,7 +124,7 @@ async function setConfigValue(key, value) {
 async function updateExtraCard() {
   try {
     const out = await exec(`cat ${CONFIG_FILE_PATH} || true`);
-    let mode = "automatic", hal = "0", disablePanic = "0", zone = "1";
+    let mode = "automatic", hal = "0", disablePanic = "0", zone = "1", charge = "0"; 
     
     out.split("\n").forEach(l => {
       const t = l.trim();
@@ -131,17 +132,27 @@ async function updateExtraCard() {
       if(t.startsWith("HAL=")) hal = t.replace("HAL=","").trim();
       if(t.startsWith("DISABLE_PANIC=")) disablePanic = t.replace("DISABLE_PANIC=","").trim();
       if(t.startsWith("ZONE=")) zone = t.replace("ZONE=","").trim(); 
+      if(t.startsWith("Charge=")) charge = t.replace("Charge=","").trim();
     });
     
     const modeSelect = document.getElementById("mode-select");
     const halSwitch = document.getElementById("hal-switch");
     const panicSwitch = document.getElementById("panic-switch");
     const zoneSelect = document.getElementById("zone-select");
+    const chargeSwitch = document.getElementById("charge-switch");
     
     if(modeSelect) modeSelect.value = mode;
     if(halSwitch) halSwitch.checked = (hal === "1");
     if(panicSwitch) panicSwitch.checked = (disablePanic === "1");
-    if(zoneSelect) zoneSelect.value = zone; 
+    if(chargeSwitch) chargeSwitch.checked = (charge === "1");
+    
+    if(zoneSelect) {
+      zoneSelect.value = zone;
+      const policyRow = document.getElementById("policy-row-wrapper");
+      if(policyRow) {
+        policyRow.style.display = (zone === "1") ? "none" : "";
+      }
+    }
   } catch(e) {}
 }
 
@@ -406,7 +417,15 @@ function openGameSettings(pkg, isChecked, iconSrc) {
   });
 
   const zoneSelect = document.getElementById('as-zone-select');
-  if (zoneSelect) zoneSelect.value = conf.zone || '1';
+  if (zoneSelect) {
+    const currentZoneVal = conf.zone || '1';
+    zoneSelect.value = currentZoneVal;
+
+    const asPolicyRow = document.getElementById("as-policy-row-wrapper");
+    if(asPolicyRow) {
+      asPolicyRow.style.display = (currentZoneVal === "1") ? "none" : "";
+    }
+  }
 
   document.getElementById('appSettingsOverlay').classList.add('active');
 }
@@ -500,6 +519,7 @@ async function init() {
   document.getElementById('modal-btn-telegram')?.addEventListener('click', (e) => window.openExternalLink('tg://resolve?domain=EverythingAboutArchive', e));
 
   document.getElementById("hal-switch")?.addEventListener('change', (e) => setConfigValue("HAL", e.target.checked ? "1" : "0"));
+  document.getElementById("charge-switch")?.addEventListener('change', (e) => setConfigValue("Charge", e.target.checked ? "1" : "0"));
   document.getElementById("mode-select")?.addEventListener('change', (e) => setConfigValue("MODE", e.target.value === "automatic" ? "auto" : "static"));
   document.getElementById("policy-select")?.addEventListener('change', async (e) => {
     if(!e.target.value) return;
@@ -516,6 +536,10 @@ async function init() {
     if(!e.target.value) return;
     try {
       await setConfigValue("ZONE", e.target.value);
+      const policyRow = document.getElementById("policy-row-wrapper");
+      if(policyRow) {
+        policyRow.style.display = (e.target.value === "1") ? "none" : "";
+      }
     } catch(err) {
       toast(`Failed: ${err.message}`);
     }
@@ -581,6 +605,11 @@ async function init() {
     await saveAppConfigs();
     const zoneText = e.target.value === '1' ? 'Disable' : 'Spoof to 30°C';
     toast(`Thermal Zone: ${zoneText}`);
+    
+    const asPolicyRow = document.getElementById("as-policy-row-wrapper");
+    if(asPolicyRow) {
+      asPolicyRow.style.display = (e.target.value === "1") ? "none" : "";
+    }
   });
 
   updateExtraCard();
