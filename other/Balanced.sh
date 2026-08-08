@@ -1,61 +1,94 @@
 #!/system/bin/sh
 
+XNXX="/data/adb/modules/LickingT"
+EPORNER="$XNXX/thermal.conf"
+JAVHD="$XNXX/AppConfigs.txt"
+PORN="$XNXX/PornArchive/PornCategories.txt"
+PORNHUB="$XNXX/CurrentZoneState"
+XHAMSTER=$(grep -i '^ZONE=' "$EPORNER" 2>/dev/null | cut -d'=' -f2)
+JAVTIFUL=$(cat "$XNXX/zpolicy" 2>/dev/null)
+if [ -f "$PORN" ]; then
+while read -r pkg || [ -n "$pkg" ]; do
+[ -z "$pkg" ] && continue
+if pidof "$pkg" >/dev/null 2>&1; then
+if [ -f "$JAVHD" ]; then
+JAVTIFUL="$(grep "^$pkg:" "$JAVHD")"
+if [ -n "$JAVTIFUL" ]; then
+XVIDEOS="$(echo "$JAVTIFUL" | cut -d':' -f4)"
+if [ -n "$XVIDEOS" ]; then
+XHAMSTER="$XVIDEOS"
+fi
+YOUJIZZ="$(echo "$JAVTIFUL" | cut -d':' -f3)"
+if [ -n "$YOUJIZZ" ]; then
+JAVTIFUL="$YOUJIZZ"
+fi
+fi
+fi
+break
+fi
+done < "$PORN"
+fi
+echo "$XHAMSTER" > "$PORNHUB"
+if [ -n "$JAVTIFUL" ]; then
+for z in /sys/class/thermal/thermal_zone*; do
+chmod 644 "$z/policy" 2>/dev/null
+echo "$JAVTIFUL" > "$z/policy" 2>/dev/null
+done
+fi
 Miyabi() {
 local val="$1"; shift
 local current_perms
 for p in "$@"; do
 [ -f "$p" ] || continue
-current_perms=$(stat -c "%a" "$p" 2>/dev/null)
-if [ "$current_perms" != "644" ]; then
 chmod 644 "$p" 2>/dev/null
-fi
 printf '%s' "$val" > "$p" 2>/dev/null
 done
 }
 Siskaeee() {
+Miyabi "0" /proc/eem/eem_status
 Miyabi "0" /proc/sys/kernel/sched_boost
 Miyabi "0" /sys/kernel/eara_thermal/enable
+Miyabi "0" /sys/module/thermal/parameters/enabled
+Miyabi "0" /sys/module/qpnp_bsi/parameters/bcl_enabled
+Miyabi "1" /proc/mtk_batoc_throttling/battery_oc_protect_stop
 cmd thermalservice override-status 0 2>/dev/null
 }
 SoraAoi() {
-getprop | grep -iE 'thermal|temp|throttl' | awk -F'[][]' '{print $2}' | while read -r penis; do
-[ -z "$penis" ] && continue
-case $((RANDOM % 4)) in
-0) kontol="YESDADDY" ;;
-1) kontol="FUCK" ;;
-2) kontol="AHHH" ;;
-3) kontol="LICKIT" ;;
-esac
-resetprop -n "$penis" "$kontol" 2>/dev/null
-setprop "$penis" "$kontol" 2>/dev/null
-done
+getprop | awk -F'[][]' 'BEGIN { words[0]="YESDADDY"; words[1]="FUCK"; words[2]="AHHH"; words[3]="LICKIT"; srand(); }
+tolower($2) ~ /thermal/ { val = words[int(rand() * 4)]; printf "resetprop -n \"%s\" \"%s\" 2>/dev/null\n", $2, val; printf "setprop \"%s\" \"%s\" 2>/dev/null\n", $2, val; }' | sh
 }
-ZONE_ARG=$(grep -i '^ZONE=' /data/adb/modules/LickingT/thermal.conf 2>/dev/null | cut -d'=' -f2)
-SweetyFox1() { 
-find /sys/devices/virtual/thermal/thermal_zone*/ /sys/firmware/devicetree/base/soc/*/ /sys/devices/virtual/hwmon/hwmon*/ -type f \( -iname '*temp*' -o -iname '*trip_point_*' -o -iname '*type*' -o -iname '*limit_info*' -o -iname '*thermal*' -o -name '*name*' \) -exec chmod 000 {} + 2>/dev/null || true
+NicoleMurkovski() {
+if ! service check miui.mqsas.IMQSNative | grep -q "not found"; then
+for a in $(find /*/etc/init -type f 2>/dev/null | xargs grep -Eh "^service (miui|.*thermal)" 2>/dev/null | awk '{print$2}'); do 
+service call miui.mqsas.IMQSNative 21 i32 1 s16 "stop" i32 1 s16 "$a" s16 "/dev/null" i32 1 >/dev/null 2>&1
+done
+fi
+}
+KitanoMina() { 
+(for core in /sys/devices/system/cpu/cpu[0-9]*/online; do read -r state < "$core" 2>/dev/null; [ "$state" = "0" ] && { chmod 644 "$core" 2>/dev/null; echo 1 > "$core" 2>/dev/null; }; done) & 
+}
+SweetyFox1() {
+find /sys/devices/virtual/thermal -type f -exec chmod 000 {} + 2>/dev/null
+}
+GinaGerson() {
+PKG="com.xiaomi.joyose"
+if pm list packages | grep -q "$PKG"; then
+cmd package uninstall -k --user 0 "$PKG" >/dev/null 2>&1
+fi
 }
 SweetyFox2() {
 PUSSY="/data/adb/modules/LickingT/FuckTemp"
-if [ ! -f "$PUSSY" ]; then
-echo "30000" > "$PUSSY"
-fi
-for FuckTemp in /sys/devices/virtual/thermal/thermal_zone*/temp; do
-if [ -f "$FuckTemp" ]; then
-mount --bind "$PUSSY" "$FuckTemp"
-fi
-done
+[ ! -f "$PUSSY" ] && echo "30000" > "$PUSSY"
+find /sys/devices/virtual/thermal -name 'temp' -type f 2>/dev/null | awk -v dummy="$PUSSY" '{print "mount --bind \"" dummy "\" \"" $0 "\""}' | sh 2>/dev/null &
 }
 LolaTaylor() {
-for armpit in /sys/devices/virtual/thermal/thermal_zone*; do
-Miyabi "disabled" "$armpit/mode"
-Miyabi "0" "$armpit/thm_enable"
-done
+find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "disabled" : "0"; print "chmod 644 \"" $0 "\"; echo " val " > \"" $0 "\"" }' | sh 2>/dev/null &
 }
 EvaElfie() {
 for puki in /sys/devices/*.mali; do
-[ -e "$puki/tmu" ] && chmod 000 "$puki/tmu" 2>/dev/null
-[ -e "$puki/throttling*" ] && chmod 000 "$puki/throttling*" 2>/dev/null
-[ -e "$puki/tripping" ] && chmod 000 "$puki/tripping" 2>/dev/null
+if [ -d "$puki" ]; then
+chmod 000 /sys/devices/*.mali/tmu /sys/devices/*.mali/throttling* /sys/devices/*.mali/tripping 2>/dev/null
+fi
 done
 }
 EmmaStone() {
@@ -74,11 +107,13 @@ Miyabi "1 ${t_limit}000 0 mtk-cl-kshutdown02 $no_cooler 1000" /proc/driver/therm
 fi
 }
 Barbamiska() {
-find /sys -name enabled | grep 'msm_thermal' 2>/dev/null | while read -r mesum; do
-val=$(cat "$mesum")
-[ "$val" = "Y" ] && Miyabi "N" "$mesum"
-[ "$val" = "1" ] && Miyabi "0" "$mesum"
-done
+local mesum=$(find /sys -path '*msm_thermal*' -name 'enabled' -type f 2>/dev/null)
+if [ -n "$mesum" ]; then
+local sange1=$(grep -l '^Y$' $mesum 2>/dev/null)
+[ -n "$sange1" ] && Miyabi "N" $sange1
+local sange2=$(grep -l '^1$' $mesum 2>/dev/null)
+[ -n "$sange2" ] && Miyabi "0" $sange2
+fi
 }
 AngelaWhite() {
 vagina=/proc/cpufreq
@@ -97,6 +132,8 @@ for anal in /sys/class/power_supply/*; do
 Miyabi "150" "$anal/temp_cool"
 Miyabi "480" "$anal/temp_hot"
 Miyabi "460" "$anal/temp_warm"
+Miyabi "0" "$anal/thermal_limit"
+Miyabi "0" "$anal/device/bcl_enabled"
 done
 }
 SashaGrey() {
@@ -127,28 +164,26 @@ Miyabi "1" "$kontol/force_rail_on"
 Miyabi "1" "$kontol/force_bus_on"
 Miyabi "1" "$kontol/force_clk_on"
 }
-AnnaPolina() {
-find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name '*temp*' 2>/dev/null | while read -r memek; do
-chmod 000 $memek 2>/dev/null
-done
-}
 Siskaeee
 Honoka
+GinaGerson
 AngelaWhite
-SashaGrey
 sleep 1
+SashaGrey
 AsamiSugiura
 ValentinaNappi
 MariaOzawa
+sleep 2
 EmmaStone
 Barbamiska
-LolaTaylor
-sleep 1
-AnnaPolina
 EvaElfie
-if [ "$ZONE_ARG" = "0" ]; then
+NicoleMurkovski
+sleep 2
+SoraAoi
+if [ "$XHAMSTER" = "0" ]; then
+LolaTaylor
 SweetyFox2
 else
 SweetyFox1
 fi
-SoraAoi
+KitanoMina
