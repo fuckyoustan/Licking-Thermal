@@ -14,18 +14,18 @@ if [ -f "$PIDFILE" ]; then
 fi
 
 echo "$MYPID" > "$PIDFILE"
-
 while [ -z "$(getprop sys.boot_completed)" ]; do
     sleep 10
 done
 
 eko() {
-local val="$1"; shift
-for p in "$@"; do
-[ -f "$p" ] || continue
-chmod 644 "$p" 2>/dev/null
-printf '%s' "$val" > "$p" 2>/dev/null
-done
+    local val="$1"; shift
+    for p in "$@"; do
+        [ -f "$p" ] || continue
+        chmod 644 "$p" 2>/dev/null
+        printf '%s' "$val" > "$p" 2>/dev/null
+        chmod 444 "$p" 2>/dev/null
+    done
 }
 
 HAL=0
@@ -36,16 +36,42 @@ ZPOLICY="$MODPATH/zpolicy"
 PORN="$MODPATH/PornArchive/PornCategories.txt"
 APP_CONFIGS="$MODPATH/AppConfigs.txt"
 STATE_FILE="$MODPATH/CurrentState"
+
+Msbreewc() {
+    find /sys/class/power_supply/battery/ -name '*temp*' -exec chmod 000 {} + 2>/dev/null
+    find /system/etc/init /vendor/etc/init /odm/etc/init -type f 2>/dev/null | xargs grep -h "^service.*thermal" 2>/dev/null | awk '{print "stop "$2"; setprop ctl.stop "$2";"}' | sh 2>/dev/null
+    find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "disabled" : "0"; print "chmod 644 \"" $0 "\"; echo " val " > \"" $0 "\"" }' | sh 2>/dev/null &
+    
+    for anal in /sys/class/power_supply/*; do
+eko "150" "$anal/temp_cool"
+eko "570" "$anal/temp_hot"
+eko "500" "$anal/temp_warm"
+eko "0" "$anal/thermal_limit"
+eko "0" "$anal/device/bcl_enabled"
+done
+}
+
+Siskaeee() {
+    find /sys/class/power_supply/battery/ -name '*temp*' -exec chmod 444 {} + 2>/dev/null
+    find /system/etc/init /vendor/etc/init /odm/etc/init -type f 2>/dev/null | xargs grep -h "^service.*thermal" 2>/dev/null | awk '{print "start "$2"; setprop ctl.start "$2";"}' | sh 2>/dev/null
+    find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "enabled" : "1"; print "echo " val " > \"" $0 "\"; chmod 444 \"" $0 "\"" }' | sh 2>/dev/null &
+    
+    for anal in /sys/class/power_supply/*; do
+eko "150" "$anal/temp_cool"
+eko "400" "$anal/temp_hot"
+eko "380" "$anal/temp_warm"
+eko "1" "$anal/thermal_limit"
+eko "1" "$anal/device/bcl_enabled"
+done
+}
+
 echo "NotHorny" > "$STATE_FILE"
 for Tits in /sys/block/*/queue; do
-eko "0" "$Tits/iostats"
-eko "0" "$Tits/rotational"
-eko "0" "$Tits/add_random"
+    eko "0" "$Tits/iostats"
+    eko "0" "$Tits/rotational"
+    eko "0" "$Tits/add_random"
+    eko "0" "$Tits/iosched/slice_idle"
 done
-PKG="com.xiaomi.joyose"
-if pm list packages | grep -q "$PKG"; then
-cmd package uninstall -k --user 0 "$PKG" >/dev/null 2>&1
-fi
 
 apply_policy() {
     local pol="$1"
@@ -57,10 +83,12 @@ apply_policy() {
         fi
     done
 }
+
 if [ -f "$ZPOLICY" ]; then
     SELECTED_POLICY=$(cat "$ZPOLICY")
     apply_policy "$SELECTED_POLICY"
 fi
+
 if [ -f "$CONF" ]; then
     . "$CONF"
     if [ "$DISABLE_PANIC" = "1" ]; then
@@ -89,18 +117,22 @@ if [ -f "$CONF" ]; then
         set_tweak "printk_devkmsg" "off"
     fi
 fi
+
 read_mode() {
     cat "$STATE_FILE" 2>/dev/null
 }
+
 write_mode() {
     printf "%s" "$1" > "$STATE_FILE"
 }
+
 get_PornApp() {
     dumpsys window 2>/dev/null | grep "Session Session{" | awk '{print $3}' | awk -F':' '{print $1}' | while read -r pid; do
         [ -r "/proc/$pid/cmdline" ] || continue
         tr '\0' ' ' < /proc/"$pid"/cmdline
     done
 }
+
 description() {
     state="$(read_mode)"
     current_desc="$(grep '^description=' "$PROP" 2>/dev/null)"
@@ -118,74 +150,96 @@ description() {
 }
 
 CURRENT_PKG=""
+THERMAL_DISABLED="false"
+FAST_CHARGE_STATE="false"
+
 while true; do
     if [ -f "$CONF" ]; then
         . "$CONF"
     fi
+    
     current_mode="$(read_mode)"
     GLOBAL_POLICY=$(cat "$ZPOLICY" 2>/dev/null)
+    TARGET_STATE="NotHorny"
+    active_pkg=""
+    USE_HAL="$HAL"
+    USE_POLICY="$GLOBAL_POLICY"
+    [ -z "$Charge" ] && Charge="0"
+    BAT_STATUS=$(cat /sys/class/power_supply/battery/status)
+
     if [ "$MODE" = "auto" ]; then
-        Hyper="NO"
-        PornApp="$(get_PornApp)"
-        active_pkg=""
-        USE_HAL="$HAL"
-        USE_POLICY="$GLOBAL_POLICY"
+        PornApp="$(get_PornApp)"        
         while read -r pkg || [ -n "$pkg" ]; do
             [ -z "$pkg" ] && continue
             echo "$PornApp" | grep -Eiq "$pkg" && {
-                Hyper="YES"
+                TARGET_STATE="Horny"
                 active_pkg="$pkg"
                 break
             }
         done < "$PORN"
-        if [ "$Hyper" = "YES" ] && [ -f "$APP_CONFIGS" ]; then
+
+        if [ "$TARGET_STATE" = "Horny" ] && [ -f "$APP_CONFIGS" ]; then
             custom_line="$(grep "^$active_pkg:" "$APP_CONFIGS")"
             if [ -n "$custom_line" ]; then
                 custom_agg="$(echo "$custom_line" | cut -d':' -f2)"
-                custom_pol="$(echo "$custom_line" | cut -d':' -f3)"
-                
+                custom_pol="$(echo "$custom_line" | cut -d':' -f3)"                
                 if [ -n "$custom_agg" ] && [ -n "$custom_pol" ]; then
                     USE_HAL="$custom_agg"
                     USE_POLICY="$custom_pol"
                 fi
             fi
-        fi
-        if [ "$Hyper" = "YES" ]; then
-            if [ "$current_mode" != "Horny" ] || [ "$CURRENT_PKG" != "$active_pkg" ]; then
-                write_mode "Horny"
-                CURRENT_PKG="$active_pkg"
-                apply_policy "$USE_POLICY"
-                
-                if [ "$USE_HAL" = "1" ]; then
-                    sh "$MODPATH/PornArchive/MILF.sh" &
-                    su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🚀 Aggressive mode Apply for $active_pkg'" > /dev/null 2>&1
-                else
-                    sh "$MODPATH/PornArchive/amature.sh" &
-                    su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🤡 Amature mode Apply for $active_pkg'" > /dev/null 2>&1
-                fi
-            fi
-        elif [ "$Hyper" = "NO" ] && [ "$current_mode" != "NotHorny" ]; then
-            write_mode "NotHorny"
-            CURRENT_PKG=""
-            apply_policy "$GLOBAL_POLICY"
-            sh "$MODPATH/PornArchive/anal.sh" &
-            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '😴 Normal mode Apply'" > /dev/null 2>&1
-        fi
-        
+        fi        
     elif [ "$MODE" = "static" ]; then
-        if [ "$current_mode" != "Horny" ] || [ "$CURRENT_PKG" != "STATIC" ]; then
-            write_mode "Horny"
-            CURRENT_PKG="STATIC"
-            apply_policy "$GLOBAL_POLICY"
-            if [ "$HAL" = "1" ]; then
-                sh "$MODPATH/PornArchive/MILF.sh" &
-                su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🚀 Aggressive mode Apply (Static)'" > /dev/null 2>&1
-            else
-                sh "$MODPATH/PornArchive/amature.sh" &
-                su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🤡 Amature mode Apply (Static)'" > /dev/null 2>&1
-            fi
+        TARGET_STATE="Horny"
+        active_pkg="STATIC"
+    fi
+
+    if [ "$Charge" = "1" ] && [ "$BAT_STATUS" = "Charging" ]; then
+        if [ "$FAST_CHARGE_STATE" != "true" ]; then
+            Msbreewc
+            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'FastCharge' '⚡ Fast Charge Enabled: turn off temp for better current'" > /dev/null 2>&1
+            FAST_CHARGE_STATE="true"
+        fi
+    else
+        if [ "$FAST_CHARGE_STATE" = "true" ]; then
+            Siskaeee
+            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'FastCharge' '🔋 Fast Charge Disabled: Restoring normal thermal state.'" > /dev/null 2>&1
+            FAST_CHARGE_STATE="false"
         fi
     fi
+    
+    if [ "$TARGET_STATE" = "Horny" ]; then        
+        if [ "$THERMAL_DISABLED" = "false" ]; then
+            write_mode "Horny"
+            CURRENT_PKG="$active_pkg"
+            apply_policy "$USE_POLICY"            
+            if [ "$USE_HAL" = "1" ]; then
+                sh "$MODPATH/PornArchive/MILF.sh" &
+                su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🚀 Aggressive mode Apply for $active_pkg'" > /dev/null 2>&1
+            else
+                sh "$MODPATH/PornArchive/amature.sh" &
+                su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🤡 Amature mode Apply for $active_pkg'" > /dev/null 2>&1
+            fi            
+            THERMAL_DISABLED="true"
+            sleep 3
+        elif [ "$CURRENT_PKG" != "$active_pkg" ]; then
+            write_mode "Horny"
+            CURRENT_PKG="$active_pkg"
+            apply_policy "$USE_POLICY"            
+            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🔄 Switched to $active_pkg'" > /dev/null 2>&1
+            sleep 1
+        fi
+    elif [ "$TARGET_STATE" = "NotHorny" ]; then
+        if [ "$THERMAL_DISABLED" = "true" ]; then
+            write_mode "NotHorny"
+            CURRENT_PKG=""
+            sh "$MODPATH/PornArchive/anal.sh" &
+            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '😴 Normal mode Apply'" > /dev/null 2>&1            
+            THERMAL_DISABLED="false"
+            sleep 3 
+        fi
+    fi
+    
     description
     sleep 10
 done
