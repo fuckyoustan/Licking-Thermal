@@ -2,416 +2,541 @@
 @import url("https://mui.kernelsu.org/internal/colors.css");
 
 :root {
+  /* window insets (KernelSU WebUI) */
   --top-inset: var(--window-inset-top, 0px);
   --bottom-inset: var(--window-inset-bottom, 0px);
+
+  /* ---- Miuix dark color scheme ---- */
+  --m-primary: #277AF7;                       /* primary */
+  --m-on-primary: #FFFFFF;                    /* onPrimary */
+  --m-surface: #000000;                       /* surface (scaffold/topappbar/halaman) */
+  --m-surface-container: #242424;             /* card / navbar / popup / switch area */
+  --m-surface-container-high: #242424;        /* searchbar / input */
+  --m-surface-container-highest: #2D2D2D;     /* pressed / elevated */
+  --m-on-surface: #F2F2F2;                    /* judul */
+  --m-on-surface-container: rgba(255,255,255,0.90);
+  --m-summary: rgba(255,255,255,0.50);        /* onSurfaceVariantSummary */
+  --m-actions: rgba(255,255,255,0.40);        /* onSurfaceVariantActions (arrow, nilai) */
+  --m-smalltitle: #787E96;                    /* onBackgroundVariant */
+  --m-on-secondary-variant: #D9D9D9;          /* teks tombol sekunder */
+  --m-secondary-variant: #434343;             /* bg tombol sekunder */
+  --m-switch-off: #505050;                    /* secondary (track off) */
+  --m-divider: #393939;                       /* dividerLine */
+  --m-dim: rgba(0,0,0,0.60);                  /* windowDimming */
+  --m-primary-press: #1E66D6;
+  --m-badge-bg: rgba(39,122,247,0.16);         /* turunan primary (badge ENABLED) */
+
+  /* ---- Miuix metrics ---- */
+  --m-radius-card: 16px;      /* CardDefaults.CornerRadius */
+  --m-radius-dialog: 32px;    /* DialogDefaults.CornerRadius */
+  --m-radius-popup: 16px;     /* ListPopup cornerRadius */
+  --m-radius-btn: 16px;       /* ButtonDefaults.CornerRadius */
+  --m-pref-pad: 16px;         /* BasicComponentDefaults.InsideMargin */
+  --m-title-pad: 26px;        /* TopAppBarDefaults.TitlePadding */
+  --m-bar-h: 52px;            /* TopAppBarDefaults.CollapsedHeight */
+
+  /* miuix motion */
+  --m-spring: cubic-bezier(0.34, 1.30, 0.64, 1);
+  --m-ease: cubic-bezier(0.2, 0, 0, 1);
 }
+
+/* ============ MONET / DYNAMIC COLOR ============ */
+html[data-monet="on"] {
+  --m-primary: var(--primary, #277AF7);
+  --m-on-primary: var(--onPrimary, #FFFFFF);
+  --m-primary-press: color-mix(in srgb, var(--primary, #277AF7) 82%, #000000);
+  --m-badge-bg: color-mix(in srgb, var(--primary, #277AF7) 16%, transparent);
+}
+
+/* ============ BASE ============ */
 *, ::after, ::before { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html { -webkit-text-size-adjust: 100%; }
 body {
   margin: 0;
-  font-family: 'Inter', 'Roboto', sans-serif;
-  background-color: var(--background, #141218);
-  color: var(--onSurface, #E6E1E5);
-  padding-bottom: calc(6rem + var(--bottom-inset));
+  font-family: 'MiSans', 'MiSans VF', 'HyperOS Sans', -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', 'Inter', sans-serif;
+  font-size: 17px;
+  line-height: 1.35;
+  background: var(--m-surface);
+  color: var(--m-on-surface);
   -webkit-user-select: none; user-select: none;
+  -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  min-height: 100vh;
 }
-.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0; }
-
-.text-sm { font-size: 0.875rem; line-height: 1.25rem; font-weight: 600; }
-.text-sss { font-size: 0.75rem; line-height: 1rem; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block; }
-.font-semibold { font-weight: 600; }
-.flex { display: flex; }
-.items-center { align-items: center; }
-.justify-between { justify-content: space-between; }
-.w-full { width: 100%; }
-.ml-auto { margin-left: auto; }
-.cursor-pointer { cursor: pointer; }
-.material-symbols-outlined { font-size: 24px; flex-shrink: 0; }
-
-/* =========================================
-   HEADER & CUSTOM BRAND FONT
-========================================= */
-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: calc(1rem + var(--top-inset)) 1.25rem 1rem;
-  position: sticky; top: 0; z-index: 1000;
-  background: color-mix(in srgb, var(--surface, #141218) 85%, transparent);
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+.sr-only {
+  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0;
 }
-.header-title { display: flex; align-items: center; gap: 12px; color: var(--onSurface, #E6E1E5); }
-.header-avatar { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primaryContainer, #4F378B); cursor: pointer; transition: 0.2s;}
-.header-avatar:active { transform: scale(0.9); }
+button { font-family: inherit; background: none; border: none; padding: 0; color: inherit; cursor: pointer; }
+input { font-family: inherit; }
+img { -webkit-user-drag: none; }
 
-.brand-text {
-  font-family: "Fruktur", cursive;
-  font-size: 1.80rem;
-  font-weight: 400;
-  font-style: normal;
-  margin-top: 2px;
+/* Ikon dasar (SVG sprite via <use>) */
+.m-icon { width: 24px; height: 24px; fill: currentColor; flex-shrink: 0; display: inline-block; vertical-align: middle; }
+
+/* ============ TOPAPPBAR (miuix TopAppBar) ============ */
+.m-topappbar {
+  position: sticky; top: 0; z-index: 100;
+  background: var(--m-surface);
+  padding-top: var(--top-inset);
 }
-
-.icon-button { 
-  background: transparent; border: none; color: var(--onSurfaceVariant, #CAC4D0); 
+.m-bar-row {
+  height: var(--m-bar-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 10px 0 var(--m-title-pad);
+  position: relative;
+}
+.m-bar-row.center { padding: 0 10px; }
+.m-bar-title-small {
+  font-size: 20px; font-weight: 500; color: var(--m-on-surface);
+  opacity: 0;                        /* digerakkan JS mengikuti scrollY */
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.m-bar-row.center .m-bar-title-small,
+.m-bar-row.center .m-bar-title {
+  position: absolute; left: 50%; transform: translateX(-50%);
+  width: max-content; max-width: 55%;
+  font-size: 20px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.m-bar-title { font-size: 20px; font-weight: 500; }
+/* judul besar: elemen biasa dalam scaffold, ikut scroll (tanpa animasi
+   max-height -> tidak ada perubahan tinggi dokumen saat collapse) */
+.m-bar-large {
+  font-size: 32px; font-weight: 400; color: var(--m-on-surface);   /* miuix: title1, Normal */
+  line-height: 1.18;
+  padding: 0 var(--m-title-pad) 10px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.m-topappbar.small { position: static; }
+.m-bar-actions { display: flex; align-items: center; gap: 6px; }
+.m-iconbtn {
+  width: 42px; height: 42px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
-  cursor: pointer; padding: 6px; border-radius: 50%; transition: 0.2s;
+  color: var(--m-on-surface-container);
+  transition: background .15s var(--m-ease), transform .15s var(--m-ease);
 }
-.icon-button:active { background: rgba(255,255,255,0.1); }
+.m-iconbtn .m-icon { width: 22px; height: 22px; }
+.m-iconbtn:active { background: rgba(255,255,255,0.08); transform: scale(0.94); }
+.m-avatar {
+  width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+  margin-left: 8px; cursor: pointer; background: var(--m-surface-container-highest);
+  transition: transform .15s var(--m-ease);
+}
+.m-avatar:active { transform: scale(0.92); }
+.m-bar-spacer { width: 42px; height: 42px; flex-shrink: 0; }
 
-/* =========================================
-   LAYOUT & PANELS
-========================================= */
-.menu-panel {
-  opacity: 1; transform: scale(1);
-  transition: opacity 0.25s ease, transform 0.25s ease;
-  display: block; width: 100%; max-width: 600px; margin: 0 auto;
-}
-.menu-panel.kanjud { display: none; opacity: 0; transform: scale(0.95); pointer-events: none; }
+/* ============ SCAFFOLD & PAGE ============ */
+.m-scaffold { max-width: 620px; margin: 0 auto; width: 100%; }
+.m-page { display: block; animation: m-page-in .28s var(--m-ease); }
+.m-page.hidden { display: none; }
+@keyframes m-page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+.m-page-pad { height: calc(120px + var(--bottom-inset)); }
 
-/* =========================================
-   BANNER & CARDS
-========================================= */
-.banner {
-  width: calc(100% - 2rem); margin: 1rem auto;
-  border-radius: 1.5rem; overflow: hidden; position: relative; height: 180px;
+/* ============ BANNER ============ */
+.m-banner {
+  position: relative; height: 150px;
+  margin: 12px 16px 4px; border-radius: var(--m-radius-card);
+  overflow: hidden; background: var(--m-surface-container);
 }
-.banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.m-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .banner-chip {
-  position: absolute; top: 12px; padding: 6px 14px; border-radius: 20px;
-  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  position: absolute; top: 12px; padding: 5px 12px; border-radius: 999px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.4px; color: #FFFFFF;
+  background: rgba(0,0,0,0.40);
   backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-  background: rgba(0, 0, 0, 0.4); color: white; border: 1px solid rgba(255, 255, 255, 0.15);
-  z-index: 5;
+  border: 1px solid rgba(255,255,255,0.15);
+  z-index: 5; max-width: 60%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 .chip-left { left: 12px; }
 .chip-right { right: 12px; }
 
-.card {
-  background-color: var(--surfaceContainer, #1D1B20);
-  border-radius: 1.5rem; padding: 1.25rem; margin: 0 1rem 1rem;
+/* ============ SMALLTITLE (miuix SmallTitle) ============ */
+.m-smalltitle {
+  font-size: 14px; font-weight: 700; color: var(--m-smalltitle);
+  padding: 16px 28px 10px;
 }
 
-.card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
-.card-icon {
-  width: 42px; height: 42px; border-radius: 12px; 
-  background-color: var(--primaryContainer, #4F378B); color: var(--onPrimaryContainer, #EADDFF);
-  display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+/* ============ CARD (miuix Card) ============ */
+.m-card {
+  background: var(--m-surface-container);
+  border-radius: var(--m-radius-card);
+  margin: 0 16px 4px;
+  overflow: hidden;
 }
-.card-icon .material-symbols-outlined { font-size: 24px; }
-.card-title { font-size: 18px; font-weight: 600; color: var(--onSurface, #E6E1E5); margin: 0; }
+/* gaya card MIUI: antar baris dipisah ruang saja, tanpa divider */
 
-.support-card { cursor: pointer; transition: transform 0.2s, background 0.2s; }
-.support-card:active { transform: scale(0.98); background-color: var(--surfaceContainerHighest, #36343B); }
-
-/* =========================================
-   CONTROLS LAYOUT (MATERIAL YOU EXPRESSIVE)
-========================================= */
-.settings-list {
-  display: flex;
-  flex-direction: column;
-}
-
-.setting-item {
-  padding: 10px 0; 
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.setting-item:last-child {
-  border-bottom: none;
-  padding-bottom: 4px; 
-}
-
-.setting-row {
+/* ============ PREFERENCE ROW (miuix BasicComponent/SwitchPreference) ============ */
+.m-pref {
+  min-height: 56px;
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px var(--m-pref-pad);
+  position: relative;
+  transition: background .18s var(--m-ease);
 }
-
-.setting-label-group { flex: 1; display: flex; align-items: center; }
-.setting-label-header { display: flex; align-items: center; margin-bottom: 0; }
-.info-icon { font-size: 16px; color: var(--primaryContainer, #4F378B); margin-left: 6px; }
-
-.select-wrapper.compact-select { 
-  position: relative; 
-  width: 135px; 
-  flex-shrink: 0; 
-  margin-top: 0; 
+.m-pref:active { background: var(--m-surface-container-highest); }
+.m-pref-text { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-self: stretch; }
+.m-pref-title {
+  font-size: 17px; font-weight: 500; color: var(--m-on-surface);
+  display: flex; align-items: center; gap: 6px;
+  min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.m-pref-title > span:first-child { overflow: hidden; text-overflow: ellipsis; }
+.m-pref-summary {
+  font-size: 14px; color: var(--m-summary);
+  margin-top: 3px; line-height: 1.3;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.m-click-info { cursor: pointer; }
+.m-info-ic { width: 16px; height: 16px; color: var(--m-actions); }
+.m-pref-start { width: 24px; height: 24px; color: var(--m-primary); margin-right: 14px; align-self: center; }
+.m-arrow { width: 10px; height: 16px; color: var(--m-actions); }
+.m-pref-click { cursor: pointer; }
 
-.pingpimp-select {
-  width: 100%; 
-  padding: 8px 28px 8px 12px; 
-  border-radius: 12px; 
-  background-color: var(--surfaceContainerHigh, #2B2930); 
-  border: 1px solid transparent;
-  color: var(--onSurface, #E6E1E5); 
-  font-size: 13px; 
-  font-weight: 500; 
-  font-family: inherit;
-  outline: none; cursor: pointer; -webkit-appearance: none; appearance: none;
-  transition: all 0.2s;
+/* grup pref yang bisa disabled (custom config) */
+.m-pref-group { transition: opacity .3s var(--m-ease), filter .3s var(--m-ease); }
+.m-pref-group.disabled { opacity: 0.35; pointer-events: none; filter: grayscale(1); }
+
+/* ============ SWITCH (miuix Switch: 49x28, thumb 20) ============ */
+.m-switch { position: relative; width: 49px; height: 28px; flex-shrink: 0; cursor: pointer; }
+.m-switch input { position: absolute; inset: 0; opacity: 0; margin: 0; cursor: pointer; z-index: 2; }
+.m-switch-track {
+  position: absolute; inset: 0; border-radius: 999px;
+  background: var(--m-switch-off);
+  transition: background .38s var(--m-ease);
+}
+.m-switch-thumb {
+  position: absolute; left: 4px; top: 4px; width: 20px; height: 20px; border-radius: 50%;
+  background: var(--m-on-primary);
+  transform: translateX(0) scale(1);
+  transition: transform .45s var(--m-spring), background-color .3s var(--m-ease);
+  z-index: 1;
+}
+.m-switch input:checked + .m-switch-track { background: var(--m-primary); }
+.m-switch input:checked + .m-switch-track + .m-switch-thumb { transform: translateX(21px) scale(1); }
+.m-switch input:active + .m-switch-track + .m-switch-thumb { transform: translateX(0) scale(1.127); }
+.m-switch input:active:checked + .m-switch-track + .m-switch-thumb { transform: translateX(21px) scale(1.127); }
+
+html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switch-thumb { background: #FFFFFF; }
+
+/* ============ DROPDOWN PREFERENCE (miuix OverlayDropdownPreference) ============ */
+.m-dd {
+  display: flex; align-items: center; gap: 8px;
+  flex-shrink: 0; max-width: 55%;
+  padding: 8px 4px 8px 8px; border-radius: 10px;
+  transition: background .15s var(--m-ease);
+}
+.m-dd:active { background: rgba(255,255,255,0.05); }
+.m-dd-val {
+  font-size: 15px; color: var(--m-actions);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.m-dd-ic { width: 10px; height: 16px; color: var(--m-actions); }
 
-.pingpimp-select:focus { 
-  border-color: var(--primaryContainer, #4F378B); 
-  background-color: color-mix(in srgb, var(--primaryContainer, #4F378B) 8%, var(--surfaceContainerHigh, #2B2930));
+/* popup menu (miuix ListPopup / DropdownImpl) */
+.m-dd-menu {
+  position: fixed; z-index: 320;
+  min-width: 170px; max-width: 280px; max-height: 328px; overflow-y: auto;
+  background: var(--m-surface-container);
+  border-radius: var(--m-radius-popup);
+  box-shadow: 0 12px 40px rgba(0,0,0,0.55);
+  padding: 4px 0;
+  opacity: 0; transform: scale(0.92); pointer-events: none;
+  transform-origin: top right;
+  transition: opacity .18s var(--m-ease), transform .18s var(--m-ease);
 }
-
-.select-arrow {
-  position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
-  pointer-events: none; color: var(--onSurfaceVariant, #CAC4D0); font-size: 18px;
+.m-dd-menu.open { opacity: 1; transform: scale(1); pointer-events: auto; }
+.m-dd-menu.upward { transform-origin: bottom right; }
+.m-dd-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 20px;
+  font-size: 17px; color: var(--m-on-surface-container);
+  cursor: pointer; transition: background .15s var(--m-ease);
 }
-
-/* =========================================
-   PINGPIMP STYLE SWITCH
-========================================= */
-.custom-switch {
-  position: relative;
-  display: inline-block;
-  width: 52px;  
-  height: 32px; 
-  flex-shrink: 0; 
-  cursor: pointer;
+.m-dd-item:first-child { padding-top: 20px; }
+.m-dd-item:last-child { padding-bottom: 20px; }
+.m-dd-item:active { background: var(--m-surface-container-highest); }
+.m-dd-item span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.m-dd-item .m-icon { width: 20px; height: 20px; color: var(--m-primary); visibility: hidden; }
+.m-dd-item.selected { color: var(--m-primary); }
+.m-dd-item.selected .m-icon { visibility: visible; }
+.m-dd-scrim {
+  position: fixed; inset: 0; z-index: 310; background: transparent;
+  opacity: 0; pointer-events: none; transition: opacity .18s var(--m-ease);
 }
+.m-dd-scrim.open { opacity: 1; pointer-events: auto; }
 
-.custom-switch input { 
-  opacity: 0; width: 100%; height: 100%; position: absolute; 
-  top: 0; left: 0; z-index: 10; cursor: pointer; margin: 0;
+/* ============ SEARCHBAR (miuix SearchBar / InputField) ============ */
+.m-searchwrap {
+  position: sticky; top: calc(var(--bar-h) + var(--top-inset)); z-index: 90;
+  padding: 8px 16px 10px;
+  background: var(--m-surface);
 }
-
-.switch-slider {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background-color: var(--surfaceContainerHighest, #36343B);
-  border: 2px solid var(--outline, #938F99);
-  border-radius: 16px; 
-  transition: 0.4s cubic-bezier(0.2, 0, 0, 1);
-  z-index: 1; 
-  pointer-events: none; 
+.m-searchbar {
+  display: flex; align-items: center;
+  min-height: 45px;
+  background: var(--m-surface-container-high);
+  border-radius: 999px;
+  padding: 0 8px 0 0;
+  transition: background .2s var(--m-ease);
 }
-
-.switch-slider:before {
-  position: absolute; content: "";
-  top: 50%; left: 14px; 
-  transform: translate(-50%, -50%);
-  height: 16px; width: 16px; 
-  background-color: var(--onSurfaceVariant, #CAC4D0);
-  border-radius: 50%;
-  transition: 0.4s cubic-bezier(0.2, 0, 0, 1);
-  z-index: 2;
+.m-searchbar:focus-within { background: var(--m-surface-container-highest); }
+.m-search-ic { width: 20px; height: 20px; color: var(--m-summary); margin: 0 8px 0 16px; }
+#app-search {
+  flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+  font-size: 17px; color: var(--m-on-surface); padding: 10px 0;
 }
-
-input:checked + .switch-slider {
-  background-color: var(--primaryContainer, #4F378B);
-  border-color: var(--primaryContainer, #4F378B);
+#app-search::placeholder { color: var(--m-summary); }
+.m-search-clear {
+  width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
 }
+.m-search-clear .m-icon { width: 18px; height: 18px; }
+.m-search-clear:active { background: rgba(255,255,255,0.08); }
 
-input:checked + .switch-slider:before {
-  left: 34px; height: 24px; width: 24px; 
-  background-color: var(--onPrimaryContainer, #EADDFF);
+/* ============ APP LIST ============ */
+.m-applist { margin-bottom: 4px; }
+.m-app-row { cursor: pointer; }
+.m-app-icon { width: 46px; height: 46px; border-radius: 12px; object-fit: contain; background: transparent; flex-shrink: 0; }
+.m-app-label {
+  font-size: 17px; font-weight: 500; color: var(--m-on-surface);
+  display: flex; align-items: center; gap: 8px;
+  white-space: nowrap; overflow: hidden;
 }
+.m-app-label .label-text { overflow: hidden; text-overflow: ellipsis; }
+.m-app-pkg {
+  font-size: 13px; color: var(--m-summary);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  margin-top: 2px;
+}
+.m-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+  color: var(--m-primary); background: var(--m-badge-bg, rgba(39,122,247,0.16));
+  padding: 2.5px 7px; border-radius: 6px; flex-shrink: 0;
+}
+.m-state {
+  padding: 40px 16px; text-align: center;
+  font-size: 14px; color: var(--m-summary);
+}
+.m-state.error { color: #FF6B6B; }
 
-/* =========================================
-   BUTTONS
-========================================= */
-.pill-btn {
-  flex: 1; padding: 10px 16px; border-radius: 20px;
-  background-color: var(--surfaceContainerHighest, #36343B); color: var(--onSurface, #E6E1E5);
-  text-align: center; font-size: 13px; font-weight: 600; text-decoration: none;
+/* ============ FLOATING NAVIGATION BAR (miuix FloatingNavigationBar) ============ */
+.m-floatnav {
+  position: fixed; left: 50%; transform: translateX(-50%);
+  bottom: calc(36px + var(--bottom-inset));
+  z-index: 120;
+  display: flex; align-items: center; gap: 12px;
+  min-height: 52px;
+  padding: 0 12px;
+  background: var(--m-surface-container);
+  border-radius: 999px;
+  box-shadow: 0 10px 32px rgba(0,0,0,0.45);
+}
+.m-floatnav-item {
+  width: 48px; height: 48px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.36);              /* onSurfaceContainer * 0.4 */
+  transition: color .25s var(--m-ease), transform .15s var(--m-spring), background .25s var(--m-ease);
+}
+.m-floatnav-item .m-icon { width: 28px; height: 28px; }
+.m-floatnav-item:active { transform: scale(0.90); color: rgba(255,255,255,0.24); }
+.m-floatnav-item.active { color: var(--m-primary); }
+
+/* ============ DIALOG (miuix SuperDialog / OverlayDialog) ============ */
+.m-scrim {
+  position: fixed; inset: 0; z-index: 300;
+  background: var(--m-dim);
+  display: flex; align-items: center; justify-content: center;
+  padding: 24px 12px;
+  opacity: 0; pointer-events: none;
+  transition: opacity .28s var(--m-ease);
+}
+.m-scrim.show { opacity: 1; pointer-events: auto; }
+.m-dialog {
+  width: 100%; max-width: 420px;
+  background: var(--m-surface-container);      /* colorScheme.background */
+  border-radius: var(--m-radius-dialog);
+  padding: 24px;
+  transform: scale(0.88); opacity: 0;
+  transition: transform .28s var(--m-spring), opacity .22s var(--m-ease);
+  max-height: calc(100vh - 64px); overflow-y: auto;
+}
+.m-scrim.show .m-dialog { transform: scale(1); opacity: 1; }
+.m-dialog-title {
+  margin: 0; font-size: 20px; font-weight: 500; color: var(--m-on-surface-container);
+  text-align: center; line-height: 1.35;
+}
+.m-dialog-summary {
+  margin: 12px 0 0; font-size: 15px; color: var(--m-summary);
+  text-align: center; line-height: 1.55; overflow-wrap: break-word;
+}
+/* popup info fitur: paragraf biasa (terpusat, gaya miuix SuperDialog) */
+.m-modal-p { margin: 0; }
+.m-modal-p + .m-modal-p { margin-top: 6px; }
+/* popup info fitur: daftar opsi "Label: deskripsi" — kotak inset rata kiri ala HyperOS */
+.m-modal-rows {
+  display: flex; flex-direction: column;
+  padding: 6px 16px;
+  background: var(--m-surface-container-highest);
+  border-radius: 12px;
+  text-align: left;
+}
+.m-modal-row { display: flex; align-items: baseline; gap: 12px; padding: 8px 0; }
+.m-modal-row.plain { display: block; }
+.m-modal-label {
+  flex-shrink: 0; max-width: 45%;
+  font-size: 15px; font-weight: 500; color: var(--m-on-surface-container);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.m-modal-desc { flex: 1; min-width: 0; font-size: 14px; color: var(--m-summary); line-height: 1.5; }
+.m-dialog-card { margin-top: 16px; }
+.m-dialog-btns {
+  display: flex; margin-top: 20px;
+  border-top: 1px solid var(--m-divider);
+  margin-left: -24px; margin-right: -24px; padding: 0 8px;
+}
+.m-textbtn {
+  flex: 1; min-height: 48px;
+  font-size: 17px; font-weight: 500; color: var(--m-on-secondary-variant);
+  border-radius: var(--m-radius-btn);
+  transition: background .15s var(--m-ease);
+}
+.m-textbtn:active { background: rgba(255,255,255,0.06); }
+.m-textbtn.primary { color: var(--m-primary); }
+
+/* ============ BUTTON (miuix Button) ============ */
+.m-btn {
+  flex: 1; min-height: 40px; min-width: 58px;
   display: flex; align-items: center; justify-content: center; gap: 8px;
-  transition: all 0.2s ease; cursor: pointer; border: none;
+  background: var(--m-secondary-variant); color: var(--m-on-secondary-variant);
+  font-size: 17px; font-weight: 400;
+  border-radius: var(--m-radius-btn);
+  padding: 10px 16px;
+  transition: transform .12s var(--m-ease), background .15s var(--m-ease), opacity .15s;
 }
-.pill-btn:active { transform: scale(0.96); }
-.pill-btn.primary { background-color: var(--primaryContainer, #4F378B); color: var(--onPrimaryContainer, #EADDFF); }
+.m-btn:active { transform: scale(0.96); background: #4C4C4C; }
+.m-btn.primary { background: var(--m-primary); color: var(--m-on-primary); font-weight: 500; }
+.m-btn.primary:active { background: var(--m-primary-press); }
 
-/* =========================================
-   APP LIST & SEARCH
-========================================= */
-.app-search-input {
-  width: calc(100% - 2rem); margin: 1rem 1rem 1rem; padding: 14px 20px; border-radius: 20px;
-  background-color: var(--surfaceContainerHigh, #2B2930); border: none; 
-  color: var(--onSurface, #E6E1E5); font-size: 14px; outline: none; transition: 0.3s;
+/* ============ DEV PROFILE DIALOG ============ */
+.m-dialog-dev { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
+.dev-banner { height: 110px; flex-shrink: 0; }
+.dev-banner img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.dev-content { padding: 0 24px 24px; text-align: center; }
+.dev-avatar {
+  width: 68px; height: 68px; border-radius: 50%; object-fit: cover;
+  border: 4px solid var(--m-surface-container);
+  background: var(--m-surface-container);
+  margin-top: -34px; position: relative; z-index: 2;
 }
-.app-search-input:focus { box-shadow: inset 0 0 0 2px var(--primaryContainer, #4F378B); }
+.dev-name { margin: 10px 0 2px; font-size: 20px; font-weight: 600; color: var(--m-on-surface); }
+.dev-desc { margin: 0 0 18px; font-size: 14px; color: var(--m-summary); line-height: 1.55; }
+.dev-btns { display: flex; gap: 12px; }
 
-#appList { display: flex; flex-direction: column; gap: 8px; padding: 0 1rem; }
-.isolate-content-wrapper { display: flex; align-items: center; gap: 14px; flex: 1; min-width: 0; }
-.isolate-app-icon { width: 44px; height: 44px; border-radius: 12px; object-fit: contain; background: transparent !important; flex-shrink: 0; }
-.isolate-text-group { display: flex; flex-direction: column; justify-content: center; min-width: 0; }
-.isolate-app-label { font-size: 15px; font-weight: 600; color: var(--onSurface, #E6E1E5); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px; transition: color 0.3s ease; }
-.isolate-app-pkg { font-size: 12px; color: var(--onSurfaceVariant, #CAC4D0); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* =========================================
-   APP LIST RE-DESIGN (REFERENCE STYLE)
-========================================= */
-.isolate-app-item {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: 12px 16px; background-color: var(--surfaceContainer, #1D1B20);
-  border-radius: 20px; gap: 16px; transition: 0.2s ease;
-  cursor: pointer;
-}
-.isolate-app-item:active {
-  background-color: var(--surfaceContainerHighest, #36343B);
-}
-.app-badge-enabled {
-  display: inline-block;
-  background-color: color-mix(in srgb, var(--primary, #D0BCFF) 20%, transparent);
-  color: var(--primary, #D0BCFF);
-  font-size: 10px;
-  font-weight: 700;
-  padding: 3px 8px;
-  border-radius: 6px;
-  margin-top: 6px;
-  width: fit-content;
-  letter-spacing: 0.5px;
-}
-.chevron-right {
-  color: var(--onSurfaceVariant, #CAC4D0);
-  font-size: 20px !important;
-}
-
-/* =========================================
-   BOTTOM TOOLBAR
-========================================= */
-#bottomToolbar {
-  position: fixed; bottom: calc(1.5rem + var(--bottom-inset)); left: 50%; transform: translateX(-50%);
-  display: flex; gap: 0.5rem; padding: 0.4rem 0.5rem; border-radius: 9999px; z-index: 999;
-  background-color: color-mix(in srgb, var(--surfaceContainerHigh, #2B2930) 65%, transparent);
-  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid var(--outlineVariant, #49454F);
-}
-#bottomToolbar button {
-  background-color: transparent; color: var(--onSurfaceVariant, #CAC4D0); border: none; padding: 0.5rem 1rem; cursor: pointer;
-  font-size: 0.85rem; font-weight: 600; min-width: 6rem; border-radius: 9999px; outline: none;
-  transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 6px;
-}
-#bottomToolbar button.active { color: var(--onPrimaryContainer, #EADDFF); background-color: var(--primaryContainer, #4F378B); }
-
-/* =========================================
-   MODALS
-========================================= */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 99999; display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.3s;
-  background: color-mix(in srgb, var(--surface, #141218) 70%, transparent); 
-  backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
-}
-.modal-overlay.active { opacity: 1; pointer-events: auto; }
-.modal-container {
-  background-color: var(--surfaceContainerHigh, #2B2930); border-radius: 1.5rem; padding: 1.5rem; width: 90%; max-width: 400px;
-  transform: scale(0.95); transition: transform 0.3s; position: relative;
-}
-.modal-overlay.active .modal-container { transform: scale(1); }
-.modal-title { font-size: 1.25rem; font-weight: 600; color: var(--onSurface, #E6E1E5); margin: 0 0 1rem 0; text-align: center; }
-.modal-desc { font-size: 0.85rem; color: var(--onSurfaceVariant, #CAC4D0); line-height: 1.5; margin-bottom: 1.5rem; text-align: center; white-space: pre-wrap; }
-
-/* Translate Popup */
-.language-dialog-container {
-  background-color: var(--surfaceContainer, #1D1B20); 
-  border-radius: 1.5rem; width: 90%; max-width: 340px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-  transform: scale(0.95); transition: transform 0.3s;
-}
-.modal-overlay.active .language-dialog-container { transform: scale(1); }
-.language-header {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 16px 20px; background-color: var(--surfaceContainerHigh, #2B2930);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  border-radius: 1.5rem 1.5rem 0 0;
-}
-.language-option {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 14px 20px; margin: 4px 8px; border-radius: 12px; cursor: pointer;
-  color: var(--onSurface, #E6E1E5); font-size: 14px; font-weight: 500; transition: background 0.2s;
-}
-.language-option:active { background: var(--surfaceContainerHighest, #36343B); }
-.language-option.selected {
-  color: var(--primary, #D0BCFF);
-  background: color-mix(in srgb, var(--primary, #D0BCFF) 15%, transparent);
-}
-.language-option .check-icon { display: none; color: var(--primary, #D0BCFF); }
-.language-option.selected .check-icon { display: block; }
-
-/* =========================================
-   DEV PROFILE MODAL
-========================================= */
-.dev-modal-container {
-  padding: 0; overflow: hidden; width: 90%; max-width: 340px;
-}
-.dev-modal-banner {
-  width: 100%; height: 120px; position: relative;
-}
-.dev-modal-banner img {
-  width: 100%; height: 100%; object-fit: cover;
-}
-.dev-modal-content {
-  padding: 0 20px 20px; position: relative; text-align: center;
-}
-.dev-modal-avatar {
-  width: 72px; height: 72px; border-radius: 50%; object-fit: cover;
-  border: 4px solid var(--surfaceContainerHigh, #2B2930);
-  background: var(--surfaceContainerHigh, #2B2930);
-  margin-top: -36px; position: relative; z-index: 2;
-}
-
-/* =========================================
-   APP SETTINGS OVERLAY
-========================================= */
-.app-settings-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background-color: var(--background, #141218);
-  z-index: 2000;
+/* ============ APP SETTINGS OVERLAY (Scaffold penuh) ============ */
+.m-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: var(--m-surface);
+  display: flex; flex-direction: column;
   transform: translateX(100%);
-  transition: transform 0.3s cubic-bezier(0.2, 0, 0, 1);
-  display: flex; flex-direction: column;
-  overflow-y: auto; padding-bottom: calc(2rem + var(--bottom-inset));
+  transition: transform .32s var(--m-ease);
 }
-.app-settings-overlay.active {
-  transform: translateX(0);
+.m-overlay.active { transform: translateX(0); }
+.m-overlay-scroll { flex: 1; overflow-y: auto; padding-bottom: calc(40px + var(--bottom-inset)); }
+.m-overlay.no-scroll { overflow: hidden; }
+
+/* hero info aplikasi (gaya halaman detail HyperOS) */
+.m-apphero { display: flex; flex-direction: column; align-items: center; padding: 24px 24px 8px; }
+.m-apphero-icon { width: 68px; height: 68px; border-radius: 18px; object-fit: contain; }
+.m-apphero-name { margin-top: 12px; font-size: 24px; font-weight: 500; color: var(--m-on-surface); text-align: center; word-break: break-word; }
+.m-apphero-pkg { margin-top: 2px; font-size: 14px; color: var(--m-summary); text-align: center; }
+
+/* ============ SETTINGS: BANNER PREVIEW ============ */
+.m-banner-pref {
+  margin: 12px 16px;
+  height: 130px;
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--m-surface-container-highest);
+  cursor: pointer;
+  position: relative;
 }
-.as-header {
-  display: flex; align-items: center; justify-content: space-between;
-  padding: calc(1rem + var(--top-inset)) 1.25rem 1rem;
-  background: var(--background, #141218);
-  position: sticky; top: 0; z-index: 2010;
+.m-banner-pref img {
+  width: 100%; height: 100%; object-fit: cover; display: block;
+  transition: transform .25s var(--m-ease);
 }
-.as-title {
-  font-size: 20px; font-weight: 500; color: var(--onSurface, #E6E1E5); margin: 0; flex: 1; text-align: left; margin-left: 12px;
+.m-banner-pref:active img { transform: scale(1.04); }   /* press-zoom ala galeri HyperOS */
+
+/* baris aksi destruktif (reset banner) */
+.m-pref-danger .m-pref-title { color: #FF7A7A; }
+
+/* ============ SETTINGS: DEV CARD (card biasa) ============ */
+.m-devcard-head { display: flex; align-items: center; gap: 16px; padding: 18px 16px 14px; }
+.m-devcard-avatar {
+  width: 56px; height: 56px; border-radius: 50%; object-fit: cover;
+  background: var(--m-surface-container-highest); flex-shrink: 0;
 }
-.as-content {
-  padding: 0 1.25rem;
+.m-devcard-info { flex: 1; min-width: 0; }
+.m-devcard-name { font-size: 17px; font-weight: 600; color: var(--m-on-surface); }
+.m-devcard-role {
+  font-size: 13px; color: var(--m-summary); margin-top: 3px; line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
-.as-section-title {
-  font-size: 14px; font-weight: 600; color: var(--onSurfaceVariant, #CAC4D0);
-  margin: 32px 0 20px;
-  letter-spacing: 0.5px;
+.m-devcard-btns { display: flex; gap: 12px; padding: 14px 16px 16px; }
+
+/* ============ BLUR (miuix Backdrop: Gaussian / Progressive) ============ */
+/* mode Gaussian: blur seragam + bg translusen */
+body.blur-on.blur-gaussian .m-topappbar,
+body.blur-on.blur-gaussian .m-searchwrap {
+  background: rgba(0,0,0,0.55);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
 }
-.as-app-info {
-  display: flex; align-items: center; gap: 16px; margin-bottom: 32px;
+body.blur-on.blur-gaussian .m-floatnav {
+  background: rgba(36,36,36,0.55);
+  -webkit-backdrop-filter: blur(24px) saturate(1.5);
+  backdrop-filter: blur(24px) saturate(1.5);
 }
-.as-icon {
-  width: 56px; height: 56px; border-radius: 12px; object-fit: contain;
+
+body.blur-on.blur-progressive .m-topappbar,
+body.blur-on.blur-progressive .m-searchwrap {
+  background: rgba(0,0,0,0.30);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 }
-.as-text-group {
-  display: flex; flex-direction: column;
+body.blur-on.blur-progressive .m-topappbar::before,
+body.blur-on.blur-progressive .m-searchwrap::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 35%, transparent 80%);
+  mask-image: linear-gradient(to bottom, #000 35%, transparent 80%);
 }
-.as-app-name {
-  font-size: 18px; font-weight: 600; color: var(--onSurface, #E6E1E5); margin-bottom: 4px;
+body.blur-on.blur-progressive .m-topappbar::after,
+body.blur-on.blur-progressive .m-searchwrap::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  -webkit-backdrop-filter: blur(28px); backdrop-filter: blur(28px);
+  -webkit-mask-image: linear-gradient(to bottom, #000 12%, transparent 50%);
+  mask-image: linear-gradient(to bottom, #000 12%, transparent 50%);
 }
-.as-app-pkg {
-  font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0);
+body.blur-on.blur-progressive .m-floatnav {
+  background: rgba(36,36,36,0.30);
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
 }
-.as-setting-row {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 32px;
+body.blur-on.blur-progressive .m-floatnav::before {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
+  -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  -webkit-mask-image: linear-gradient(to top, #000 35%, transparent 80%);
+  mask-image: linear-gradient(to top, #000 35%, transparent 80%);
 }
-.as-setting-row:last-child {
-  margin-bottom: 0;
+body.blur-on.blur-progressive .m-floatnav::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
+  -webkit-backdrop-filter: blur(28px); backdrop-filter: blur(28px);
+  -webkit-mask-image: linear-gradient(to top, #000 12%, transparent 50%);
+  mask-image: linear-gradient(to top, #000 12%, transparent 50%);
 }
-.as-setting-label {
-  flex: 1; display: flex; flex-direction: column; justify-content: center;
-}
-.disabled-group {
-  opacity: 0.35;
-  pointer-events: none;
-  filter: grayscale(100%);
-  transition: all 0.3s ease;
+
+/* responsive sempit */
+@media (max-width: 360px) {
+  .m-dd-val { font-size: 14px; }
+  .m-pref-title { font-size: 16px; }
 }
