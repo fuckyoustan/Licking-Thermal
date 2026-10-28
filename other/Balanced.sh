@@ -1,36 +1,14 @@
 #!/system/bin/sh
 
 XNXX="/data/adb/modules/LickingT"
-EPORNER="$XNXX/thermal.conf"
-JAVHD="$XNXX/AppConfigs.txt"
-PORN="$XNXX/PornArchive/PornCategories.txt"
 PORNHUB="$XNXX/CurrentZoneState"
-XHAMSTER=$(grep -i '^ZONE=' "$EPORNER" 2>/dev/null | cut -d'=' -f2)
-JAVTIFUL=$(cat "$XNXX/zpolicy" 2>/dev/null)
-if [ -f "$PORN" ]; then
-while read -r pkg || [ -n "$pkg" ]; do
-[ -z "$pkg" ] && continue
-if pidof "$pkg" >/dev/null 2>&1; then
-if [ -f "$JAVHD" ]; then
-JAVTIFUL="$(grep "^$pkg:" "$JAVHD")"
-if [ -n "$JAVTIFUL" ]; then
-XVIDEOS="$(echo "$JAVTIFUL" | cut -d':' -f4)"
-if [ -n "$XVIDEOS" ]; then
-XHAMSTER="$XVIDEOS"
-fi
-YOUJIZZ="$(echo "$JAVTIFUL" | cut -d':' -f3)"
-if [ -n "$YOUJIZZ" ]; then
-JAVTIFUL="$YOUJIZZ"
-fi
-fi
-fi
-break
-fi
-done < "$PORN"
-fi
+JAVTIFUL="$1"
+XHAMSTER="$2"
+[ -z "$XHAMSTER" ] && XHAMSTER="0"
 echo "$XHAMSTER" > "$PORNHUB"
 if [ -n "$JAVTIFUL" ]; then
 for z in /sys/class/thermal/thermal_zone*; do
+[ -f "$z/policy" ] || continue
 chmod 644 "$z/policy" 2>/dev/null
 echo "$JAVTIFUL" > "$z/policy" 2>/dev/null
 done
@@ -54,8 +32,10 @@ Miyabi "1" /proc/mtk_batoc_throttling/battery_oc_protect_stop
 cmd thermalservice override-status 0 2>/dev/null
 }
 SoraAoi() {
+BK="$XNXX/PropBackup.txt"
+[ -s "$BK" ] || getprop | awk -F'[][]' 'tolower($2) ~ /thermal|temp|throttl/ && $2 !~ /^init[.]svc[.]/ {print $2"="$4}' > "$BK" 2>/dev/null
 getprop | awk -F'[][]' 'BEGIN { words[0]="YESDADDY"; words[1]="FUCK"; words[2]="AHHH"; words[3]="LICKIT"; srand(); }
-tolower($2) ~ /thermal/ { val = words[int(rand() * 4)]; printf "resetprop -n \"%s\" \"%s\" 2>/dev/null\n", $2, val; printf "setprop \"%s\" \"%s\" 2>/dev/null\n", $2, val; }' | sh
+tolower($2) ~ /thermal/ { val = words[int(rand() * 4)]; printf "resetprop -n \"%s\" \"%s\" 2>/dev/null\n", $2, val; }' | sh
 }
 NicoleMurkovski() {
 if ! service check miui.mqsas.IMQSNative | grep -q "not found"; then
@@ -79,7 +59,10 @@ fi
 SweetyFox2() {
 PUSSY="/data/adb/modules/LickingT/FuckTemp"
 [ ! -f "$PUSSY" ] && echo "30000" > "$PUSSY"
-find /sys/devices/virtual/thermal -name 'temp' -type f 2>/dev/null | awk -v dummy="$PUSSY" '{print "mount --bind \"" dummy "\" \"" $0 "\""}' | sh 2>/dev/null &
+find /sys/devices/virtual/thermal -name 'temp' -type f 2>/dev/null | while read -r Boobs; do
+grep -qF " $Boobs " /proc/mounts 2>/dev/null && continue
+mount --bind "$PUSSY" "$Boobs" 2>/dev/null
+done
 }
 LolaTaylor() {
 find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "disabled" : "0"; print "chmod 644 \"" $0 "\"; echo " val " > \"" $0 "\"" }' | sh 2>/dev/null &
@@ -87,7 +70,7 @@ find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" 
 EvaElfie() {
 for puki in /sys/devices/*.mali; do
 if [ -d "$puki" ]; then
-chmod 000 /sys/devices/*.mali/tmu /sys/devices/*.mali/throttling* /sys/devices/*.mali/tripping 2>/dev/null
+chmod 000 "$puki/tmu" "$puki"/throttling* "$puki/tripping" 2>/dev/null
 fi
 done
 }
@@ -179,11 +162,13 @@ Barbamiska
 EvaElfie
 NicoleMurkovski
 sleep 2
-SoraAoi
+#SoraAoi
 if [ "$XHAMSTER" = "0" ]; then
 LolaTaylor
+sleep 1
 SweetyFox2
 else
 SweetyFox1
 fi
 KitanoMina
+wait
