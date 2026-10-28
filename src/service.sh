@@ -15,16 +15,14 @@ fi
 
 echo "$MYPID" > "$PIDFILE"
 while [ -z "$(getprop sys.boot_completed)" ]; do
-    sleep 10
+    sleep 7
 done
 
 eko() {
     local val="$1"; shift
     for p in "$@"; do
         [ -f "$p" ] || continue
-        chmod 644 "$p" 2>/dev/null
         printf '%s' "$val" > "$p" 2>/dev/null
-        chmod 444 "$p" 2>/dev/null
     done
 }
 
@@ -36,33 +34,70 @@ ZPOLICY="$MODPATH/zpolicy"
 PORN="$MODPATH/PornArchive/PornCategories.txt"
 APP_CONFIGS="$MODPATH/AppConfigs.txt"
 STATE_FILE="$MODPATH/CurrentState"
+CHARGE_BACKUP="$MODPATH/chargebackup.txt"
+LIMIT_CHARGE="$(find /sys/devices -name charge_control_limit 2>/dev/null)"
+rm -f /data/vendor/thermal/config
+rm -f /data/vendor/thermal/thermal.dump
+rm -f /data/vendor/thermal/thermal_history.dump
 
 Msbreewc() {
-    find /sys/class/power_supply/battery/ -name '*temp*' -exec chmod 000 {} + 2>/dev/null
-    find /system/etc/init /vendor/etc/init /odm/etc/init -type f 2>/dev/null | xargs grep -h "^service.*thermal" 2>/dev/null | awk '{print "stop "$2"; setprop ctl.stop "$2";"}' | sh 2>/dev/null
-    find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "disabled" : "0"; print "chmod 644 \"" $0 "\"; echo " val " > \"" $0 "\"" }' | sh 2>/dev/null &
+    local BASE=/sys/class/power_supply
+    local TARGET_CURRENT=5750000
+    local TARGET_VOLTAGE=12500000
+    local TARGET_SIOP=100
+    local TARGET_TEMP_LIMIT=500
+    local CURRENT_PATHS=$(ls $BASE/*/constant_charge_current_max $BASE/*/input_current_limit $BASE/*/charge_control_limit $BASE/*/current_max 2>/dev/null)
+    local VOLTAGE_PATHS=$(ls $BASE/*/input_voltage_limit $BASE/*/voltage_max 2>/dev/null)
+    local SIOP_PATHS=$(ls $BASE/*/siop_level 2>/dev/null)
+    local TEMP_LIMIT_PATHS=$(ls $BASE/*/temp_warm $BASE/*/temp_hot 2>/dev/null)
+    > "$CHARGE_BACKUP"
+
+    apply_and_backup() {
+        local target_val="$1"; shift
+        for node in "$@"; do
+            [ -f "$node" ] || continue
+
+            local orig_val=$(cat "$node" 2>/dev/null)
+            orig_val=${orig_val%"$(printf '\r')"}
+            echo "$node|$orig_val" >> "$CHARGE_BACKUP"
+
+            chmod 0666 "$node" 2>/dev/null
+            echo "$target_val" > "$node" 2>/dev/null
+            chmod 0644 "$node" 2>/dev/null
+        done
+    }
+
+    apply_and_backup "$TARGET_CURRENT" $CURRENT_PATHS
+    apply_and_backup "$TARGET_VOLTAGE" $VOLTAGE_PATHS
+    apply_and_backup "$TARGET_SIOP" $SIOP_PATHS
+    apply_and_backup "$TARGET_TEMP_LIMIT" $TEMP_LIMIT_PATHS
     
-    for anal in /sys/class/power_supply/*; do
-eko "150" "$anal/temp_cool"
-eko "570" "$anal/temp_hot"
-eko "500" "$anal/temp_warm"
-eko "0" "$anal/thermal_limit"
-eko "0" "$anal/device/bcl_enabled"
-done
+    for a in $LIMIT_CHARGE; do
+        eko "0" "$a"
+    done
+    find /sys/kernel /sys/class -type f \( -iname '*fast_charge*' -o -iname '*boost_mode*' -o -iname '*turbo_mode*' -o -iname '*force_fast_charge*' -o -iname '*fastcharge*' \) 2>/dev/null | while read -r b; do
+        eko "1" "$b"
+    done
 }
 
 Siskaeee() {
-    find /sys/class/power_supply/battery/ -name '*temp*' -exec chmod 444 {} + 2>/dev/null
-    find /system/etc/init /vendor/etc/init /odm/etc/init -type f 2>/dev/null | xargs grep -h "^service.*thermal" 2>/dev/null | awk '{print "start "$2"; setprop ctl.start "$2";"}' | sh 2>/dev/null
-    find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "enabled" : "1"; print "echo " val " > \"" $0 "\"; chmod 444 \"" $0 "\"" }' | sh 2>/dev/null &
+    if [ -f "$CHARGE_BACKUP" ]; then
+        while IFS='|' read -r node val; do
+            if [ -f "$node" ] && [ -n "$val" ]; then
+                chmod 0666 "$node" 2>/dev/null
+                echo "$val" > "$node" 2>/dev/null
+                chmod 0664 "$node" 2>/dev/null
+            fi
+        done < "$CHARGE_BACKUP"
+        rm -f "$CHARGE_BACKUP"
+    fi
     
-    for anal in /sys/class/power_supply/*; do
-eko "150" "$anal/temp_cool"
-eko "400" "$anal/temp_hot"
-eko "380" "$anal/temp_warm"
-eko "1" "$anal/thermal_limit"
-eko "1" "$anal/device/bcl_enabled"
-done
+    for a in $LIMIT_CHARGE; do
+        eko "1" "$a"
+    done
+    find /sys/kernel /sys/class -type f \( -iname '*fast_charge*' -o -iname '*boost_mode*' -o -iname '*turbo_mode*' -o -iname '*force_fast_charge*' -o -iname '*fastcharge*' \) 2>/dev/null | while read -r b; do
+        eko "0" "$b"
+    done
 }
 
 echo "NotHorny" > "$STATE_FILE"
@@ -78,8 +113,8 @@ apply_policy() {
     [ -z "$pol" ] && return
     for z in /sys/class/thermal/thermal_zone*; do
         if [ -f "$z/policy" ]; then
-            chmod 644 "$z/policy"
-            echo "$pol" > "$z/policy"
+            chmod 644 "$z/policy" 2>/dev/null
+            echo "$pol" > "$z/policy" 2>/dev/null
         fi
     done
 }
@@ -93,28 +128,13 @@ if [ -f "$CONF" ]; then
     . "$CONF"
     if [ "$DISABLE_PANIC" = "1" ]; then
         write_val() {
-            local file="$1"
-            local value="$2"
-            if [ -f "$file" ]; then
-                chmod +w "$file" 2>/dev/null
-                echo "$value" > "$file"
-            fi
+            [ -f "$1" ] && { chmod +w "$1" 2>/dev/null; echo "$2" > "$1" 2>/dev/null; }
         }
-
-        set_tweak() {
-            local name="$1"
-            local val="$2"
-            find /proc/sys /sys -name "$name" 2>/dev/null | while read -r path; do
-                write_val "$path" "$val"
-            done
-        }
-
-        for p in "*panic*" exception-trace sched_schedstats tracing_on log_ecn_error snapshot_crashdumper use_spi_crc; do
-            set_tweak "$p" "0"
+        find /proc/sys /sys -type f \( -name "*panic*" -o -name "exception-trace" -o -name "sched_schedstats" -o -name "tracing_on" -o -name "log_ecn_error" -o -name "snapshot_crashdumper" -o -name "use_spi_crc" \) 2>/dev/null | while read -r path; do
+            write_val "$path" "0"
         done
-
-        set_tweak "printk" "0 0 0 0"
-        set_tweak "printk_devkmsg" "off"
+        write_val "/proc/sys/kernel/printk" "0 0 0 0"
+        write_val "/proc/sys/kernel/printk_devkmsg" "off"
     fi
 fi
 
@@ -124,6 +144,10 @@ read_mode() {
 
 write_mode() {
     printf "%s" "$1" > "$STATE_FILE"
+}
+
+Notip() { 
+    su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' '$1' '$2'" > /dev/null 2>&1
 }
 
 get_PornApp() {
@@ -153,6 +177,7 @@ CURRENT_PKG=""
 THERMAL_DISABLED="false"
 FAST_CHARGE_STATE="false"
 
+sleep 10
 while true; do
     if [ -f "$CONF" ]; then
         . "$CONF"
@@ -160,86 +185,97 @@ while true; do
     
     current_mode="$(read_mode)"
     GLOBAL_POLICY=$(cat "$ZPOLICY" 2>/dev/null)
+    GLOBAL_ZONE=$(grep -i '^ZONE=' "$CONF" 2>/dev/null | cut -d'=' -f2)    
     TARGET_STATE="NotHorny"
     active_pkg=""
     USE_HAL="$HAL"
     USE_POLICY="$GLOBAL_POLICY"
+    USE_ZONE="${GLOBAL_ZONE:-0}"    
     [ -z "$Charge" ] && Charge="0"
-    BAT_STATUS=$(cat /sys/class/power_supply/battery/status)
+    BAT_STATUS=$(cat /sys/class/power_supply/battery/status 2>/dev/null)
 
     if [ "$MODE" = "auto" ]; then
         PornApp="$(get_PornApp)"        
-        while read -r pkg || [ -n "$pkg" ]; do
-            [ -z "$pkg" ] && continue
-            echo "$PornApp" | grep -Eiq "$pkg" && {
-                TARGET_STATE="Horny"
-                active_pkg="$pkg"
-                break
-            }
-        done < "$PORN"
-
-        if [ "$TARGET_STATE" = "Horny" ] && [ -f "$APP_CONFIGS" ]; then
-            custom_line="$(grep "^$active_pkg:" "$APP_CONFIGS")"
-            if [ -n "$custom_line" ]; then
-                custom_agg="$(echo "$custom_line" | cut -d':' -f2)"
-                custom_pol="$(echo "$custom_line" | cut -d':' -f3)"                
-                if [ -n "$custom_agg" ] && [ -n "$custom_pol" ]; then
-                    USE_HAL="$custom_agg"
-                    USE_POLICY="$custom_pol"
+        
+        if [ -f "$APP_CONFIGS" ]; then
+            while read -r line || [ -n "$line" ]; do
+                [ -z "$line" ] && continue
+                pkg="$(echo "$line" | cut -d':' -f1)"
+                if echo "$PornApp" | grep -q "$pkg"; then
+                    TARGET_STATE="Horny"
+                    active_pkg="$pkg"
+                    custom_agg="$(echo "$line" | cut -d':' -f2)"
+                    custom_pol="$(echo "$line" | cut -d':' -f3)"
+                    custom_zone="$(echo "$line" | cut -d':' -f4)"                
+                    
+                    [ -n "$custom_agg" ] && USE_HAL="$custom_agg"
+                    [ -n "$custom_pol" ] && USE_POLICY="$custom_pol"
+                    [ -n "$custom_zone" ] && USE_ZONE="$custom_zone"
+                    break
                 fi
-            fi
+            done < "$APP_CONFIGS"
+        fi
+
+        if [ "$TARGET_STATE" != "Horny" ] && [ -f "$PORN" ]; then
+            while read -r pkg || [ -n "$pkg" ]; do
+                [ -z "$pkg" ] && continue
+                if echo "$PornApp" | grep -q "$pkg"; then
+                    TARGET_STATE="Horny"
+                    active_pkg="$pkg"
+                    break
+                fi
+            done < "$PORN"
         fi        
     elif [ "$MODE" = "static" ]; then
         TARGET_STATE="Horny"
         active_pkg="STATIC"
     fi
 
-    if [ "$Charge" = "1" ] && [ "$BAT_STATUS" = "Charging" ]; then
-        if [ "$FAST_CHARGE_STATE" != "true" ]; then
-            Msbreewc
-            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'FastCharge' '⚡ Fast Charge Enabled: turn off temp for better current'" > /dev/null 2>&1
-            FAST_CHARGE_STATE="true"
-        fi
-    else
-        if [ "$FAST_CHARGE_STATE" = "true" ]; then
-            Siskaeee
-            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'FastCharge' '🔋 Fast Charge Disabled: Restoring normal thermal state.'" > /dev/null 2>&1
-            FAST_CHARGE_STATE="false"
+    if [ "$MODE" = "auto" ]; then
+        if [ "$Charge" = "1" ] && [ "$BAT_STATUS" = "Charging" ]; then
+            if [ "$FAST_CHARGE_STATE" != "true" ]; then
+                Msbreewc
+                Notip FastCharge "⚡ Fast Charge Enabled: turn off temp for better current"
+                FAST_CHARGE_STATE="true"
+            fi
+        else
+            if [ "$FAST_CHARGE_STATE" = "true" ]; then
+                Siskaeee
+                Notip FastCharge "🔋 Fast Charge Disabled: Restoring normal thermal state."
+                FAST_CHARGE_STATE="false"
+            fi
         fi
     fi
     
     if [ "$TARGET_STATE" = "Horny" ]; then        
-        if [ "$THERMAL_DISABLED" = "false" ]; then
+        if [ "$THERMAL_DISABLED" = "false" ] || [ "$CURRENT_PKG" != "$active_pkg" ]; then
             write_mode "Horny"
             CURRENT_PKG="$active_pkg"
             apply_policy "$USE_POLICY"            
+            echo "$USE_HAL" > "$MODPATH/CurrentHalState"
+            
             if [ "$USE_HAL" = "1" ]; then
-                sh "$MODPATH/PornArchive/MILF.sh" &
-                su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🚀 Aggressive mode Apply for $active_pkg'" > /dev/null 2>&1
+                sh "$MODPATH/PornArchive/MILF.sh" "$USE_POLICY" "$USE_ZONE" &
+                Notip Tag "🚀 Aggressive mode Apply for $active_pkg"
             else
-                sh "$MODPATH/PornArchive/amature.sh" &
-                su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🤡 Amature mode Apply for $active_pkg'" > /dev/null 2>&1
+                sh "$MODPATH/PornArchive/amature.sh" "$USE_POLICY" "$USE_ZONE" &
+                Notip Tag "🤡 Amature mode Apply for $active_pkg"
             fi            
             THERMAL_DISABLED="true"
             sleep 3
-        elif [ "$CURRENT_PKG" != "$active_pkg" ]; then
-            write_mode "Horny"
-            CURRENT_PKG="$active_pkg"
-            apply_policy "$USE_POLICY"            
-            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '🔄 Switched to $active_pkg'" > /dev/null 2>&1
-            sleep 1
         fi
     elif [ "$TARGET_STATE" = "NotHorny" ]; then
         if [ "$THERMAL_DISABLED" = "true" ]; then
             write_mode "NotHorny"
             CURRENT_PKG=""
             sh "$MODPATH/PornArchive/anal.sh" &
-            su -lp 2000 -c "cmd notification post -S bigtext -t 'Licking Thermal 💦' 'Tag' '😴 Normal mode Apply'" > /dev/null 2>&1            
+            Notip Tag "😴 Normal mode Apply"
             THERMAL_DISABLED="false"
-            sleep 3 
+            rm -f "$MODPATH/CurrentHalState"
+            sleep 3
         fi
     fi
     
     description
-    sleep 10
+    sleep 7
 done
