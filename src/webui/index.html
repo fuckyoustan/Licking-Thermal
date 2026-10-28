@@ -4,11 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Licking Thermal</title>
-  
-  <link href="https://fonts.googleapis.com/css2?family=Fruktur" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/icon?family=Material+Symbols+Outlined" rel="stylesheet">
   <link rel="stylesheet" href="assets/style.css">
-  
   <script type="importmap">
     {
       "imports": {
@@ -19,290 +15,365 @@
 </head>
 <body>
 
-  <header>
-    <div class="header-title">
-      <img src="assets/shit.jpg" alt="Dev" class="header-avatar" id="dev-profile-btn" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'42\' height=\'42\'><circle cx=\'21\' cy=\'21\' r=\'21\' fill=\'%23333\'/></svg>'">
-      <span class="brand-text">Licking Thermal</span>
+  <!-- ================= MIUIX ICON SPRITE ================= -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+    <symbol id="i-info" viewBox="0 0 1225.2 1225.2"><path d="M 1123.1 613.1 Q 1123.1 474.1 1054.6 357.1 Q 986.1 240.1 869.1 171.1 Q 752.1 102.1 613.1 102.1 Q 474.1 102.1 357.1 171.1 Q 240.1 240.1 171.1 357.1 Q 102.1 474.1 102.1 613.1 Q 102.1 752.1 171.1 869.1 Q 240.1 986.1 357.1 1054.6 Q 474.1 1123.1 613.1 1123.1 Q 752.1 1123.1 869.1 1054.6 Q 986.1 986.1 1054.6 869.1 Q 1123.1 752.1 1123.1 613.1 M 188.1 613.1 Q 188.1 497.1 245.1 399.6 Q 302.1 302.1 399.6 245.1 Q 497.1 188.1 613.1 188.1 Q 728.1 188.1 825.6 245.1 Q 923.1 302.1 980.6 399.6 Q 1038.1 497.1 1038.1 613.1 Q 1038.1 729.1 980.6 826.6 Q 923.1 924.1 825.6 981.1 Q 728.1 1038.1 613.1 1038.1 Q 497.1 1038.1 399.6 981.1 Q 302.1 924.1 245.1 826.6 Q 188.1 729.1 188.1 613.1 M 667.1 377.1 Q 667.1 354.1 651.6 338.6 Q 636.1 323.1 613.1 323.1 Q 590.1 323.1 574.1 339.1 Q 558.1 355.1 558.1 377.1 Q 558.1 399.1 574.6 415.6 Q 591.1 432.1 613.1 432.1 Q 635.1 432.1 651.1 416.1 Q 667.1 400.1 667.1 377.1 M 655.1 875.1 V 709.1 Q 655.1 504.1 648.1 496.6 Q 641.1 489.1 626.1 489.1 H 598.1 Q 585.1 489.1 577.6 497.1 Q 570.1 505.1 570.1 516.1 V 350.1 Q 570.1 888.1 578.1 895.1 Q 586.1 902.1 599.1 902.1 H 627.1 Q 640.1 902.1 647.6 895.1 Q 655.1 888.1 655.1 875.1" fill="currentColor"/></symbol>
+    <symbol id="i-favorites" viewBox="0 0 1306.8 1306.8"><path d="M 680.9 234.9 L 675.9 238.9 L 664.9 249.9 Q 652.9 261.9 641.9 249.9 Q 634.9 241.9 625.9 234.9 Q 583.9 200.9 532.4 181.9 Q 480.9 162.9 424.9 162.9 Q 338.9 162.9 266.4 204.9 Q 193.9 246.9 151.4 318.9 Q 108.9 390.9 108.9 476.9 Q 108.9 566.9 155.9 641.9 Q 211.9 736.9 339.4 865.9 Q 466.9 994.9 596.9 1109.9 Q 609.9 1121.9 619.9 1129.4 Q 629.9 1136.9 637.9 1138.9 Q 654.9 1143.9 670.9 1138.9 Q 677.9 1136.9 688.4 1128.9 Q 698.9 1120.9 711.9 1108.9 Q 835.9 997.9 958.9 874.9 Q 1081.9 751.9 1143.9 654.9 Q 1197.9 575.9 1197.9 476.9 Q 1197.9 390.9 1155.4 318.9 Q 1112.9 246.9 1040.9 204.9 Q 968.9 162.9 882.9 162.9 Q 826.9 162.9 774.9 181.9 Q 722.9 200.9 680.9 234.9 M 1111.9 476.9 Q 1111.9 547.9 1072.9 606.9 Q 1025.9 678.9 940.9 768.4 Q 855.9 857.9 791.9 918.9 Q 730.9 976.9 668.9 1031.9 Q 658.9 1040.9 653.9 1040.9 Q 648.9 1040.9 638.9 1031.9 Q 571.9 971.9 506.9 909.9 Q 291.9 704.9 228.9 595.9 Q 208.9 562.9 202.4 535.9 Q 195.9 508.9 195.9 476.9 Q 195.9 414.9 226.4 362.4 Q 256.9 309.9 309.9 279.4 Q 362.9 248.9 424.9 248.9 Q 472.9 248.9 515.9 267.9 Q 558.9 286.9 590.9 320.9 Q 603.9 334.9 613.9 344.4 Q 623.9 353.9 631.9 356.9 Q 653.9 365.9 675.9 356.9 Q 683.9 352.9 693.9 343.9 Q 703.9 334.9 716.9 320.9 Q 747.9 286.9 791.4 267.9 Q 834.9 248.9 882.9 248.9 Q 944.9 248.9 997.9 279.4 Q 1050.9 309.9 1081.4 362.4 Q 1111.9 414.9 1111.9 476.9" fill="currentColor"/></symbol>
+    <symbol id="i-arrowright" viewBox="0 0 10 16"><path d="M 1.65 1.47 C 1.93 1.19 2.38 1.19 2.66 1.47 L 8.72 7.53 C 9 7.81 9 8.26 8.72 8.54 L 2.66 14.6 C 2.38 14.88 1.93 14.88 1.65 14.6 C 1.37 14.32 1.37 13.87 1.65 13.59 L 7.21 8.04 L 1.65 2.48 C 1.37 2.2 1.37 1.75 1.65 1.47 Z" fill="currentColor"/></symbol>
+    <symbol id="i-arrowupdown" viewBox="0 0 10 16"><path d="M 2.4 4.74 L 4.57 2.57 L 5.01 2.13 L 5.43 2.55 L 7.6 4.72 L 8.53 5.65 C 8.83 5.95 9.31 5.95 9.61 5.65 C 9.9 5.35 9.9 4.87 9.61 4.57 L 8.68 3.64 L 6.5 1.47 L 5.57 0.54 C 5.36 0.33 5.06 0.27 4.79 0.35 C 4.66 0.39 4.53 0.45 4.42 0.56 L 3.49 1.49 L 1.32 3.66 L 0.39 4.59 C 0.09 4.89 0.09 5.37 0.39 5.67 C 0.69 5.97 1.17 5.97 1.46 5.67 L 2.4 4.74 Z M 2.4 11.26 L 4.57 13.43 L 5.01 13.87 L 5.43 13.45 L 7.6 11.28 L 8.53 10.34 C 8.83 10.05 9.31 10.05 9.61 10.34 C 9.9 10.64 9.9 11.12 9.61 11.42 L 8.68 12.35 L 6.5 14.53 L 5.57 15.46 C 5.36 15.67 5.06 15.73 4.79 15.64 C 4.66 15.61 4.53 15.54 4.42 15.44 L 3.49 14.51 L 1.32 12.33 L 0.39 11.4 C 0.09 11.1 0.09 10.62 0.39 10.32 C 0.69 10.03 1.17 10.03 1.46 10.32 L 2.4 11.26 Z" fill="currentColor"/></symbol>
+    <symbol id="i-search" viewBox="0 0 20 20"><path d="M 12.57 13.38 C 11.54 14.18 10.24 14.66 8.84 14.66 C 5.48 14.66 2.75 11.94 2.75 8.58 C 2.75 5.22 5.48 2.5 8.84 2.5 C 12.19 2.5 14.92 5.22 14.92 8.58 C 14.92 9.99 14.44 11.29 13.63 12.32 L 17.46 16.15 C 17.56 16.25 17.61 16.3 17.64 16.35 C 17.78 16.55 17.78 16.81 17.64 17.01 C 17.61 17.06 17.56 17.11 17.46 17.21 C 17.37 17.31 17.32 17.36 17.27 17.39 C 17.07 17.52 16.8 17.52 16.6 17.39 C 16.55 17.36 16.5 17.31 16.4 17.21 L 12.57 13.38 Z M 13.42 8.58 C 13.42 11.11 11.37 13.16 8.84 13.16 C 6.3 13.16 4.25 11.11 4.25 8.58 C 4.25 6.05 6.3 4 8.84 4 C 11.37 4 13.42 6.05 13.42 8.58 Z" fill="currentColor"/></symbol>
+    <symbol id="i-searchcleanup" viewBox="0 0 68 68"><path d="M 34 66 C 51.67 66 66 51.67 66 34 C 66 16.33 51.67 2 34 2 C 16.33 2 2 16.33 2 34 C 2 51.67 16.33 66 34 66 Z" fill="currentColor" fill-opacity="0.06"/><path d="M 44.61 27.85 C 45.78 26.68 45.78 24.78 44.61 23.61 C 43.44 22.43 41.54 22.43 40.36 23.61 L 34 29.97 L 27.64 23.61 C 26.46 22.43 24.57 22.43 23.39 23.61 C 22.22 24.78 22.22 26.68 23.39 27.85 L 29.76 34.21 L 23.39 40.58 C 22.22 41.75 22.22 43.65 23.39 44.82 C 24.57 45.99 26.46 45.99 27.64 44.82 L 34 38.46 L 40.36 44.82 C 41.54 45.99 43.44 45.99 44.61 44.82 C 45.78 43.65 45.78 41.75 44.61 40.58 L 38.24 34.21 L 44.61 27.85 Z" fill="currentColor" fill-opacity="0.3"/></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M 2.24 10.4 C 2.12 10.85 2.12 11.33 2.12 12.29 L 2.12 17.2 C 2.12 18.88 2.12 19.72 2.45 20.36 C 2.74 20.93 3.2 21.39 3.76 21.67 C 4.4 22 5.24 22 6.92 22 L 7.16 22 C 7.84 22 8.17 22 8.43 21.87 C 8.65 21.75 8.84 21.57 8.95 21.35 C 9.08 21.09 9.08 20.75 9.08 20.08 L 9.08 17.57 C 9.08 15.96 10.39 14.65 12 14.65 C 13.61 14.65 14.91 15.96 14.91 17.57 L 14.91 20.08 C 14.91 20.75 14.91 21.09 15.05 21.35 C 15.16 21.57 15.35 21.75 15.57 21.87 C 15.83 22 16.16 22 16.83 22 L 17.08 22 C 18.76 22 19.6 22 20.24 21.67 C 20.8 21.39 21.26 20.93 21.55 20.36 C 21.88 19.72 21.88 18.88 21.88 17.2 L 21.88 12.29 C 21.88 11.33 21.88 10.85 21.76 10.4 C 21.65 10.01 21.48 9.64 21.24 9.3 C 20.98 8.93 20.61 8.62 19.88 8 L 14.05 3.11 C 13.32 2.5 12.96 2.19 12.55 2.08 C 12.19 1.97 11.81 1.97 11.45 2.08 C 11.04 2.19 10.68 2.5 9.94 3.11 L 4.12 8 C 3.39 8.62 3.02 8.93 2.76 9.3 C 2.52 9.64 2.35 10.01 2.24 10.4" fill="currentColor"/></symbol>
+    <symbol id="i-gridview" viewBox="0 0 1120.8 1120.8"><path d="M 416.8 230.7 Q 425.3 233.9 431.5 239.8 Q 437.6 245.6 439.8 253.3 Q 443.3 264.3 443.3 301 V 751.2 Q 443.3 406.6 439.8 417.7 Q 437.6 425.4 431.3 431.2 Q 424.9 437.1 416.8 439.8 Q 404.5 443.8 370.5 443.8 H 359.4 H 311.9 H 300.9 Q 266.8 443.8 254.5 439.8 Q 246 437.1 239.7 431.2 Q 233.4 425.4 231.1 417.7 Q 228 405.9 228 369.6 V 819.8 Q 228 282.1 228.7 270.9 Q 229.4 259.6 231.1 253.3 Q 233.4 245.6 239.7 239.8 Q 246 233.9 254.5 230.7 Q 262.9 228.1 278.4 227.4 Q 293.8 226.7 311.9 226.7 H 359.4 Q 377.5 226.7 392.9 227.4 Q 408.4 228.1 416.8 230.7 M 447.8 518.9 Q 471.8 510.7 489.4 492.1 Q 507.1 473.6 517.6 448.7 Q 524.6 431.7 526.5 410.1 Q 528.5 388.4 528.5 352.9 V 803.1 Q 528.5 282.2 526.5 260.8 Q 524.6 239.3 517.6 222.2 Q 507.1 197.4 489.4 178.9 Q 471.8 160.3 447.8 151.6 Q 418.8 141.6 373.4 141.6 H 297.8 Q 252.5 141.6 223.5 151.6 Q 199.5 160.3 181.6 179 Q 163.8 197.8 153.8 222.2 Q 146.7 239.3 144.8 260.8 Q 142.8 282.2 142.8 317.7 V 767.9 Q 142.8 388.4 144.8 410.1 Q 146.7 431.7 153.8 448.7 Q 163.8 473.2 181.6 492 Q 199.5 510.7 223.5 518.9 Q 251.1 529 297.8 529 H 373.4 Q 420.6 529 447.8 518.9 M 866.3 230.7 Q 874.8 233.9 881.1 239.8 Q 887.4 245.6 889.7 253.3 Q 891.4 259.6 892.1 270.9 Q 892.8 282.1 892.8 301 V 751.2 Q 892.8 388.5 892.1 400 Q 891.4 411.4 889.7 417.7 Q 887.4 425.4 881.1 431.2 Q 874.8 437.1 866.3 439.8 Q 854 443.8 819.9 443.8 H 808.8 H 761.4 H 750.3 Q 716.2 443.8 704 439.8 Q 695.4 437.1 689.1 431.2 Q 682.9 425.4 681 417.7 Q 677.5 406.6 677.5 369.6 V 819.8 Q 677.5 264.3 681 253.3 Q 683.2 245.6 689.5 239.8 Q 695.8 233.9 704 230.7 Q 712.4 228.1 727.9 227.4 Q 743.3 226.7 761.4 226.7 H 808.8 Q 826.9 226.7 842.4 227.4 Q 857.9 228.1 866.3 230.7 M 897.3 518.9 Q 921.2 510.7 939.1 492 Q 957 473.2 967 448.7 Q 974.1 431.7 976 410.1 Q 978 388.4 978 352.9 V 803.1 Q 978 282.2 976 260.8 Q 974.1 239.3 967 222.2 Q 957 197.8 939.1 179 Q 921.2 160.3 897.3 151.6 Q 868.2 141.6 822.9 141.6 H 747.3 Q 702 141.6 673 151.6 Q 649 160.3 631.3 178.9 Q 613.6 197.4 603.2 222.2 Q 596.2 239.3 594.3 260.8 Q 592.3 282.2 592.3 317.7 V 767.9 Q 592.3 388.4 594.3 410.1 Q 596.2 431.7 603.2 448.7 Q 613.6 473.6 631.3 492.1 Q 649 510.7 673 518.9 Q 700.6 529 747.3 529 H 822.9 Q 870.1 529 897.3 518.9 M 370.5 677 Q 404.5 677 416.8 681 Q 424.9 683.7 431.3 689.6 Q 437.6 695.5 439.8 703.1 Q 443.3 714.2 443.3 751.2 V 301 Q 443.3 856.5 439.8 867.5 Q 437.6 875.2 431.5 881.1 Q 425.3 886.9 416.8 890.1 Q 408.4 892.7 392.9 893.4 Q 377.5 894.1 359.4 894.1 H 311.9 Q 293.8 894.1 278.4 893.4 Q 262.9 892.7 254.5 890.1 Q 246 886.9 239.7 881.1 Q 233.4 875.2 231.1 867.5 Q 228 855.7 228 819.8 V 369.6 Q 228 732.3 228.7 720.8 Q 229.4 709.4 231.1 703.1 Q 233.4 695.5 239.7 689.6 Q 246 683.7 254.5 681 Q 266.8 677 300.9 677 H 311.9 H 359.4 M 447.8 969.2 Q 471.8 960.5 489.4 941.9 Q 507.1 923.4 517.6 898.6 Q 524.6 881.5 526.5 860 Q 528.5 838.6 528.5 803.1 V 352.9 Q 528.5 732.5 526.5 710.8 Q 524.6 689.1 517.6 672.1 Q 507.1 647.2 489.4 628.7 Q 471.8 610.1 447.8 601.9 Q 420.6 591.8 373.4 591.8 H 297.8 Q 251.1 591.8 223.5 601.9 Q 199.5 610.1 181.6 628.9 Q 163.8 647.6 153.8 672.1 Q 146.7 689.1 144.8 710.8 Q 142.8 732.5 142.8 767.9 V 317.7 Q 142.8 838.6 144.8 860 Q 146.7 881.5 153.8 898.6 Q 163.8 923.1 181.6 941.8 Q 199.5 960.5 223.5 969.2 Q 252.5 979.2 297.8 979.2 H 373.4 Q 418.8 979.2 447.8 969.2 M 819.9 677 Q 854 677 866.3 681 Q 874.8 683.7 881.1 689.6 Q 887.4 695.5 889.7 703.1 Q 891.4 709.4 892.1 720.8 Q 892.8 732.3 892.8 751.2 V 301 Q 892.8 838.8 892.1 850 Q 891.4 861.2 889.7 867.5 Q 887.4 875.2 881.1 881.1 Q 874.8 886.9 866.3 890.1 Q 857.9 892.7 842.4 893.4 Q 826.9 894.1 808.8 894.1 H 761.4 Q 743.3 894.1 727.9 893.4 Q 712.4 892.7 704 890.1 Q 695.4 886.9 689.1 881.1 Q 682.9 875.2 681 867.5 Q 677.5 856.5 677.5 819.8 V 369.6 Q 677.5 714.2 681 703.1 Q 683.2 695.5 689.5 689.6 Q 695.8 683.7 704 681 Q 716.2 677 750.3 677 H 761.4 H 808.8 M 897.3 969.2 Q 921.2 960.5 939.1 941.8 Q 957 923.1 967 898.6 Q 974.1 881.5 976 860 Q 978 838.6 978 803.1 V 352.9 Q 978 732.5 976 710.8 Q 974.1 689.1 967 672.1 Q 957 647.6 939.1 628.9 Q 921.2 610.1 897.3 601.9 Q 870.1 591.8 822.9 591.8 H 747.3 Q 700.6 591.8 673 601.9 Q 649 610.1 631.3 628.7 Q 613.6 647.2 603.2 672.1 Q 596.2 689.1 594.3 710.8 Q 592.3 732.5 592.3 767.9 V 317.7 Q 592.3 838.6 594.3 860 Q 596.2 881.5 603.2 898.6 Q 613.6 923.4 631.3 941.9 Q 649 960.5 673 969.2 Q 702 979.2 747.3 979.2 H 822.9 Q 868.2 979.2 897.3 969.2" fill="currentColor"/></symbol>
+    <symbol id="i-check" viewBox="0 0 56 56"><path d="M 46.82 18.15 C 48.05 16.66 47.84 14.46 46.35 13.22 C 44.86 11.99 42.66 12.2 41.42 13.69 L 22.95 36 L 13.4 26.45 C 12.03 25.08 9.82 25.08 8.45 26.45 C 7.08 27.82 7.08 30.03 8.45 31.4 L 20.71 43.66 C 21.72 44.67 23.21 44.93 24.47 44.44 C 25.02 44.23 25.52 43.88 25.92 43.4 L 46.82 18.15 Z" fill="currentColor"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M 6 6 L 18 18 M 18 6 L 6 18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+    <symbol id="i-back" viewBox="0 0 1330.8 1330.8"><path d="M 255.9 708.4 H 1187.9 Q 1203.9 708.4 1211.9 700.4 Q 1219.9 692.4 1219.9 677.4 V 680.4 Q 1219.9 637.4 1211.4 629.9 Q 1202.9 622.4 1187.9 622.4 H 255.9 L 539.9 338.4 Q 549.9 328.4 549.9 318.4 Q 549.9 308.4 537.9 296.4 L 520.9 279.4 Q 508.9 267.4 498.9 267.4 Q 488.9 267.4 476.9 279.4 L 129.9 627.4 Q 111.9 645.4 111.4 664.9 Q 110.9 684.4 130.9 704.4 L 476.9 1050.4 Q 488.9 1062.4 498.4 1062.9 Q 507.9 1063.4 520.9 1050.4 L 539.9 1031.4 Q 550.9 1020.4 550.9 1011.9 Q 550.9 1003.4 538.9 991.4" fill="currentColor"/></symbol>
+    <symbol id="i-send" viewBox="0 0 1148.4 1148.4"><path d="M 981.7 951.7 L 1048.7 217.7 Q 1052.7 178.7 1030.7 147.7 Q 1008.7 116.7 971.7 106.7 Q 934.7 96.7 899.7 113.7 L 160.7 472.7 Q 123.7 490.7 109.7 527.2 Q 95.7 563.7 108.7 601.2 Q 121.7 638.7 157.7 658.7 L 358.7 766.7 Q 367.7 771.7 372.7 780.7 Q 377.7 789.7 377.7 800.7 V 178.7 Q 377.7 999.7 397.7 1020.7 Q 417.7 1041.7 447.2 1044.7 Q 476.7 1047.7 500.7 1029.7 L 610.7 944.7 Q 618.7 937.7 629.7 937.2 Q 640.7 936.7 650.7 941.7 L 828.7 1034.7 Q 860.7 1051.7 895.2 1045.2 Q 929.7 1038.7 954.2 1013.2 Q 978.7 987.7 981.7 951.7 M 572.7 865.7 L 478.7 942.7 Q 474.7 946.7 469.2 943.7 Q 463.7 940.7 463.7 934.7 V 362.7 Q 463.7 759.7 449.7 736.7 Q 435.7 713.7 412.7 701.7 L 198.7 587.7 Q 189.7 583.7 186.7 575.2 Q 183.7 566.7 187.2 558.2 Q 190.7 549.7 198.7 545.7 L 888.7 216.7 L 530.7 626.7 Q 523.7 634.7 524.7 646.2 Q 525.7 657.7 534.7 664.7 L 560.7 684.7 Q 568.7 690.7 579.2 689.7 Q 589.7 688.7 596.7 680.7 L 958.7 266.7 L 896.7 932.7 Q 895.7 945.7 884.7 951.7 Q 873.7 957.7 862.7 951.7 L 676.7 855.7 Q 651.7 842.7 623.7 845.2 Q 595.7 847.7 572.7 865.7" fill="currentColor"/></symbol>
+    <symbol id="i-ok" viewBox="0 0 1282.8 1282.8"><path d="M 441.9 1081.4 L 112.9 596.4 Q 106.9 587.4 108.9 576.9 Q 110.9 566.4 119.9 560.4 L 149.9 538.4 Q 158.9 532.4 169.9 534.4 Q 180.9 536.4 186.9 545.4 L 474.9 975.4 Q 477.9 979.4 482.9 979.9 Q 487.9 980.4 490.9 976.4 L 1097.9 190.4 Q 1104.9 181.4 1115.9 179.9 Q 1126.9 178.4 1135.9 185.4 L 1163.9 208.4 Q 1172.9 215.4 1174.4 226.4 Q 1175.9 237.4 1168.9 246.4 L 518.9 1084.4 Q 508.9 1096.4 494.4 1100.4 Q 479.9 1104.4 465.4 1099.4 Q 450.9 1094.4 441.9 1081.4" fill="currentColor"/></symbol>
+    <symbol id="i-more" viewBox="0 0 1042.8 1042.8"><path d="M 521.4 86.9 Q 492.4 86.9 471.4 107.9 Q 450.4 128.9 450.4 157.9 Q 450.4 186.9 471.4 207.9 Q 492.4 228.9 521.4 228.9 Q 550.4 228.9 571.4 207.9 Q 592.4 186.9 592.4 157.9 Q 592.4 128.9 571.4 107.9 Q 550.4 86.9 521.4 86.9 M 521.4 814.9 Q 492.4 814.9 471.4 835.4 Q 450.4 855.9 450.4 885.9 Q 450.4 914.9 471.4 935.4 Q 492.4 955.9 521.4 955.9 Q 550.4 955.9 571.4 935.4 Q 592.4 914.9 592.4 885.9 Q 592.4 855.9 571.4 835.4 Q 550.4 814.9 521.4 814.9 M 521.4 450.9 Q 492.4 450.9 471.4 471.9 Q 450.4 492.9 450.4 521.9 Q 450.4 550.9 471.4 571.9 Q 492.4 592.9 521.4 592.9 Q 550.4 592.9 571.4 571.9 Q 592.4 550.9 592.4 521.9 Q 592.4 492.9 571.4 471.9 Q 550.4 450.9 521.4 450.9" fill="currentColor"/></symbol>
+    <symbol id="i-tune" viewBox="0 0 1183.2 1183.2"><path d="M 600.6 881.6 Q 600.6 832.6 576.6 791.1 Q 552.6 749.6 511.1 725.6 Q 469.6 701.6 420.6 701.6 Q 371.6 701.6 330.6 725.6 Q 289.6 749.6 265.1 791.1 Q 240.6 832.6 240.6 881.6 Q 240.6 930.6 265.1 971.6 Q 289.6 1012.6 330.6 1037.1 Q 371.6 1061.6 420.6 1061.6 Q 469.6 1061.6 511.1 1037.1 Q 552.6 1012.6 576.6 971.6 Q 600.6 930.6 600.6 881.6 M 326.6 881.6 Q 326.6 842.6 354.1 814.6 Q 381.6 786.6 420.6 786.6 Q 460.6 786.6 488.1 814.6 Q 515.6 842.6 515.6 881.6 Q 515.6 920.6 488.1 948.6 Q 460.6 976.6 420.6 976.6 Q 381.6 976.6 354.1 948.6 Q 326.6 920.6 326.6 881.6 M 291.6 838.6 H 126.6 Q 115.6 838.6 107.1 845.6 Q 98.6 852.6 98.6 869.6 V 290.6 Q 98.6 909.6 106.6 916.6 Q 114.6 923.6 126.6 923.6 H 291.6 M 1084.6 892.6 V 313.6 Q 1084.6 852.6 1076.1 845.6 Q 1067.6 838.6 1056.6 838.6 H 558.6 V 258.6 L 1056.6 923.6 Q 1068.6 923.6 1076.6 916.6 Q 1084.6 909.6 1084.6 892.6 M 1084.6 312.6 V 893.6 Q 1084.6 272.6 1076.1 265.6 Q 1067.6 258.6 1056.6 258.6 H 891.6 V 839.6 H 1056.6 Q 1068.6 343.6 1076.6 336.6 Q 1084.6 329.6 1084.6 312.6 M 624.6 258.6 H 126.6 Q 115.6 258.6 107.1 265.6 Q 98.6 272.6 98.6 289.6 V 870.6 Q 98.6 329.6 106.6 336.6 Q 114.6 343.6 126.6 343.6 H 624.6 M 941.6 301.6 Q 941.6 252.6 917.6 211.1 Q 893.6 169.6 852.1 145.6 Q 810.6 121.6 761.6 121.6 Q 712.6 121.6 671.6 145.6 Q 630.6 169.6 606.1 211.1 Q 581.6 252.6 581.6 301.6 Q 581.6 350.6 606.1 391.6 Q 630.6 432.6 671.6 457.1 Q 712.6 481.6 761.6 481.6 Q 810.6 481.6 852.1 457.1 Q 893.6 432.6 917.6 391.6 Q 941.6 350.6 941.6 301.6 M 667.6 301.6 Q 667.6 262.6 695.1 234.6 Q 722.6 206.6 761.6 206.6 Q 801.6 206.6 829.1 234.6 Q 856.6 262.6 856.6 301.6 Q 856.6 340.6 829.1 368.6 Q 801.6 396.6 761.6 396.6 Q 722.6 396.6 695.1 368.6 Q 667.6 340.6 667.6 301.6" fill="currentColor"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 1239.6 1239.6"><path d="M 643.8 1131.3 Q 653.8 1129.3 666.8 1123.3 Q 679.8 1117.3 694.8 1108.3 L 712.8 1098.3 L 993.8 940.3 Q 1023.8 923.3 1037.3 914.8 Q 1050.8 906.3 1059.8 896.3 Q 1077.8 877.3 1084.8 853.3 Q 1088.8 841.3 1089.8 821.3 Q 1090.8 801.3 1090.8 774.3 V 774.3 Q 1090.8 438.3 1089.8 418.8 Q 1088.8 399.3 1084.8 387.3 Q 1077.8 364.3 1059.8 343.3 Q 1051.8 334.3 1038.3 325.8 Q 1024.8 317.3 1005.8 307.3 L 993.8 300.3 L 712.8 141.3 Q 690.8 128.3 673.3 119.8 Q 655.8 111.3 643.8 109.3 Q 619.8 103.3 595.8 109.3 Q 583.8 111.3 566.3 119.8 Q 548.8 128.3 526.8 141.3 L 245.8 300.3 Q 238.8 304.3 230.8 308.3 Q 213.8 318.3 200.3 326.8 Q 186.8 335.3 179.8 343.3 Q 161.8 364.3 154.8 387.3 Q 150.8 399.3 149.8 418.8 Q 148.8 438.3 148.8 465.3 V 465.3 Q 148.8 801.3 149.8 821.3 Q 150.8 841.3 154.8 853.3 Q 161.8 877.3 179.8 896.3 Q 187.8 905.3 201.8 914.3 Q 215.8 923.3 234.8 934.3 L 245.8 940.3 L 526.8 1098.3 L 544.8 1108.3 Q 559.8 1117.3 572.8 1123.3 Q 585.8 1129.3 595.8 1131.3 Q 619.8 1136.3 643.8 1131.3 M 234.8 801.3 V 807.3 Q 234.8 418.3 241.3 407.8 Q 247.8 397.3 262.8 388.3 L 587.8 205.3 Q 606.8 194.3 618.3 193.8 Q 629.8 193.3 646.8 202.3 L 966.8 382.3 Q 991.8 396.3 998.8 408.3 Q 1005.8 420.3 1005.8 449.3 V 441.3 Q 1005.8 817.3 1000.8 828.8 Q 995.8 840.3 981.8 848.3 L 651.8 1035.3 Q 632.8 1046.3 620.3 1046.3 Q 607.8 1046.3 587.8 1035.3 L 265.8 853.3 Q 247.8 843.3 241.3 832.8 Q 234.8 822.3 234.8 801.3 M 819.8 620.3 Q 819.8 565.3 792.8 519.8 Q 765.8 474.3 720.3 447.3 Q 674.8 420.3 619.8 420.3 Q 565.8 420.3 519.8 447.3 Q 473.8 474.3 446.8 519.8 Q 419.8 565.3 419.8 620.3 Q 419.8 674.3 446.8 720.3 Q 473.8 766.3 519.8 793.3 Q 565.8 820.3 619.8 820.3 Q 674.8 820.3 720.3 793.3 Q 765.8 766.3 792.8 720.3 Q 819.8 674.3 819.8 620.3 M 507.8 620.3 Q 507.8 573.3 540.8 540.8 Q 573.8 508.3 619.8 508.3 Q 666.8 508.3 699.3 540.8 Q 731.8 573.3 731.8 620.3 Q 731.8 666.3 699.3 699.3 Q 666.8 732.3 619.8 732.3 Q 573.8 732.3 540.8 699.3 Q 507.8 666.3 507.8 620.3" fill="currentColor"/></symbol>
+    <symbol id="i-help" viewBox="0 0 1225.2 1225.2"><path d="M 1123.1 613.1 Q 1123.1 474.1 1054.6 357.1 Q 986.1 240.1 869.1 171.1 Q 752.1 102.1 613.1 102.1 Q 474.1 102.1 357.1 171.1 Q 240.1 240.1 171.1 357.1 Q 102.1 474.1 102.1 613.1 Q 102.1 752.1 171.1 869.1 Q 240.1 986.1 357.1 1054.6 Q 474.1 1123.1 613.1 1123.1 Q 752.1 1123.1 869.1 1054.6 Q 986.1 986.1 1054.6 869.1 Q 1123.1 752.1 1123.1 613.1 M 188.1 613.1 Q 188.1 497.1 245.1 399.6 Q 302.1 302.1 399.6 245.1 Q 497.1 188.1 613.1 188.1 Q 729.1 188.1 826.6 245.1 Q 924.1 302.1 981.1 399.6 Q 1038.1 497.1 1038.1 613.1 Q 1038.1 728.1 981.1 825.6 Q 924.1 923.1 826.6 980.6 Q 729.1 1038.1 613.1 1038.1 Q 497.1 1038.1 399.6 980.6 Q 302.1 923.1 245.1 825.6 Q 188.1 728.1 188.1 613.1 M 610.1 893.1 Q 632.1 893.1 648.1 877.1 Q 664.1 861.1 664.1 838.1 Q 664.1 815.1 648.1 799.1 Q 632.1 783.1 610.1 783.1 Q 587.1 783.1 571.1 799.1 Q 555.1 815.1 555.1 838.1 Q 555.1 861.1 571.1 877.1 Q 587.1 893.1 610.1 893.1 M 653.1 710.1 Q 661.1 682.1 674.1 660.6 Q 687.1 639.1 704.1 624.1 L 733.1 598.1 Q 784.1 550.1 784.1 482.1 Q 784.1 432.1 759.1 395.1 Q 734.1 358.1 695.6 338.6 Q 657.1 319.1 617.1 319.1 Q 569.1 319.1 529.6 341.6 Q 490.1 364.1 468.1 399.6 Q 446.1 435.1 446.1 474.1 Q 446.1 487.1 451.1 493.1 Q 456.1 499.1 467.1 499.1 H 506.1 Q 520.1 499.1 526.1 491.6 Q 532.1 484.1 534.1 470.1 Q 538.1 437.1 562.6 420.6 Q 587.1 404.1 615.1 404.1 Q 645.1 404.1 671.6 424.1 Q 698.1 444.1 698.1 480.1 Q 698.1 510.1 677.1 530.1 L 636.1 571.1 Q 582.1 625.1 567.1 706.1 Q 565.1 716.1 571.1 723.1 Q 577.1 730.1 588.1 730.1 H 624.1 Q 636.1 730.1 643.1 725.6 Q 650.1 721.1 653.1 710.1" fill="currentColor"/></symbol>
+  </svg>
+
+  <!-- ================= SCAFFOLD / TOPAPPBAR ================= -->
+  <header class="m-topappbar" id="topAppBar">
+    <div class="m-bar-row center">
+      <span class="m-bar-title-small" id="bar-title-small">Licking Thermal</span>
     </div>
-    <button class="icon-button" id="btn-language">
-      <span class="material-symbols-outlined">Language</span>
-    </button>
   </header>
 
-  <main id="mainMenu" class="menu-panel">
-    
-    <div class="banner">
-      <img src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%231a1b22\'/></svg>'">
-      <div id="status-indicator" class="banner-chip chip-left" style="color: var(--primary, #D0BCFF);">Loading...</div>
-      <div id="pid-indicator" class="banner-chip chip-right">PID: NULL</div>
-    </div>
+  <div class="m-scaffold">
 
-    <div class="card">
-      <div class="card-header">
-        <div class="card-icon"><span class="material-symbols-outlined">tune</span></div>
-        <h2 class="card-title" data-i18n="thermalConfig">Thermal Config</h2>
+    <!-- judul besar mengikuti tab aktif (Home tetap nama module) -->
+    <div class="m-bar-large" id="bar-title-large">Licking Thermal</div>
+
+    <!-- ================= PAGE : HOME ================= -->
+    <main id="mainMenu" class="m-page">
+
+      <div class="m-banner">
+        <img id="home-banner-img" src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%23242424\'/></svg>'">
+        <div id="status-indicator" class="banner-chip chip-left" style="color: var(--m-primary);">Loading...</div>
+        <div id="pid-indicator" class="banner-chip chip-right">PID: NULL</div>
       </div>
 
-      <div class="settings-list">
-        
-        <div class="setting-item setting-row">
-          <div onclick="showInfo('aggressive')" class="cursor-pointer setting-label-group">
-            <p class="text-sm text-white"><span data-i18n="aggMode">Aggressive Mode</span> <span class="material-symbols-outlined info-icon">info</span></p>
+      <div class="m-smalltitle" data-i18n="thermalConfig">Thermal Config</div>
+
+      <div class="m-card">
+
+        <div class="m-pref">
+          <div class="m-pref-text m-click-info" onclick="showInfo('aggressive')">
+            <span class="m-pref-title"><span data-i18n="aggMode">Aggressive Mode</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
           </div>
-          <label class="custom-switch">
+          <label class="m-switch">
             <input type="checkbox" id="hal-switch">
-            <span class="switch-slider"></span>
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
           </label>
         </div>
-        
-        <div class="setting-item setting-row">
-          <div onclick="showInfo('kernelPanic')" class="cursor-pointer setting-label-group">
-            <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;">
-              <span data-i18n="disablePanic">Disable Kernel Panic</span> 
-              <span class="material-symbols-outlined info-icon">info</span>
-            </p>
+
+        <div class="m-pref">
+          <div class="m-pref-text m-click-info" onclick="showInfo('kernelPanic')">
+            <span class="m-pref-title"><span data-i18n="disablePanic">Disable Kernel Panic</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
           </div>
-          <label class="custom-switch">
+          <label class="m-switch">
             <input type="checkbox" id="panic-switch">
-            <span class="switch-slider"></span>
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
           </label>
         </div>
-        
-        <div class="setting-item setting-row">
-          <div onclick="showInfo('fastCharge')" class="cursor-pointer setting-label-group">
-            <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;">
-              <span data-i18n="fastCharge">Fast Charge</span> 
-              <span class="material-symbols-outlined info-icon">info</span>
-            </p>
+
+        <div class="m-pref" id="charge-row">
+          <div class="m-pref-text m-click-info" onclick="showInfo('fastCharge')">
+            <span class="m-pref-title"><span data-i18n="fastCharge">Fast Charge</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
           </div>
-          <label class="custom-switch">
+          <label class="m-switch">
             <input type="checkbox" id="charge-switch">
-            <span class="switch-slider"></span>
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
           </label>
         </div>
 
-        <div class="setting-item setting-row">
-          <div onclick="showInfo('modeOptions')" class="cursor-pointer setting-label-group">
-            <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;">
-              <span data-i18n="opMode">Operation Mode</span> 
-              <span class="material-symbols-outlined info-icon">info</span>
-            </p>
+        <div class="m-pref">
+          <div class="m-pref-text m-click-info" onclick="showInfo('modeOptions')">
+            <span class="m-pref-title"><span data-i18n="opMode">Operation Mode</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
           </div>
-          <div class="select-wrapper compact-select">
-            <select id="mode-select" class="pingpimp-select">
-              <option value="automatic">Auto (By App)</option>
-              <option value="static">Static (Always On)</option>
-            </select>
-            <span class="material-symbols-outlined select-arrow">expand_more</span>
-          </div>
+          <button class="m-dd" id="mode-select" type="button" aria-label="Operation Mode">
+            <span class="m-dd-val">Auto (By App)</span>
+            <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
+          </button>
         </div>
 
-        <div class="setting-item setting-row">
-          <div onclick="showInfo('thermalZone')" class="cursor-pointer setting-label-group">
-            <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;">
-              <span data-i18n="thermZone">Thermal Zone</span> 
-              <span class="material-symbols-outlined info-icon">info</span>
-            </p>
+        <div class="m-pref">
+          <div class="m-pref-text m-click-info" onclick="showInfo('thermalZone')">
+            <span class="m-pref-title"><span data-i18n="thermZone">Thermal Zone</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
           </div>
-          <div class="select-wrapper compact-select">
-            <select id="zone-select" class="pingpimp-select">
-              <option value="1">Kill Thermal Zone</option>
-              <option value="0">Spoof to 30°C</option>
-            </select>
-            <span class="material-symbols-outlined select-arrow">expand_more</span>
-          </div>
+          <button class="m-dd" id="zone-select" type="button" aria-label="Thermal Zone">
+            <span class="m-dd-val">Kill Thermal Zone</span>
+            <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
+          </button>
         </div>
 
-        <div class="setting-item setting-row" id="policy-row-wrapper">
-          <div onclick="showInfo('zonePolicy')" class="cursor-pointer setting-label-group">
-            <p class="text-sm text-white" style="display: flex; align-items: center; gap: 6px;">
-              <span data-i18n="thermPolicy">Thermal Policy</span> 
-              <span class="material-symbols-outlined info-icon">info</span>
-            </p>
+        <div class="m-pref" id="policy-row-wrapper">
+          <div class="m-pref-text m-click-info" onclick="showInfo('zonePolicy')">
+            <span class="m-pref-title"><span data-i18n="thermPolicy">Thermal Policy</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
           </div>
-          <div class="select-wrapper compact-select">
-            <select id="policy-select" class="pingpimp-select">
-              <option value="">Loading...</option>
-            </select>
-            <span class="material-symbols-outlined select-arrow">expand_more</span>
+          <button class="m-dd" id="policy-select" type="button" aria-label="Thermal Policy">
+            <span class="m-dd-val">Loading...</span>
+            <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
+          </button>
+        </div>
+
+      </div>
+
+      <div class="m-smalltitle" data-i18n="supportTitle">Support &amp; Thanks</div>
+
+      <div class="m-card">
+        <div class="m-pref m-pref-click" id="btn-support">
+          <svg class="m-icon m-pref-start"><use href="#i-favorites"/></svg>
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="supportTitle">Support &amp; Thanks</span>
+            <span class="m-pref-summary" data-i18n="supportDesc">Click here to support the project or get updates!</span>
+          </div>
+          <svg class="m-icon m-arrow"><use href="#i-arrowright"/></svg>
+        </div>
+      </div>
+
+      <div class="m-page-pad"></div>
+    </main>
+
+    <!-- ================= PAGE : APPS ================= -->
+    <main id="gameListMenu" class="m-page hidden">
+
+      <div class="m-searchwrap">
+        <div class="m-searchbar">
+          <svg class="m-icon m-search-ic"><use href="#i-search"/></svg>
+          <input type="text" id="app-search" data-i18n="searchPlaceholder" placeholder="Search apps..." autocomplete="off">
+          <button class="m-search-clear" id="app-search-clear" type="button" aria-label="Clear" hidden>
+            <svg class="m-icon"><use href="#i-searchcleanup"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="appList" class="m-card m-applist">
+        <div class="m-state" data-i18n="loadingApps">Looking for apps...</div>
+      </div>
+
+      <div class="m-page-pad"></div>
+    </main>
+
+    <!-- ================= PAGE : SETTINGS ================= -->
+    <main id="settingsMenu" class="m-page hidden">
+
+      <div class="m-smalltitle" data-i18n="setSectionAppearance">Appearance</div>
+      <div class="m-card m-banner-card">
+        <div class="m-banner-pref" id="banner-preview-row" role="button" aria-label="Change banner">
+          <img id="banner-preview" src="assets/banner.jpg" alt="Banner preview" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%232D2D2D\'/></svg>'">
+        </div>
+        <div class="m-pref m-pref-click" id="banner-change-row">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="setBannerChange">Change Banner</span>
+            <span class="m-pref-summary" data-i18n="setBannerFormats">PNG, JPG, GIF, WEBP, BMP &middot; max 5 MB</span>
+          </div>
+          <svg class="m-icon m-arrow"><use href="#i-arrowright"/></svg>
+        </div>
+        <div class="m-pref m-pref-click m-pref-danger" id="banner-reset-row" style="display:none">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="setBannerReset">Reset to Default Banner</span>
+          </div>
+        </div>
+        <div class="m-pref">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="setMonet">Monet Colors</span>
+            <span class="m-pref-summary" data-i18n="setMonetDesc">Material You dynamic colors from the system</span>
+          </div>
+          <label class="m-switch">
+            <input type="checkbox" id="monet-switch">
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
+          </label>
+        </div>
+        <div class="m-pref">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="setBlur">Blur Effect</span>
+            <span class="m-pref-summary" data-i18n="setBlurDesc">Apply blur to the header and navigation bar</span>
+          </div>
+          <label class="m-switch">
+            <input type="checkbox" id="blur-switch">
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
+          </label>
+        </div>
+        <div id="blur-mode-group" style="display:none">
+          <div class="m-pref">
+            <div class="m-pref-text">
+              <span class="m-pref-title" data-i18n="setBlurMode">Blur Mode</span>
+            </div>
+            <button class="m-dd" id="blur-mode-select" type="button" aria-label="Blur Mode">
+              <span class="m-dd-val">Gaussian</span>
+              <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
+            </button>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="card support-card" id="btn-support" style="margin-bottom: 2rem;">
-      <div class="flex items-center" style="gap: 16px;">
-        <div class="card-icon" style="background-color: var(--primaryContainer, #4F378B); color: var(--onPrimaryContainer, #EADDFF);">
-          <span class="material-symbols-outlined">favorite</span>
+      <div class="m-smalltitle" data-i18n="setSectionGeneral">General</div>
+
+      <!-- Language: dropdown miuix (seperti opsi lain), tanpa icon -->
+      <div class="m-card">
+        <div class="m-pref">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="setLang">Language</span>
+          </div>
+          <button class="m-dd" id="lang-select" type="button" aria-label="Language">
+            <span class="m-dd-val">English</span>
+            <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
+          </button>
         </div>
-        <div>
-          <h3 style="margin: 0 0 4px; font-size: 1rem; color: var(--onSurface, #E6E1E5);" data-i18n="supportTitle">Support & Thanks</h3>
-          <span class="text-sss" style="margin: 0;" data-i18n="supportDesc">Click here to support the project or get updates!</span>
-        </div>
-        <span class="material-symbols-outlined" style="margin-left: auto; color: var(--onSurfaceVariant, #CAC4D0);">chevron_right</span>
       </div>
-    </div>
-  </main>
 
-  <main id="gameListMenu" class="menu-panel kanjud">
-    <input type="text" id="app-search" data-i18n="searchPlaceholder" placeholder="Search apps..." class="app-search-input" style="margin-top: 1rem;">
-    <div id="appList">
-      <div style="text-align: center; padding: 2rem 0; color: var(--onSurfaceVariant, #CAC4D0); font-size: 0.85rem;" data-i18n="loadingApps">Looking for apps...</div>
-    </div>
-  </main>
+      <div class="m-smalltitle" data-i18n="setSectionDev">Developer</div>
 
-  <div id="bottomToolbar">
-    <button id="openMain" class="active">
-      <span data-i18n="navHome">Home</span>
-    </button>
-    <button id="openGameList">
-      <span data-i18n="navApps">Apps</span>
-    </button>
+      <!-- Developer card (mantan popup, kini card biasa) -->
+      <div class="m-card m-devcard">
+        <div class="m-devcard-head">
+          <img src="assets/shit.jpg" alt="Dev" class="m-devcard-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'56\' height=\'56\'><circle cx=\'28\' cy=\'28\' r=\'28\' fill=\'%233A3A3C\'/></svg>'">
+          <div class="m-devcard-info">
+            <div class="m-devcard-name">@fuckyoustan</div>
+            <div class="m-devcard-role" data-i18n="devDescFull">System Modifier &amp; WebUI Developer. I create things that make your device run smoother and hotter.</div>
+          </div>
+        </div>
+        <div class="m-devcard-btns">
+          <button class="m-btn" id="dev-btn-github" type="button">GitHub</button>
+          <button class="m-btn primary" id="dev-btn-telegram" type="button">Telegram</button>
+        </div>
+      </div>
+
+      <div class="m-page-pad"></div>
+    </main>
+
   </div>
 
-  <div class="modal-overlay" id="languageDialog">
-    <div class="language-dialog-container">
-      <div class="language-header">
-        <h3 style="margin: 0; font-size: 1.1rem; color: var(--onSurface, #E6E1E5);" data-i18n="selectLang">Select Language</h3>
-        <button class="icon-button" id="closeLangDialog" style="margin: 0;">
-          <span class="material-symbols-outlined">close</span>
+  <!-- ================= FLOATING NAVIGATION BAR ================= -->
+  <nav class="m-floatnav" aria-label="Navigation">
+    <button class="m-floatnav-item active" id="openMain" type="button" aria-label="Home">
+      <span class="sr-only" data-i18n="navHome">Home</span>
+      <svg class="m-icon"><use href="#i-home"/></svg>
+    </button>
+    <button class="m-floatnav-item" id="openGameList" type="button" aria-label="Apps">
+      <span class="sr-only" data-i18n="navApps">Apps</span>
+      <svg class="m-icon"><use href="#i-gridview"/></svg>
+    </button>
+    <button class="m-floatnav-item" id="openSettings" type="button" aria-label="Settings">
+      <span class="sr-only" data-i18n="navSettings">Settings</span>
+      <svg class="m-icon"><use href="#i-settings"/></svg>
+    </button>
+  </nav>
+
+  <!-- ================= DIALOG : INFO ================= -->
+  <div class="m-scrim" id="info-modal">
+    <div class="m-dialog">
+      <h3 id="modal-title" class="m-dialog-title">Info</h3>
+      <div id="modal-text" class="m-dialog-summary">Detail info.</div>
+      <div class="m-dialog-btns">
+        <button class="m-textbtn primary" id="close-info-modal" type="button"><span data-i18n="btnGotIt">Got it</span></button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= OVERLAY : GAME / APP SETTINGS ================= -->
+  <div id="appSettingsOverlay" class="m-overlay">
+    <header class="m-topappbar small">
+      <div class="m-bar-row center">
+        <button class="m-iconbtn" id="btn-close-settings" aria-label="Back">
+          <svg class="m-icon"><use href="#i-back"/></svg>
         </button>
+        <span class="m-bar-title" data-i18n="gameSettings">Game Settings</span>
+        <span class="m-bar-spacer" aria-hidden="true"></span>
       </div>
-      <div style="padding: 8px;">
-        <div class="language-option" data-lang="en"><span>English</span> <span class="material-symbols-outlined check-icon">check_circle</span></div>
-        <div class="language-option" data-lang="id"><span>Bahasa Indonesia</span> <span class="material-symbols-outlined check-icon">check_circle</span></div>
-        <div class="language-option" data-lang="ja"><span>日本語</span> <span class="material-symbols-outlined check-icon">check_circle</span></div>
-        <div class="language-option" data-lang="jv"><span>Basa Jawa</span> <span class="material-symbols-outlined check-icon">check_circle</span></div>
-      </div>
-    </div>
-  </div>
+    </header>
 
-  <div id="info-modal" class="modal-overlay">
-    <div class="modal-container">
-      <h3 id="modal-title" class="modal-title">Info</h3>
-      <p id="modal-text" class="modal-desc">Detail info.</p>
-      <div style="display: flex; justify-content: flex-end;">
-        <button class="pill-btn primary" style="flex: none; padding: 10px 24px;" id="close-info-modal"><span data-i18n="btnGotIt">Got it</span></button>
-      </div>
-    </div>
-  </div>
+    <div class="m-overlay-scroll">
 
-  <div class="modal-overlay" id="devModal">
-    <div class="modal-container dev-modal-container">
-      <div class="dev-modal-banner">
-        <img src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%231a1b22\'/></svg>'">
-      </div>
-      <div class="dev-modal-content">
-        <img src="assets/shit.jpg" alt="Dev" class="dev-modal-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'72\' height=\'72\'><circle cx=\'36\' cy=\'36\' r=\'36\' fill=\'%23333\'/></svg>'">
-        <h3 style="margin: 10px 0 4px; font-size: 1.25rem; font-weight: 700; color: var(--onSurface, #E6E1E5);">@fuckyoustan</h3>
-        <p style="margin: 0 0 20px; font-size: 0.85rem; color: var(--onSurfaceVariant, #CAC4D0); line-height: 1.5;" data-i18n="devDescFull">
-          System Modifier & WebUI Developer. I create things that make your device run smoother and hotter.
-        </p>
-        <div class="flex items-center justify-between" style="gap: 12px;">
-          <button class="pill-btn" id="modal-btn-github"><span class="material-symbols-outlined">code</span> GitHub</button>
-          <button class="pill-btn primary" id="modal-btn-telegram"><span class="material-symbols-outlined">send</span> Telegram</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="appSettingsOverlay" class="app-settings-overlay">
-    <div class="as-header">
-      <button class="icon-button" id="btn-close-settings" style="color: var(--onSurface, #E6E1E5);">
-        <span class="material-symbols-outlined">arrow_back</span>
-      </button>
-      <h2 class="as-title" data-i18n="gameSettings">Game Settings</h2>
-      <button class="icon-button" style="color: var(--onSurface, #E6E1E5); visibility: hidden;">
-        <span class="material-symbols-outlined">more_vert</span>
-      </button>
-    </div>
-
-    <div class="as-content">
-      <div class="as-section-title" data-i18n="asSectionApp">Application</div>
-      
-      <div class="as-app-info">
-        <img src="" alt="App Icon" id="as-app-icon" class="as-icon">
-        <div class="as-text-group">
-          <span id="as-app-name" class="as-app-name">App Name</span>
-          <span id="as-app-pkg" class="as-app-pkg">com.package.name</span>
-        </div>
+      <div class="m-apphero">
+        <img src="" alt="App Icon" id="as-app-icon" class="m-apphero-icon">
+        <div id="as-app-name" class="m-apphero-name">App Name</div>
+        <div id="as-app-pkg" class="m-apphero-pkg">com.package.name</div>
       </div>
 
-      <div class="as-setting-row">
-        <div class="as-setting-label">
-          <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="asEnableTweaks">Enable Tweaks</span>
-        </div>
-        <label class="custom-switch">
-          <input type="checkbox" id="as-main-switch">
-          <span class="switch-slider"></span>
-        </label>
-      </div>
+      <div class="m-smalltitle" data-i18n="asSectionApp">Application</div>
 
-      <div class="as-section-title" style="margin-top: 12px;" data-i18n="asSectionPref">Preferences</div>
-
-      <div class="as-setting-row" style="margin-bottom: 24px;">
-        <div class="card-icon" style="background: transparent; color: var(--primaryContainer, #4F378B); width: 28px; height: 28px; margin-right: 16px;">
-          <span class="material-symbols-outlined" style="font-size: 28px;">settings</span>
-        </div>
-        <div class="as-setting-label">
-          <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="asCustomConfig">Custom Config</span>
-          <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asCustomConfigDesc">Override global thermal settings</span>
-        </div>
-        <label class="custom-switch">
-          <input type="checkbox" id="as-custom-switch">
-          <span class="switch-slider"></span>
-        </label>
-      </div>
-
-      <div id="custom-config-group" class="disabled-group">
-        <div class="as-setting-row">
-          <div class="card-icon" style="background: transparent; color: var(--primaryContainer, #4F378B); width: 28px; height: 28px; margin-right: 16px;">
-            <span class="material-symbols-outlined" style="font-size: 28px;">bolt</span>
+      <div class="m-card">
+        <div class="m-pref">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="asEnableTweaks">Enable Tweaks</span>
           </div>
-          <div class="as-setting-label">
-            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="aggMode">Aggressive Mode</span>
-            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asAggModeDesc">Push performance to the limit</span>
+          <label class="m-switch">
+            <input type="checkbox" id="as-main-switch">
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="m-smalltitle" data-i18n="asSectionPref">Preferences</div>
+
+      <div class="m-card">
+        <div class="m-pref">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="asCustomConfig">Custom Config</span>
+            <span class="m-pref-summary" data-i18n="asCustomConfigDesc">Override global thermal settings</span>
           </div>
-          <label class="custom-switch">
-            <input type="checkbox" id="as-agg-switch">
-            <span class="switch-slider"></span>
+          <label class="m-switch">
+            <input type="checkbox" id="as-custom-switch">
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
           </label>
         </div>
 
-        <div class="as-setting-row">
-          <div class="card-icon" style="background: transparent; color: var(--primaryContainer, #4F378B); width: 28px; height: 28px; margin-right: 16px;">
-            <span class="material-symbols-outlined" style="font-size: 28px;">device_thermostat</span>
+        <div id="custom-config-group" class="m-pref-group disabled">
+          <div class="m-pref">
+            <div class="m-pref-text">
+              <span class="m-pref-title" data-i18n="aggMode">Aggressive Mode</span>
+              <span class="m-pref-summary" data-i18n="asAggModeDesc">Push performance to the limit</span>
+            </div>
+            <label class="m-switch">
+              <input type="checkbox" id="as-agg-switch">
+              <span class="m-switch-track"></span>
+              <span class="m-switch-thumb"></span>
+            </label>
           </div>
-          <div class="as-setting-label">
-            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="thermZone">Thermal Zone</span>
-            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asZoneDesc">Thermal zone spoof control</span>
+
+          <div class="m-pref">
+            <div class="m-pref-text">
+              <span class="m-pref-title" data-i18n="thermZone">Thermal Zone</span>
+              <span class="m-pref-summary" data-i18n="asZoneDesc">Thermal zone spoof control</span>
+            </div>
+            <button class="m-dd" id="as-zone-select" type="button" aria-label="Thermal Zone">
+              <span class="m-dd-val">Kill Thermal Zone</span>
+              <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
+            </button>
           </div>
-          <div class="select-wrapper compact-select" style="width: 140px;">
-            <select id="as-zone-select" class="pingpimp-select">
-              <option value="1">Kill Thermal Zone</option>
-              <option value="0">Spoof to 30°C</option>
-            </select>
-            <span class="material-symbols-outlined select-arrow">expand_more</span>
-          </div>
-        </div>
-        
-        <div class="as-setting-row" id="as-policy-row-wrapper">
-          <div class="card-icon" style="background: transparent; color: var(--primaryContainer, #4F378B); width: 28px; height: 28px; margin-right: 16px;">
-            <span class="material-symbols-outlined" style="font-size: 28px;">thermostat</span>
-          </div>
-          <div class="as-setting-label">
-            <span style="font-size: 16px; font-weight: 500; color: var(--onSurface, #E6E1E5);" data-i18n="thermPolicy">Thermal Policy</span>
-            <span style="font-size: 13px; color: var(--onSurfaceVariant, #CAC4D0); margin-top: 4px; display: block;" data-i18n="asPolicyDesc">System reaction to heat</span>
-          </div>
-          <div class="select-wrapper compact-select" style="width: 140px;">
-            <select id="as-policy-select" class="pingpimp-select">
-              </select>
-            <span class="material-symbols-outlined select-arrow">expand_more</span>
+
+          <div class="m-pref" id="as-policy-row-wrapper">
+            <div class="m-pref-text">
+              <span class="m-pref-title" data-i18n="thermPolicy">Thermal Policy</span>
+              <span class="m-pref-summary" data-i18n="asPolicyDesc">System reaction to heat</span>
+            </div>
+            <button class="m-dd" id="as-policy-select" type="button" aria-label="Thermal Policy">
+              <span class="m-dd-val"></span>
+              <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
+            </button>
           </div>
         </div>
       </div>
+
+      <div class="m-page-pad"></div>
     </div>
   </div>
+
+  <!-- input file tersembunyi untuk upload banner kustom -->
+  <input type="file" id="banner-file" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp,image/avif,image/x-icon,.png,.jpg,.jpeg,.gif,.webp,.bmp,.avif,.ico" hidden>
 
   <script type="module" src="assets/script.js"></script>
 </body>
