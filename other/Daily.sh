@@ -3,8 +3,15 @@
 XNXX="/data/adb/modules/LickingT"
 EPORNER="$XNXX/thermal.conf"
 PORNHUB="$XNXX/CurrentZoneState"
+HAL_STATE="$XNXX/CurrentHalState"
 XHAMSTER=$(grep -i '^ZONE=' "$EPORNER" 2>/dev/null | cut -d'=' -f2)
 JAVHD=$(grep -i '^HAL=' "$EPORNER" 2>/dev/null | cut -d'=' -f2)
+if [ -f "$HAL_STATE" ]; then
+JAVTIFUL_HAL="$(cat "$HAL_STATE")"
+if [ -n "$JAVTIFUL_HAL" ]; then
+JAVHD="$JAVTIFUL_HAL"
+fi
+fi
 if [ -f "$PORNHUB" ]; then
 JAVTIFUL="$(cat "$PORNHUB")"
 if [ -n "$JAVTIFUL" ]; then
@@ -81,13 +88,6 @@ Miyabi "1 ${t_limit}000 0 mtk-cl-kshutdown01 $no_cooler 1000" /proc/driver/therm
 Miyabi "1 ${t_limit}000 0 mtk-cl-kshutdown02 $no_cooler 1000" /proc/driver/thermal/tzbtspa
 fi
 }
-MiaKholifah() {
-for memek in /sys/devices/soc/*/kgsl/kgsl-3d0; do
-if [ -d "$memek" ]; then
-find /sys/devices/soc/*/kgsl/kgsl-3d0/ -name '*temp*' -exec chmod 644 {} + 2>/dev/null
-fi
-done
-}
 SaoriHara() {
 for anal in /sys/class/power_supply/*; do
 Miyabi "150" "$anal/temp_cool"
@@ -101,7 +101,13 @@ HitomiTanaka1() {
 find /sys/devices/virtual/thermal -type f -exec chmod 644 {} + 2>/dev/null
 }
 HitomiTanaka2() {
-(find /sys/devices/virtual/thermal -name 'temp' -type f 2>/dev/null | xargs -n 1 umount 2>/dev/null) &
+find /sys/devices/virtual/thermal -name 'temp' -type f 2>/dev/null | while read -r tgt; do
+n=0
+while grep -qF " $tgt " /proc/mounts 2>/dev/null && [ "$n" -lt 5 ]; do
+umount "$tgt" 2>/dev/null || break
+n=$((n+1))
+done
+done
 }
 AliceaFox() {
 find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "enabled" : "1"; print "echo " val " > \"" $0 "\"; chmod 444 \"" $0 "\"" }' | sh 2>/dev/null &
@@ -113,23 +119,19 @@ Miyabi "$idx 1" /proc/ppm/policy_status
 done
 }
 MikamiYua() {
-getprop | awk -F'[][]' 'tolower($0) ~ /thermal|temp|throttl/ {print $2}' | while read -r penis; do
+BK="$XNXX/PropBackup.txt"
+if [ -s "$BK" ]; then
+resetprop --file "$BK" 2>/dev/null
+else
+getprop | awk -F'[][]' 'tolower($2) ~ /thermal|temp|throttl/ {print $2}' | while read -r penis; do
 resetprop -n "$penis" "running" 2>/dev/null
-setprop "$penis" "running" 2>/dev/null
 done
-}
-AngelaWhite() {
-for puki in /sys/devices/*.mali; do
-if [ -d "$puki" ]; then
-chmod 644 /sys/devices/*.mali/tmu /sys/devices/*.mali/throttling* /sys/devices/*.mali/tripping 2>/dev/null
 fi
-done
 }
 AngelaWhite() {
 for puki in /sys/devices/*.mali; do
 if [ -d "$puki" ]; then
-chmod 644 /sys/devices/*.mali/tmu /sys/devices/*.mali/throttling* /sys/devices/*.mali/tripping 2>/dev/null
-break
+chmod 644 "$puki/tmu" "$puki"/throttling* "$puki/tripping" 2>/dev/null
 fi
 done
 }
@@ -139,13 +141,16 @@ Miyabi "Y" "$goth/power_efficient"
 Miyabi "Y" "$goth/disable_numa"
 }
 EvaAngelina() {
-find /system /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | xargs -n 1 umount 2>/dev/null
+find /system/lib* /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r tgt; do
+n=0
+while grep -qF " $tgt " /proc/mounts 2>/dev/null && [ "$n" -lt 5 ]; do
+umount "$tgt" 2>/dev/null || break
+n=$((n+1))
+done
+done
 }
 MelenaTara() {
 find /*/etc/init -type f 2>/dev/null | xargs grep -h "^service.*thermal" 2>/dev/null | awk '{print "start "$2"; setprop ctl.start "$2";"}' | sh 2>/dev/null
-}
-Msbreewc() {
-find /sys/class/power_supply/battery/ -name '*temp*' -exec chmod 444 {} + 2>/dev/null
 }
 FunkyTown() {
 if ! service check miui.mqsas.IMQSNative | grep -q "not found"; then
@@ -167,7 +172,7 @@ HitomiTanaka2
 else
 HitomiTanaka1
 fi
-MikamiYua
+#MikamiYua
 AngelaWhite
 sleep 1
 GinaGerson
@@ -183,8 +188,6 @@ mysaaat
 LanaRhoades
 }
 main2() {
-MiaKholifah
-Msbreewc
 EvaAngelina
 FunkyTown
 MelenaTara
@@ -199,3 +202,4 @@ fi
 main1
 }
 run_main
+wait
