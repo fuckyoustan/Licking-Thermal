@@ -14,6 +14,11 @@ if [ -f "$PIDFILE" ]; then
 fi
 
 echo "$MYPID" > "$PIDFILE"
+# reap transition scripts orphaned by a previous daemon instance
+# (the old daemon is killed above, but its background children survive)
+pkill -9 -f "$MODPATH/PornArchive/MILF.sh" 2>/dev/null
+pkill -9 -f "$MODPATH/PornArchive/amature.sh" 2>/dev/null
+pkill -9 -f "$MODPATH/PornArchive/anal.sh" 2>/dev/null
 while [ -z "$(getprop sys.boot_completed)" ]; do
     sleep 7
 done
@@ -176,6 +181,33 @@ description() {
 CURRENT_PKG=""
 THERMAL_DISABLED="false"
 FAST_CHARGE_STATE="false"
+TRANS_PIDFILE="$MODPATH/transition.pid"
+
+# Serialize thermal transitions: never allow an apply script (MILF/amature) and
+# the restore script (anal) to run at the same time. Overlapping runs write
+# opposite values to the same sysfs nodes and race bind-mounts against
+# unmounts, which freezes or reboots the device on rapid app switching.
+kill_transitions() {
+    if [ -f "$TRANS_PIDFILE" ]; then
+        OPID="$(cat "$TRANS_PIDFILE" 2>/dev/null)"
+        [ -n "$OPID" ] && kill -9 "$OPID" 2>/dev/null
+        rm -f "$TRANS_PIDFILE" 2>/dev/null
+    fi
+    pkill -9 -f "$MODPATH/PornArchive/MILF.sh" 2>/dev/null
+    pkill -9 -f "$MODPATH/PornArchive/amature.sh" 2>/dev/null
+    pkill -9 -f "$MODPATH/PornArchive/anal.sh" 2>/dev/null
+    return 0
+}
+
+start_transition() {
+    kill_transitions
+    if [ -n "$2" ]; then
+        sh "$1" "$2" "$3" &
+    else
+        sh "$1" &
+    fi
+    echo $! > "$TRANS_PIDFILE" 2>/dev/null
+}
 
 sleep 10
 while true; do
@@ -255,10 +287,10 @@ while true; do
             echo "$USE_HAL" > "$MODPATH/CurrentHalState"
             
             if [ "$USE_HAL" = "1" ]; then
-                sh "$MODPATH/PornArchive/MILF.sh" "$USE_POLICY" "$USE_ZONE" &
+                start_transition "$MODPATH/PornArchive/MILF.sh" "$USE_POLICY" "$USE_ZONE"
                 Notip Tag "🚀 Aggressive mode Apply for $active_pkg"
             else
-                sh "$MODPATH/PornArchive/amature.sh" "$USE_POLICY" "$USE_ZONE" &
+                start_transition "$MODPATH/PornArchive/amature.sh" "$USE_POLICY" "$USE_ZONE"
                 Notip Tag "🤡 Amature mode Apply for $active_pkg"
             fi            
             THERMAL_DISABLED="true"
@@ -268,7 +300,7 @@ while true; do
         if [ "$THERMAL_DISABLED" = "true" ]; then
             write_mode "NotHorny"
             CURRENT_PKG=""
-            sh "$MODPATH/PornArchive/anal.sh" &
+            start_transition "$MODPATH/PornArchive/anal.sh"
             Notip Tag "😴 Normal mode Apply"
             THERMAL_DISABLED="false"
             rm -f "$MODPATH/CurrentHalState"
