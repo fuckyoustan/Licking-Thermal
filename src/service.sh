@@ -291,6 +291,10 @@ while true; do
     fi
     
     if [ "$TARGET_STATE" = "Horny" ]; then        
+        # any poll that sees a listed app resets the idle counter, otherwise
+        # non-consecutive idle polls (home -> game -> home -> home) could
+        # still add up and trigger a bogus restore
+        NOTHORNY_SEEN=0
         NEW_KEY="$active_pkg|$USE_HAL|$USE_POLICY|$USE_ZONE"
         if [ "$THERMAL_DISABLED" = "false" ] || [ "$CURRENT_PKG" != "$active_pkg" ] || [ "$LAST_KEY" != "$NEW_KEY" ]; then
             write_mode "Horny"
