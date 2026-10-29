@@ -181,6 +181,7 @@ description() {
 CURRENT_PKG=""
 THERMAL_DISABLED="false"
 FAST_CHARGE_STATE="false"
+NOTHORNY_SEEN=0
 TRANS_PIDFILE="$MODPATH/transition.pid"
 
 # Serialize thermal transitions: never allow an apply script (MILF/amature) and
@@ -294,17 +295,24 @@ while true; do
                 Notip Tag "🤡 Amature mode Apply for $active_pkg"
             fi            
             THERMAL_DISABLED="true"
+            NOTHORNY_SEEN=0
             sleep 3
         fi
     elif [ "$TARGET_STATE" = "NotHorny" ]; then
         if [ "$THERMAL_DISABLED" = "true" ]; then
-            write_mode "NotHorny"
-            CURRENT_PKG=""
-            start_transition "$MODPATH/PornArchive/anal.sh"
-            Notip Tag "😴 Normal mode Apply"
-            THERMAL_DISABLED="false"
-            rm -f "$MODPATH/CurrentHalState"
-            sleep 3
+            # Hysteresis: restore only after 2 consecutive idle polls, so a
+            # quick game -> home -> other-game switch does not thrash the
+            # thermal state (restore + re-apply back to back).
+            NOTHORNY_SEEN=$((NOTHORNY_SEEN + 1))
+            if [ "$NOTHORNY_SEEN" -ge 2 ]; then
+                write_mode "NotHorny"
+                CURRENT_PKG=""
+                start_transition "$MODPATH/PornArchive/anal.sh"
+                Notip Tag "😴 Normal mode Apply"
+                THERMAL_DISABLED="false"
+                rm -f "$MODPATH/CurrentHalState"
+                sleep 3
+            fi
         fi
     fi
     
