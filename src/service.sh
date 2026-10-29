@@ -159,7 +159,11 @@ get_PornApp() {
     dumpsys window 2>/dev/null | grep "Session Session{" | awk '{print $3}' | awk -F':' '{print $1}' | while read -r pid; do
         [ -r "/proc/$pid/cmdline" ] || continue
         tr '\0' ' ' < /proc/"$pid"/cmdline
+        echo ""
     done
+    # fallback: the sessions dump is missing or empty on some ROMs/Android
+    # versions; the resumed activity is a reliable foreground signal there.
+    dumpsys activity activities 2>/dev/null | grep -E 'm?ResumedActivity' | head -n 1 | sed -E 's/.* u[0-9]+ ([A-Za-z0-9._]+)\/.*/\1/' | grep -E '^[A-Za-z0-9._]+$'
 }
 
 description() {
@@ -224,18 +228,20 @@ while true; do
     active_pkg=""
     USE_HAL="$HAL"
     USE_POLICY="$GLOBAL_POLICY"
-    USE_ZONE="${GLOBAL_ZONE:-0}"    
+    USE_ZONE="${GLOBAL_ZONE:-1}"    
     [ -z "$Charge" ] && Charge="0"
     BAT_STATUS=$(cat /sys/class/power_supply/battery/status 2>/dev/null)
 
     if [ "$MODE" = "auto" ]; then
-        PornApp="$(get_PornApp)"        
+        PornApp="$(get_PornApp | tr '\n' ' ')"        
         
         if [ -f "$APP_CONFIGS" ]; then
             while read -r line || [ -n "$line" ]; do
                 [ -z "$line" ] && continue
                 pkg="$(echo "$line" | cut -d':' -f1)"
-                if echo "$PornApp" | grep -q "$pkg"; then
+                [ -z "$pkg" ] && continue
+                case " $PornApp " in
+                    *" $pkg "*)
                     TARGET_STATE="Horny"
                     active_pkg="$pkg"
                     custom_agg="$(echo "$line" | cut -d':' -f2)"
@@ -246,18 +252,21 @@ while true; do
                     [ -n "$custom_pol" ] && USE_POLICY="$custom_pol"
                     [ -n "$custom_zone" ] && USE_ZONE="$custom_zone"
                     break
-                fi
+                    ;;
+                esac
             done < "$APP_CONFIGS"
         fi
 
         if [ "$TARGET_STATE" != "Horny" ] && [ -f "$PORN" ]; then
             while read -r pkg || [ -n "$pkg" ]; do
                 [ -z "$pkg" ] && continue
-                if echo "$PornApp" | grep -q "$pkg"; then
+                case " $PornApp " in
+                    *" $pkg "*)
                     TARGET_STATE="Horny"
                     active_pkg="$pkg"
                     break
-                fi
+                    ;;
+                esac
             done < "$PORN"
         fi        
     elif [ "$MODE" = "static" ]; then
