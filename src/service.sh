@@ -182,6 +182,7 @@ CURRENT_PKG=""
 THERMAL_DISABLED="false"
 FAST_CHARGE_STATE="false"
 NOTHORNY_SEEN=0
+LAST_KEY=""
 TRANS_PIDFILE="$MODPATH/transition.pid"
 
 # Serialize thermal transitions: never allow an apply script (MILF/amature) and
@@ -281,9 +282,11 @@ while true; do
     fi
     
     if [ "$TARGET_STATE" = "Horny" ]; then        
-        if [ "$THERMAL_DISABLED" = "false" ] || [ "$CURRENT_PKG" != "$active_pkg" ]; then
+        NEW_KEY="$active_pkg|$USE_HAL|$USE_POLICY|$USE_ZONE"
+        if [ "$THERMAL_DISABLED" = "false" ] || [ "$CURRENT_PKG" != "$active_pkg" ] || [ "$LAST_KEY" != "$NEW_KEY" ]; then
             write_mode "Horny"
             CURRENT_PKG="$active_pkg"
+            LAST_KEY="$NEW_KEY"
             apply_policy "$USE_POLICY"            
             echo "$USE_HAL" > "$MODPATH/CurrentHalState"
             
@@ -307,6 +310,7 @@ while true; do
             if [ "$NOTHORNY_SEEN" -ge 2 ]; then
                 write_mode "NotHorny"
                 CURRENT_PKG=""
+                LAST_KEY=""
                 start_transition "$MODPATH/PornArchive/anal.sh"
                 Notip Tag "😴 Normal mode Apply"
                 THERMAL_DISABLED="false"
