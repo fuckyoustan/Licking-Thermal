@@ -60,19 +60,30 @@ ui_print "           PACKAGE FILTER              "
 ui_print "======================================"
 ui_print " Scanning game installed..."
 sleep 0.3
-FILTER_FILE="$MODPATH/PornArchive/PornCategories.txt"
-FILTERED_PKGS="$(cmd package list packages --user 0 | grep -Eo "$(cat "$FILTER_FILE" 2>/dev/null)")"
+# Resolve the staged catalog: during customize.sh the module files sit in the
+# extraction dir (cwd) on Magisk, but may already be at $MODPATH on other
+# root managers. The old hardcoded $MODPATH path missed the staged copy.
+FILTER_FILE="PornArchive/PornCategories.txt"
+[ -f "$FILTER_FILE" ] || FILTER_FILE="$MODPATH/PornArchive/PornCategories.txt"
+FILTERED_PKGS=""
+if [ -f "$FILTER_FILE" ]; then
+    # Exact whole-package matching. The old 'grep -Eo "$(cat ...)"' printed
+    # only the matched SUBSTRING (com.pubg out of com.pubg.newstate), so the
+    # catalog was rewritten with truncated names, and treated dots as regex.
+    FILTERED_PKGS="$(cmd package list packages --user 0 2>/dev/null | sed 's/^package://' | grep -Fxf "$FILTER_FILE" 2>/dev/null)"
+fi
 if [ -n "$FILTERED_PKGS" ]; then
     ui_print " game installed:"
     echo "$FILTERED_PKGS" | while read -r line; do
-        pkg="${line#package:}"
-        ui_print "  - $pkg"
+        ui_print "  - $line"
     done
+    # Rewrite the catalog with the games actually installed; when nothing
+    # matched, keep the shipped catalog instead of wiping it to empty.
+    echo "$FILTERED_PKGS" > "$FILTER_FILE"
 else
     ui_print " No game detected"
     ui_print " Add game list manually in webui!"
 fi
-echo "$FILTERED_PKGS" | sed 's/package://g' > "$FILTER_FILE"
 sleep 0.3
 ui_print ""
 ui_print "======================================"
