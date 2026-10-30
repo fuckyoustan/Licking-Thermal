@@ -14,11 +14,6 @@ if [ -f "$PIDFILE" ]; then
 fi
 
 echo "$MYPID" > "$PIDFILE"
-# reap transition scripts orphaned by a previous daemon instance
-# (the old daemon is killed above, but its background children survive)
-pkill -9 -f "$MODPATH/PornArchive/MILF.sh" 2>/dev/null
-pkill -9 -f "$MODPATH/PornArchive/amature.sh" 2>/dev/null
-pkill -9 -f "$MODPATH/PornArchive/anal.sh" 2>/dev/null
 while [ -z "$(getprop sys.boot_completed)" ]; do
     sleep 7
 done
