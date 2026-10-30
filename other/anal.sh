@@ -33,6 +33,16 @@ if [ -n "$JAVTIFUL" ]; then
 XHAMSTER="$JAVTIFUL"
 fi
 fi
+# --- concise debug log (LickT.log) — must never block the module ----------
+LICKT_LOG="$XNXX/LickT.log"
+if [ -f "$LICKT_LOG" ] && [ "$(wc -c < "$LICKT_LOG" 2>/dev/null || echo 0)" -gt 262144 ]; then
+    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t" 2>/dev/null && mv -f "${LICKT_LOG}.t" "$LICKT_LOG" 2>/dev/null
+fi
+lick_log() {
+    # $1 = OK | ERR | SKIP | INFO ; $2 = message
+    echo "$(date '+%m-%d %H:%M:%S') $1 ${0##*/}: $2" 2>/dev/null >> "$LICKT_LOG" || :
+}
+lick_log INFO "restore start (hal=$JAVHD zone=$XHAMSTER agghal=$AGGHAL was_on=$AGGHAL_WAS_ON)"
 Miyabi() {
 local val="$1"; shift
 for p in "$@"; do
@@ -159,8 +169,10 @@ EvaAngelina() {
 # unmount only when the HAL-disable mounts were enabled; still clean up
 # leftovers if any FuckingThermal bind-mount survived a config change
 if [ "$AGGHAL" != "1" ] && ! grep -qF "$XNXX/FuckingThermal" /proc/mounts 2>/dev/null; then
+lick_log SKIP "HAL unmount skipped (AggHal=0, no leftover)"
 return 0
 fi
+[ "$AGGHAL" != "1" ] && lick_log INFO "leftover HAL mounts found - cleaning"
 find /system/lib* /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r tgt; do
 n=0
 while grep -qF " $tgt " /proc/mounts 2>/dev/null && [ "$n" -lt 5 ]; do
@@ -168,6 +180,7 @@ umount "$tgt" 2>/dev/null || break
 n=$((n+1))
 done
 done
+lick_log OK "vendor HAL bind-mounts removed"
 }
 MelenaTara() {
 find /*/etc/init -type f 2>/dev/null | xargs grep -h "^service.*thermal" 2>/dev/null | awk '{print "start "$2"; setprop ctl.start "$2";"}' | sh 2>/dev/null
@@ -183,6 +196,7 @@ GinaGerson() {
 PKG="com.xiaomi.joyose"
 if ! pm list packages | grep -q "$PKG"; then
 cmd package install-existing "$PKG" >/dev/null 2>&1
+lick_log OK "joyose re-installed"
 fi
 }
 main1() {
@@ -214,6 +228,7 @@ MelenaTara
 }
 run_main() {
 if [ "$JAVHD" = "1" ]; then
+lick_log INFO "restore aggressive profile"
 main2
 sleep 2
 main1
@@ -222,7 +237,9 @@ fi
 # the last apply was balanced, but an aggressive session may still have left
 # vendor HAL mounts behind (hal switched off mid-game) - undo them once
 [ "$AGGHAL_WAS_ON" = "1" ] && EvaAngelina
+lick_log INFO "restore balanced profile"
 main1
 }
 run_main
 wait
+lick_log OK "restore done"

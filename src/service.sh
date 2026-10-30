@@ -4,11 +4,22 @@ MODPATH="/data/adb/modules/LickingT"
 PIDFILE="$MODPATH/daemon.pid"
 MYPID=$$
 
+# --- concise debug log (LickT.log) — must never block the module ----------
+LICKT_LOG="$MODPATH/LickT.log"
+if [ -f "$LICKT_LOG" ] && [ "$(wc -c < "$LICKT_LOG" 2>/dev/null || echo 0)" -gt 262144 ]; then
+    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t" 2>/dev/null && mv -f "${LICKT_LOG}.t" "$LICKT_LOG" 2>/dev/null
+fi
+lick_log() {
+    # $1 = OK | ERR | SKIP | INFO ; $2 = message
+    echo "$(date '+%m-%d %H:%M:%S') $1 ${0##*/}: $2" 2>/dev/null >> "$LICKT_LOG" || :
+}
+
 if [ -f "$PIDFILE" ]; then
     OPID=$(cat "$PIDFILE" 2>/dev/null)
     if [ -n "$OPID" ] && [ "$OPID" != "$MYPID" ]; then
         if kill -0 "$OPID" 2>/dev/null; then
             kill -9 "$OPID" 2>/dev/null
+            lick_log INFO "stale daemon pid=$OPID killed"
         fi
     fi
 fi
@@ -17,6 +28,7 @@ echo "$MYPID" > "$PIDFILE"
 while [ -z "$(getprop sys.boot_completed)" ]; do
     sleep 7
 done
+lick_log INFO "daemon start (pid=$MYPID)"
 
 eko() {
     local val="$1"; shift
@@ -270,12 +282,14 @@ while true; do
         if [ "$Charge" = "1" ] && [ "$BAT_STATUS" = "Charging" ]; then
             if [ "$FAST_CHARGE_STATE" != "true" ]; then
                 Msbreewc
+                lick_log OK "fast charge enabled"
                 Notip FastCharge "⚡ Fast Charge Enabled: turn off temp for better current"
                 FAST_CHARGE_STATE="true"
             fi
         else
             if [ "$FAST_CHARGE_STATE" = "true" ]; then
                 Siskaeee
+                lick_log OK "fast charge disabled"
                 Notip FastCharge "🔋 Fast Charge Disabled: Restoring normal thermal state."
                 FAST_CHARGE_STATE="false"
             fi
@@ -289,6 +303,7 @@ while true; do
         NOTHORNY_SEEN=0
         NEW_KEY="$active_pkg|$USE_HAL|$USE_POLICY|$USE_ZONE|$USE_AGGHAL"
         if [ "$THERMAL_DISABLED" = "false" ] || [ "$CURRENT_PKG" != "$active_pkg" ] || [ "$LAST_KEY" != "$NEW_KEY" ]; then
+            [ "$THERMAL_DISABLED" = "true" ] && lick_log INFO "re-apply $active_pkg (config changed)"
             write_mode "Horny"
             CURRENT_PKG="$active_pkg"
             LAST_KEY="$NEW_KEY"
@@ -300,9 +315,11 @@ while true; do
                 # vendor HAL mounts must be undone on restore (the state file
                 # is consumed and removed by anal.sh itself)
                 echo "$USE_AGGHAL" > "$MODPATH/CurrentAggHalState"
+                lick_log OK "agg apply $active_pkg (policy=$USE_POLICY zone=$USE_ZONE agghal=$USE_AGGHAL)"
                 start_transition "$MODPATH/PornArchive/MILF.sh" "$USE_POLICY" "$USE_ZONE" "$USE_AGGHAL"
                 Notip Tag "🚀 Aggressive mode Apply for $active_pkg"
             else
+                lick_log OK "balanced apply $active_pkg (policy=$USE_POLICY zone=$USE_ZONE)"
                 start_transition "$MODPATH/PornArchive/amature.sh" "$USE_POLICY" "$USE_ZONE"
                 Notip Tag "🤡 Amature mode Apply for $active_pkg"
             fi            
@@ -317,6 +334,7 @@ while true; do
             # thermal state (restore + re-apply back to back).
             NOTHORNY_SEEN=$((NOTHORNY_SEEN + 1))
             if [ "$NOTHORNY_SEEN" -ge 2 ]; then
+                lick_log OK "restore normal mode (app idle)"
                 write_mode "NotHorny"
                 CURRENT_PKG=""
                 LAST_KEY=""

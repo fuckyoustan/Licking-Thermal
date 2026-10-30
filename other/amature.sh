@@ -5,6 +5,16 @@ PORNHUB="$XNXX/CurrentZoneState"
 JAVTIFUL="$1"
 XHAMSTER="$2"
 [ -z "$XHAMSTER" ] && XHAMSTER="0"
+# --- concise debug log (LickT.log) — must never block the module ----------
+LICKT_LOG="$XNXX/LickT.log"
+if [ -f "$LICKT_LOG" ] && [ "$(wc -c < "$LICKT_LOG" 2>/dev/null || echo 0)" -gt 262144 ]; then
+    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t" 2>/dev/null && mv -f "${LICKT_LOG}.t" "$LICKT_LOG" 2>/dev/null
+fi
+lick_log() {
+    # $1 = OK | ERR | SKIP | INFO ; $2 = message
+    echo "$(date '+%m-%d %H:%M:%S') $1 ${0##*/}: $2" 2>/dev/null >> "$LICKT_LOG" || :
+}
+lick_log INFO "balanced apply start (policy=${JAVTIFUL:-none} zone=$XHAMSTER)"
 echo "$XHAMSTER" > "$PORNHUB"
 if [ -n "$JAVTIFUL" ]; then
 for z in /sys/class/thermal/thermal_zone*; do
@@ -54,6 +64,7 @@ GinaGerson() {
 PKG="com.xiaomi.joyose"
 if pm list packages | grep -q "$PKG"; then
 cmd package uninstall -k --user 0 "$PKG" >/dev/null 2>&1
+lick_log OK "joyose uninstalled for user 0"
 fi
 }
 SweetyFox2() {
@@ -172,3 +183,4 @@ SweetyFox1
 fi
 KitanoMina
 wait
+lick_log OK "balanced apply done"

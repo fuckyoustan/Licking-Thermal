@@ -11,6 +11,16 @@ AGGHAL="$3"
 # default 1 keeps the previous always-mount behavior.
 [ -z "$AGGHAL" ] && AGGHAL="$(grep -i '^AggHal=' "$XNXX/thermal.conf" 2>/dev/null | cut -d'=' -f2)"
 [ -z "$AGGHAL" ] && AGGHAL="1"
+# --- concise debug log (LickT.log) — must never block the module ----------
+LICKT_LOG="$XNXX/LickT.log"
+if [ -f "$LICKT_LOG" ] && [ "$(wc -c < "$LICKT_LOG" 2>/dev/null || echo 0)" -gt 262144 ]; then
+    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t" 2>/dev/null && mv -f "${LICKT_LOG}.t" "$LICKT_LOG" 2>/dev/null
+fi
+lick_log() {
+    # $1 = OK | ERR | SKIP | INFO ; $2 = message
+    echo "$(date '+%m-%d %H:%M:%S') $1 ${0##*/}: $2" 2>/dev/null >> "$LICKT_LOG" || :
+}
+lick_log INFO "aggressive apply start (policy=${JAVTIFUL:-none} zone=$XHAMSTER agghal=$AGGHAL)"
 echo "$XHAMSTER" > "$PORNHUB"
 if [ -n "$JAVTIFUL" ]; then
 for z in /sys/class/thermal/thermal_zone*; do
@@ -45,13 +55,14 @@ Miyabi "2" "$vagina/cpufreq_imax_enable"
 Miyabi "3" "$vagina/cpufreq_power_mode"
 }
 AvaAddams() {
-[ "$AGGHAL" = "1" ] || return 0
+[ "$AGGHAL" = "1" ] || { lick_log SKIP "HAL mount skipped (AggHal=0)"; return 0; }
 SHIT="/data/adb/modules/LickingT/FuckingThermal"
 [ ! -f "$SHIT" ] && echo > "$SHIT"
 find /system/lib* /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r Pussy; do
 grep -qF " $Pussy " /proc/mounts 2>/dev/null && continue
 mount --bind "$SHIT" "$Pussy" 2>/dev/null
 done
+lick_log OK "vendor HAL bind-mounts applied"
 }
 Siskaeee() {
 Miyabi "0" /proc/eem/eem_status
@@ -118,6 +129,7 @@ GinaGerson() {
 PKG="com.xiaomi.joyose"
 if pm list packages | grep -q "$PKG"; then
 cmd package uninstall -k --user 0 "$PKG" >/dev/null 2>&1
+lick_log OK "joyose uninstalled for user 0"
 fi
 }
 AsamiSugiura() {
@@ -192,3 +204,4 @@ SweetyFox1
 fi
 KitanoMina
 wait
+lick_log OK "aggressive apply done"
