@@ -39,6 +39,15 @@ cp -a src/webui/. "$STAGE/webroot/"
 cp other/MILF.sh other/amature.sh other/anal.sh "$STAGE/PornArchive/"
 cp other/list.txt "$STAGE/PornArchive/PornCategories.txt"
 
+# module.prop declares banner=webroot/assets/banner.jpg and the WebUI falls
+# back to assets/banner.jpg — ship the repo-root banner inside the webroot so
+# the manager and the WebUI both resolve it (optional, warn when absent).
+if [ -f banner.jpg ]; then
+    cp banner.jpg "$STAGE/webroot/assets/banner.jpg"
+else
+    echo "WARN: banner.jpg not in repo root - managers will show no banner (optional component)" >&2
+fi
+
 if [ -f toast.apk ]; then
     cp toast.apk "$STAGE/toast.apk"
 else
