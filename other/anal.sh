@@ -36,17 +36,56 @@ fi
 # --- concise debug log (LickT.log) — must never block the module ----------
 LICKT_LOG="$XNXX/LickT.log"
 if [ -f "$LICKT_LOG" ] && [ "$(wc -c < "$LICKT_LOG" 2>/dev/null || echo 0)" -gt 262144 ]; then
-    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t" 2>/dev/null && mv -f "${LICKT_LOG}.t" "$LICKT_LOG" 2>/dev/null
+    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t.$$" 2>/dev/null && mv -f "${LICKT_LOG}.t.$$" "$LICKT_LOG" 2>/dev/null
 fi
 lick_log() {
     # $1 = OK | ERR | SKIP | INFO ; $2 = message
     echo "$(date '+%m-%d %H:%M:%S') $1 ${0##*/}: $2" 2>/dev/null >> "$LICKT_LOG" || :
+}
+
+# --- node snapshot restore (P1-10): the apply scripts recorded path|value|mode
+# before their first write; restore the TRUE originals here. Nodes without a
+# snapshot entry (older module version, never touched) fall back to the
+# hardcoded constants below.
+SNAP="$XNXX/nodesnapshot.txt"
+restore_snapshot() {
+    if [ -s "$SNAP" ]; then
+        local cnt
+        cnt=$(wc -l < "$SNAP" 2>/dev/null || echo 0)
+        while IFS='|' read -r p v m; do
+            [ -f "$p" ] || continue
+            [ -n "$v" ] && printf '%s' "$v" > "$p" 2>/dev/null
+            [ -n "$m" ] && chmod "$m" "$p" 2>/dev/null
+        done < "$SNAP"
+        rm -f "$SNAP"
+        lick_log OK "node snapshot restored ($cnt nodes)"
+    fi
+}
+
+# --- cached find (P2-15): full-tree scans cost seconds per restore; cache the
+# paths and rescan only when the cache is empty or every entry vanished.
+cached_find() {
+    # $1 = cache key, $2 = find command string
+    local CF="$XNXX/cache/$1" out=""
+    if [ -s "$CF" ]; then
+        out=$(while read -r p; do [ -e "$p" ] && echo "$p"; done < "$CF")
+    fi
+    if [ -z "$out" ]; then
+        mkdir -p "$XNXX/cache" 2>/dev/null
+        out=$(eval "$2" 2>/dev/null)
+        printf '%s\n' "$out" > "$CF" 2>/dev/null
+    else
+        printf '%s\n' "$out"
+    fi
 }
 lick_log INFO "restore start (hal=$JAVHD zone=$XHAMSTER agghal=$AGGHAL was_on=$AGGHAL_WAS_ON)"
 Miyabi() {
 local val="$1"; shift
 for p in "$@"; do
 [ -f "$p" ] || continue
+# nodes with a snapshot entry already got their exact original restored by
+# restore_snapshot; write the hardcoded constant only for the others (P1-10)
+[ -f "$SNAP" ] && grep -qF "$p|" "$SNAP" 2>/dev/null && continue
 printf '%s' "$val" > "$p" 2>/dev/null
 chmod 444 "$p" 2>/dev/null
 done
@@ -73,7 +112,7 @@ Miyabi "0" "$vagina/cpufreq_imax_enable"
 Miyabi "1" "$vagina/cpufreq_power_mode"
 }
 AbellaDanger() {
-local mesum=$(find /sys -path '*msm_thermal*' -name 'enabled' -type f 2>/dev/null)
+local mesum=$(cached_find msm_thermal "find /sys -path '*msm_thermal*' -name 'enabled' -type f 2>/dev/null")
 if [ -n "$mesum" ]; then
 local sange1=$(grep -l '^N$' $mesum 2>/dev/null)
 [ -n "$sange1" ] && Miyabi "Y" $sange1
@@ -123,7 +162,12 @@ Miyabi "1" "$anal/device/bcl_enabled"
 done
 }
 HitomiTanaka1() {
-find /sys/devices/virtual/thermal -type f -exec chmod 644 {} + 2>/dev/null
+# exact modes come from the snapshot; 644 is only the fallback for nodes that
+# were never snapshotted (sessions started by older module versions)
+find /sys/devices/virtual/thermal -type f 2>/dev/null | while read -r f; do
+if [ -f "$SNAP" ] && grep -qF "$f|" "$SNAP" 2>/dev/null; then continue; fi
+chmod 644 "$f" 2>/dev/null
+done
 }
 HitomiTanaka2() {
 find /sys/devices/virtual/thermal -name 'temp' -type f 2>/dev/null | while read -r tgt; do
@@ -135,7 +179,14 @@ done
 done
 }
 AliceaFox() {
-find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "enabled" : "1"; print "echo " val " > \"" $0 "\"; chmod 444 \"" $0 "\"" }' | sh 2>/dev/null &
+find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | while read -r mz; do
+if [ -f "$SNAP" ] && grep -qF "$mz|" "$SNAP" 2>/dev/null; then continue; fi
+chmod 644 "$mz" 2>/dev/null
+case "$mz" in
+*/mode) echo "enabled" > "$mz" 2>/dev/null ;;
+*) echo "1" > "$mz" 2>/dev/null ;;
+esac
+done
 }
 mysaaat() {
 Miyabi "1" /proc/ppm/enabled
@@ -143,20 +194,15 @@ for idx in 2 3 4 6 7; do
 Miyabi "$idx 1" /proc/ppm/policy_status
 done
 }
-MikamiYua() {
-BK="$XNXX/PropBackup.txt"
-if [ -s "$BK" ]; then
-resetprop --file "$BK" 2>/dev/null
-else
-getprop | awk -F'[][]' 'tolower($2) ~ /thermal|temp|throttl/ {print $2}' | while read -r penis; do
-resetprop -n "$penis" "running" 2>/dev/null
-done
-fi
-}
 AngelaWhite() {
 for puki in /sys/devices/*.mali; do
 if [ -d "$puki" ]; then
-chmod 644 "$puki/tmu" "$puki"/throttling* "$puki/tripping" 2>/dev/null
+for f in "$puki/tmu" "$puki"/throttling* "$puki/tripping"; do
+[ -e "$f" ] || continue
+# exact modes come from the snapshot; 644 is only the un-snapshotted fallback
+if [ -f "$SNAP" ] && grep -qF "$f|" "$SNAP" 2>/dev/null; then continue; fi
+chmod 644 "$f" 2>/dev/null
+done
 fi
 done
 }
@@ -173,7 +219,7 @@ lick_log SKIP "HAL unmount skipped (AggHal=0, no leftover)"
 return 0
 fi
 [ "$AGGHAL" != "1" ] && lick_log INFO "leftover HAL mounts found - cleaning"
-find /system/lib* /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r tgt; do
+cached_find hal_files "find /system/lib* /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null" | while read -r tgt; do
 n=0
 while grep -qF " $tgt " /proc/mounts 2>/dev/null && [ "$n" -lt 5 ]; do
 umount "$tgt" 2>/dev/null || break
@@ -193,11 +239,21 @@ done
 fi
 }
 GinaGerson() {
+# joyose reinstall closes the apply/restore cycle: only run when the marker
+# says WE uninstalled it (P1-11)
 PKG="com.xiaomi.joyose"
+MARK="$XNXX/.joyose_off"
+[ -f "$MARK" ] || return 0
 if ! pm list packages | grep -q "$PKG"; then
 cmd package install-existing "$PKG" >/dev/null 2>&1
+if pm list packages | grep -q "$PKG"; then
 lick_log OK "joyose re-installed"
+else
+lick_log ERR "joyose re-install failed (will retry next restore)"
+return 0
 fi
+fi
+rm -f "$MARK" 2>/dev/null
 }
 main1() {
 if [ "$XHAMSTER" = "0" ]; then
@@ -206,7 +262,6 @@ HitomiTanaka2
 else
 HitomiTanaka1
 fi
-#MikamiYua
 AngelaWhite
 sleep 1
 GinaGerson
@@ -227,6 +282,7 @@ FunkyTown
 MelenaTara
 }
 run_main() {
+restore_snapshot
 if [ "$JAVHD" = "1" ]; then
 lick_log INFO "restore aggressive profile"
 main2

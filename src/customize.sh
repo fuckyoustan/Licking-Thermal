@@ -3,7 +3,7 @@
 # --- concise debug log (LickT.log) — must never block the install ----------
 LICKT_LOG="$MODPATH/LickT.log"
 if [ -f "$LICKT_LOG" ] && [ "$(wc -c < "$LICKT_LOG" 2>/dev/null || echo 0)" -gt 262144 ]; then
-    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t" 2>/dev/null && mv -f "${LICKT_LOG}.t" "$LICKT_LOG" 2>/dev/null
+    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t.$$" 2>/dev/null && mv -f "${LICKT_LOG}.t.$$" "$LICKT_LOG" 2>/dev/null
 fi
 lick_log() {
     # $1 = OK | ERR | SKIP | INFO ; $2 = message
@@ -44,7 +44,6 @@ ui_print "======================================"
 if [ "$APATCH" ]; then
     ROOT_METHOD="APatch"
     ROOT_VERSION="$APATCH_VER ($APATCH_VER_CODE)"
-    ACTION=false
 elif [ "$KSU" ]; then
     if [ "$KSU_NEXT" ]; then
         ROOT_METHOD="KernelSU Next"
@@ -53,7 +52,6 @@ elif [ "$KSU" ]; then
         ROOT_METHOD="KernelSU"
         ROOT_VERSION="$KSU_KERNEL_VER_CODE ($KSU_VER_CODE)"
     fi
-    ACTION=false
 elif [ "$MAGISK_VER_CODE" ]; then
     ROOT_METHOD="Magisk"
     ROOT_VERSION="$MAGISK_VER ($MAGISK_VER_CODE)"
@@ -123,8 +121,8 @@ else
             ui_print " Toast app installation failed"
         fi
     else
-        lick_log ERR "toast apk missing in zip"
-        ui_print " Error! toast app not found"
+        lick_log SKIP "toast apk missing in zip (optional component)"
+        ui_print " Toast app not found (optional - skipped)"
     fi
 fi
 echo "$TOAST_PKG" > /data/local/tmp/ToastProvider

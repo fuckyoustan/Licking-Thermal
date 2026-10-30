@@ -8,11 +8,39 @@ XHAMSTER="$2"
 # --- concise debug log (LickT.log) — must never block the module ----------
 LICKT_LOG="$XNXX/LickT.log"
 if [ -f "$LICKT_LOG" ] && [ "$(wc -c < "$LICKT_LOG" 2>/dev/null || echo 0)" -gt 262144 ]; then
-    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t" 2>/dev/null && mv -f "${LICKT_LOG}.t" "$LICKT_LOG" 2>/dev/null
+    tail -n 1000 "$LICKT_LOG" > "${LICKT_LOG}.t.$$" 2>/dev/null && mv -f "${LICKT_LOG}.t.$$" "$LICKT_LOG" 2>/dev/null
 fi
 lick_log() {
     # $1 = OK | ERR | SKIP | INFO ; $2 = message
     echo "$(date '+%m-%d %H:%M:%S') $1 ${0##*/}: $2" 2>/dev/null >> "$LICKT_LOG" || :
+}
+
+# --- node snapshot (P1-10): record path|value|mode before the first write of
+# a session; the grep guard keeps the ORIGINAL entry, so a crash + re-apply
+# never replaces the true originals with already-modified values. anal.sh
+# restores from this file and removes it on a clean restore.
+SNAP="$XNXX/nodesnapshot.txt"
+snapshot_node() {
+    [ -f "$1" ] || return 0
+    grep -qF "$1|" "$SNAP" 2>/dev/null && return 0
+    echo "$1|$(cat "$1" 2>/dev/null)|$(stat -c %a "$1" 2>/dev/null)" >> "$SNAP" 2>/dev/null || :
+}
+
+# --- cached find (P2-15): full-tree scans cost seconds per apply; cache the
+# paths and rescan only when the cache is empty or every entry vanished.
+cached_find() {
+    # $1 = cache key, $2 = find command string
+    local CF="$XNXX/cache/$1" out=""
+    if [ -s "$CF" ]; then
+        out=$(while read -r p; do [ -e "$p" ] && echo "$p"; done < "$CF")
+    fi
+    if [ -z "$out" ]; then
+        mkdir -p "$XNXX/cache" 2>/dev/null
+        out=$(eval "$2" 2>/dev/null)
+        printf '%s\n' "$out" > "$CF" 2>/dev/null
+    else
+        printf '%s\n' "$out"
+    fi
 }
 lick_log INFO "balanced apply start (policy=${JAVTIFUL:-none} zone=$XHAMSTER)"
 echo "$XHAMSTER" > "$PORNHUB"
@@ -25,9 +53,9 @@ done
 fi
 Miyabi() {
 local val="$1"; shift
-local current_perms
 for p in "$@"; do
 [ -f "$p" ] || continue
+snapshot_node "$p"
 chmod 644 "$p" 2>/dev/null
 printf '%s' "$val" > "$p" 2>/dev/null
 done
@@ -41,12 +69,6 @@ Miyabi "0" /sys/module/qpnp_bsi/parameters/bcl_enabled
 Miyabi "1" /proc/mtk_batoc_throttling/battery_oc_protect_stop
 cmd thermalservice override-status 0 2>/dev/null
 }
-SoraAoi() {
-BK="$XNXX/PropBackup.txt"
-[ -s "$BK" ] || getprop | awk -F'[][]' 'tolower($2) ~ /thermal|temp|throttl/ && $2 !~ /^init[.]svc[.]/ {print $2"="$4}' > "$BK" 2>/dev/null
-getprop | awk -F'[][]' 'BEGIN { words[0]="YESDADDY"; words[1]="FUCK"; words[2]="AHHH"; words[3]="LICKIT"; srand(); }
-tolower($2) ~ /thermal/ { val = words[int(rand() * 4)]; printf "resetprop -n \"%s\" \"%s\" 2>/dev/null\n", $2, val; }' | sh
-}
 NicoleMurkovski() {
 if ! service check miui.mqsas.IMQSNative | grep -q "not found"; then
 for a in $(find /*/etc/init -type f 2>/dev/null | xargs grep -Eh "^service (miui|.*thermal)" 2>/dev/null | awk '{print$2}'); do 
@@ -58,12 +80,20 @@ KitanoMina() {
 (for core in /sys/devices/system/cpu/cpu[0-9]*/online; do read -r state < "$core" 2>/dev/null; [ "$state" = "0" ] && { chmod 644 "$core" 2>/dev/null; echo 1 > "$core" 2>/dev/null; }; done) & 
 }
 SweetyFox1() {
-find /sys/devices/virtual/thermal -type f -exec chmod 000 {} + 2>/dev/null
+find /sys/devices/virtual/thermal -type f 2>/dev/null | while read -r f; do
+snapshot_node "$f"
+chmod 000 "$f" 2>/dev/null
+done
 }
 GinaGerson() {
+# uninstall joyose once per active cycle (marker file); anal.sh reinstalls it
+# on restore - the old code uninstalled it on EVERY apply, balanced included
 PKG="com.xiaomi.joyose"
+MARK="$XNXX/.joyose_off"
+[ -f "$MARK" ] && return 0
 if pm list packages | grep -q "$PKG"; then
 cmd package uninstall -k --user 0 "$PKG" >/dev/null 2>&1
+echo "1" > "$MARK" 2>/dev/null
 lick_log OK "joyose uninstalled for user 0"
 fi
 }
@@ -76,12 +106,23 @@ mount --bind "$PUSSY" "$Boobs" 2>/dev/null
 done
 }
 LolaTaylor() {
-find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | awk '{ val = ($0 ~ /mode/) ? "disabled" : "0"; print "chmod 644 \"" $0 "\"; echo " val " > \"" $0 "\"" }' | sh 2>/dev/null &
+find /sys/devices/virtual/thermal -type f \( -name "mode" -o -name "thm_enable" \) 2>/dev/null | while read -r mz; do
+snapshot_node "$mz"
+chmod 644 "$mz" 2>/dev/null
+case "$mz" in
+*/mode) echo "disabled" > "$mz" 2>/dev/null ;;
+*) echo "0" > "$mz" 2>/dev/null ;;
+esac
+done
 }
 EvaElfie() {
 for puki in /sys/devices/*.mali; do
 if [ -d "$puki" ]; then
-chmod 000 "$puki/tmu" "$puki"/throttling* "$puki/tripping" 2>/dev/null
+for f in "$puki/tmu" "$puki"/throttling* "$puki/tripping"; do
+[ -e "$f" ] || continue
+snapshot_node "$f"
+chmod 000 "$f" 2>/dev/null
+done
 fi
 done
 }
@@ -101,7 +142,7 @@ Miyabi "1 ${t_limit}000 0 mtk-cl-kshutdown02 $no_cooler 1000" /proc/driver/therm
 fi
 }
 Barbamiska() {
-local mesum=$(find /sys -path '*msm_thermal*' -name 'enabled' -type f 2>/dev/null)
+local mesum=$(cached_find msm_thermal "find /sys -path '*msm_thermal*' -name 'enabled' -type f 2>/dev/null")
 if [ -n "$mesum" ]; then
 local sange1=$(grep -l '^Y$' $mesum 2>/dev/null)
 [ -n "$sange1" ] && Miyabi "N" $sange1
@@ -173,7 +214,6 @@ Barbamiska
 EvaElfie
 NicoleMurkovski
 sleep 2
-#SoraAoi
 if [ "$XHAMSTER" = "0" ]; then
 LolaTaylor
 sleep 1
