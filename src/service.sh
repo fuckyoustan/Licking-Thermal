@@ -196,7 +196,7 @@ kill_transitions() {
 start_transition() {
     kill_transitions
     if [ -n "$2" ]; then
-        sh "$1" "$2" "$3" &
+        sh "$1" "$2" "$3" "$4" &
     else
         sh "$1" &
     fi
@@ -215,6 +215,8 @@ while true; do
     TARGET_STATE="NotHorny"
     active_pkg=""
     USE_HAL="$HAL"
+    USE_AGGHAL="$(grep -i '^AggHal=' "$CONF" 2>/dev/null | cut -d'=' -f2)"
+    [ -z "$USE_AGGHAL" ] && USE_AGGHAL="1"
     USE_POLICY="$GLOBAL_POLICY"
     USE_ZONE="${GLOBAL_ZONE:-1}"    
     [ -z "$Charge" ] && Charge="0"
@@ -239,6 +241,8 @@ while true; do
                     [ -n "$custom_agg" ] && USE_HAL="$custom_agg"
                     [ -n "$custom_pol" ] && USE_POLICY="$custom_pol"
                     [ -n "$custom_zone" ] && USE_ZONE="$custom_zone"
+                    custom_agghal="$(echo "$line" | cut -d':' -f5)"
+                    [ -n "$custom_agghal" ] && USE_AGGHAL="$custom_agghal"
                     break
                     ;;
                 esac
@@ -283,7 +287,7 @@ while true; do
         # non-consecutive idle polls (home -> game -> home -> home) could
         # still add up and trigger a bogus restore
         NOTHORNY_SEEN=0
-        NEW_KEY="$active_pkg|$USE_HAL|$USE_POLICY|$USE_ZONE"
+        NEW_KEY="$active_pkg|$USE_HAL|$USE_POLICY|$USE_ZONE|$USE_AGGHAL"
         if [ "$THERMAL_DISABLED" = "false" ] || [ "$CURRENT_PKG" != "$active_pkg" ] || [ "$LAST_KEY" != "$NEW_KEY" ]; then
             write_mode "Horny"
             CURRENT_PKG="$active_pkg"
@@ -292,7 +296,11 @@ while true; do
             echo "$USE_HAL" > "$MODPATH/CurrentHalState"
             
             if [ "$USE_HAL" = "1" ]; then
-                start_transition "$MODPATH/PornArchive/MILF.sh" "$USE_POLICY" "$USE_ZONE"
+                # record the effective AggHal so anal.sh knows whether the
+                # vendor HAL mounts must be undone on restore (the state file
+                # is consumed and removed by anal.sh itself)
+                echo "$USE_AGGHAL" > "$MODPATH/CurrentAggHalState"
+                start_transition "$MODPATH/PornArchive/MILF.sh" "$USE_POLICY" "$USE_ZONE" "$USE_AGGHAL"
                 Notip Tag "🚀 Aggressive mode Apply for $active_pkg"
             else
                 start_transition "$MODPATH/PornArchive/amature.sh" "$USE_POLICY" "$USE_ZONE"

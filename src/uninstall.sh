@@ -32,7 +32,7 @@ if [ -d "$XNXX" ]; then
         done < "$XNXX/chargebackup.txt"
         rm -f "$XNXX/chargebackup.txt"
     fi
-    rm -f "$XNXX/daemon.pid" "$XNXX/transition.pid" "$XNXX/CurrentHalState" "$XNXX/CurrentZoneState"
+    rm -f "$XNXX/daemon.pid" "$XNXX/transition.pid" "$XNXX/CurrentHalState" "$XNXX/CurrentAggHalState" "$XNXX/CurrentZoneState"
 fi
 
 if [ -f $INFO ]; then

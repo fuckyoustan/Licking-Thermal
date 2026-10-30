@@ -4,6 +4,7 @@
   "navSettings": "Setelan",
   "thermalConfig": "Setelan Termal",
   "aggMode": "Mode Agresif",
+  "aggressiveHal": "Matèni Thermal HAL",
   "disablePanic": "Pateni Kernel Panic",
   "fastCharge": "Ngecas Cepet",
   "opMode": "Mode Operasi",
@@ -37,6 +38,7 @@
   "asCustomConfig": "Setelan Dewe",
   "asCustomConfigDesc": "Tumpuk setelan suhu global",
   "asAggModeDesc": "Genjot performa mentok",
+  "asAggHalDesc": "Mask pustaka thermal HAL vendor",
   "asZoneDesc": "Kontrol ngapusi suhu zona termal",
   "asPolicyDesc": "Reaksi sistem pas panas",
   "statusActive": "Lagi Mlaku ✨",
@@ -62,6 +64,10 @@
     "aggressive": {
       "title": "Mode Agresif",
       "text": "Disaranake banget nggo dongkrak performa ben makin joss! Pateni yen game sing lagi kowe mainake ndeteksi modifikasi termal."
+    },
+    "aggressiveHal": {
+      "title": "Matèni Thermal HAL",
+      "text": "Nutupi (mask) pustaka thermal HAL vendor nalika Mode Agresif aktif. Mateni yen game utawa layanan thermal sistem ana masalah (crash, freeze, utawa pamacaan suhu mandheg)."
     },
     "fastCharge": {
       "title": "Ngecas Cepet",

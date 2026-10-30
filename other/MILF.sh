@@ -4,7 +4,13 @@ XNXX="/data/adb/modules/LickingT"
 PORNHUB="$XNXX/CurrentZoneState"
 JAVTIFUL="$1"
 XHAMSTER="$2"
+AGGHAL="$3"
 [ -z "$XHAMSTER" ] && XHAMSTER="0"
+# AggHal: optional vendor thermal HAL disable (1 = mount, 0 = skip).
+# Falls back to thermal.conf when the daemon passes no per-app value,
+# default 1 keeps the previous always-mount behavior.
+[ -z "$AGGHAL" ] && AGGHAL="$(grep -i '^AggHal=' "$XNXX/thermal.conf" 2>/dev/null | cut -d'=' -f2)"
+[ -z "$AGGHAL" ] && AGGHAL="1"
 echo "$XHAMSTER" > "$PORNHUB"
 if [ -n "$JAVTIFUL" ]; then
 for z in /sys/class/thermal/thermal_zone*; do
@@ -39,6 +45,7 @@ Miyabi "2" "$vagina/cpufreq_imax_enable"
 Miyabi "3" "$vagina/cpufreq_power_mode"
 }
 AvaAddams() {
+[ "$AGGHAL" = "1" ] || return 0
 SHIT="/data/adb/modules/LickingT/FuckingThermal"
 [ ! -f "$SHIT" ] && echo > "$SHIT"
 find /system/lib* /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r Pussy; do

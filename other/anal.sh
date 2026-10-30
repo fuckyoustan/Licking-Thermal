@@ -4,6 +4,8 @@ XNXX="/data/adb/modules/LickingT"
 EPORNER="$XNXX/thermal.conf"
 PORNHUB="$XNXX/CurrentZoneState"
 HAL_STATE="$XNXX/CurrentHalState"
+AGGHAL_STATE="$XNXX/CurrentAggHalState"
+AGGHAL_WAS_ON=0
 XHAMSTER=$(grep -i '^ZONE=' "$EPORNER" 2>/dev/null | cut -d'=' -f2)
 JAVHD=$(grep -i '^HAL=' "$EPORNER" 2>/dev/null | cut -d'=' -f2)
 if [ -f "$HAL_STATE" ]; then
@@ -12,6 +14,19 @@ if [ -n "$JAVTIFUL_HAL" ]; then
 JAVHD="$JAVTIFUL_HAL"
 fi
 fi
+# AggHal: the daemon records the effective value when an aggressive session
+# mounts the vendor HAL; consume it here (and drop the state file right away,
+# before the restore work below, so a late writer cannot resurrect it).
+AGGHAL=$(grep -i '^AggHal=' "$EPORNER" 2>/dev/null | cut -d'=' -f2)
+if [ -f "$AGGHAL_STATE" ]; then
+JAVTIFUL_AGHAL="$(cat "$AGGHAL_STATE")"
+if [ -n "$JAVTIFUL_AGHAL" ]; then
+AGGHAL="$JAVTIFUL_AGHAL"
+AGGHAL_WAS_ON=1
+fi
+rm -f "$AGGHAL_STATE" 2>/dev/null
+fi
+[ -z "$AGGHAL" ] && AGGHAL="1"
 if [ -f "$PORNHUB" ]; then
 JAVTIFUL="$(cat "$PORNHUB")"
 if [ -n "$JAVTIFUL" ]; then
@@ -141,6 +156,11 @@ Miyabi "Y" "$goth/power_efficient"
 Miyabi "Y" "$goth/disable_numa"
 }
 EvaAngelina() {
+# unmount only when the HAL-disable mounts were enabled; still clean up
+# leftovers if any FuckingThermal bind-mount survived a config change
+if [ "$AGGHAL" != "1" ] && ! grep -qF "$XNXX/FuckingThermal" /proc/mounts 2>/dev/null; then
+return 0
+fi
 find /system/lib* /vendor -type f \( -iname '*thermal*' -o -iname '*throttl*' \) ! -iname '*.rc' 2>/dev/null | while read -r tgt; do
 n=0
 while grep -qF " $tgt " /proc/mounts 2>/dev/null && [ "$n" -lt 5 ]; do
@@ -199,6 +219,9 @@ sleep 2
 main1
 return
 fi
+# the last apply was balanced, but an aggressive session may still have left
+# vendor HAL mounts behind (hal switched off mid-game) - undo them once
+[ "$AGGHAL_WAS_ON" = "1" ] && EvaAngelina
 main1
 }
 run_main

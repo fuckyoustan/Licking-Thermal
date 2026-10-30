@@ -25,6 +25,7 @@ function setHeaderTitle(text) {
 
 const infoContentFallback = {
   aggressive: { title: "Aggressive Mode", text: "Highly recommended for a performance boost." },
+  aggressiveHal: { title: "Disable Thermal HAL", text: "Masks vendor thermal HAL libraries while Aggressive Mode is active. Turn it off if the game or the system thermal service misbehaves (crash, freeze, or stuck temperature readings)." },
   modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on." },
   zonePolicy: { title: "Thermal Policy", text: "Sets how the system reacts to temps." },
   thermalZone: { title: "Thermal Zone", text: "Disable: Disable thermal zone spoofing.\nSpoof to 30°C: Spoof thermal zone temperature to 30°C." },
@@ -183,7 +184,7 @@ function setRowVisible(rowId, visible) {
 async function updateExtraCard() {
   try {
     const out = await exec(`cat ${CONFIG_FILE_PATH} || true`);
-    let mode = "automatic", hal = "0", disablePanic = "0", zone = "1", charge = "0";
+    let mode = "automatic", hal = "0", disablePanic = "0", zone = "1", charge = "0", agghal = "1";
 
     out.split("\n").forEach(l => {
       const t = l.trim();
@@ -192,6 +193,7 @@ async function updateExtraCard() {
       if(t.startsWith("DISABLE_PANIC=")) disablePanic = t.replace("DISABLE_PANIC=","").trim();
       if(t.startsWith("ZONE=")) zone = t.replace("ZONE=","").trim();
       if(t.startsWith("Charge=")) charge = t.replace("Charge=","").trim();
+      if(t.startsWith("AggHal=")) agghal = t.replace("AggHal=","").trim();
     });
 
     const modeDd = dropdowns['mode-select'];
@@ -199,11 +201,15 @@ async function updateExtraCard() {
     const panicSwitch = document.getElementById("panic-switch");
     const zoneDd = dropdowns['zone-select'];
     const chargeSwitch = document.getElementById("charge-switch");
+    const agghalSwitch = document.getElementById("agghal-switch");
 
     if(modeDd) modeDd.setValue(mode);
     if(halSwitch) halSwitch.checked = (hal === "1");
     if(panicSwitch) panicSwitch.checked = (disablePanic === "1");
     if(chargeSwitch) chargeSwitch.checked = (charge === "1");
+    if(agghalSwitch) agghalSwitch.checked = (agghal === "1");
+    globalAggHal = agghal;
+    setRowVisible('agghal-row', hal === "1");
 
     if(zoneDd) {
       zoneDd.setValue(zone);
@@ -336,13 +342,15 @@ let cachedApps = [];
 let activePackages = new Set();
 let appConfigs = {};
 let currentEditingPkg = null;
+/* global AggHal value from thermal.conf — used as the per-app default */
+let globalAggHal = '1';
 
 async function saveAppConfigs() {
   let customLines = [];
   for (const pkg of activePackages) {
     const conf = appConfigs[pkg];
     if (conf && conf.isCustomized) {
-      customLines.push(`${pkg}:${conf.agg ? '1' : '0'}:${conf.policy}:${conf.zone || '1'}`);
+      customLines.push(`${pkg}:${conf.agg ? '1' : '0'}:${conf.policy}:${conf.zone || '1'}:${conf.agghal == null ? '' : (conf.agghal ? '1' : '0')}`);
     }
   }
 
@@ -365,18 +373,15 @@ async function loadAppsData() {
     const configContent = await exec(`cat ${APP_CONFIGS_PATH} || true`);
     configContent.split('\n').forEach(line => {
       const parts = line.trim().split(':');
-      if (parts.length === 3) {
+      if (parts.length >= 3) {
+        /* field 5 = AggHal ('1'/'0'); absent/empty = inherit the global value */
+        let agghal = null;
+        if (parts.length >= 5 && (parts[4] === '1' || parts[4] === '0')) agghal = parts[4] === '1';
         appConfigs[parts[0]] = {
           agg: parts[1] === '1',
           policy: parts[2],
-          zone: '1',
-          isCustomized: true
-        };
-      } else if (parts.length === 4) {
-        appConfigs[parts[0]] = {
-          agg: parts[1] === '1',
-          policy: parts[2],
-          zone: parts[3],
+          zone: parts.length >= 4 ? parts[3] : '1',
+          agghal: agghal,
           isCustomized: true
         };
       }
@@ -475,7 +480,7 @@ function renderAppList() {
     const labelText = pkg.appLabel || pkg.packageName;
 
     if (!appConfigs[pkg.packageName]) {
-      appConfigs[pkg.packageName] = { agg: false, policy: globalPolicies[0] || 'stepwise', zone: '1', isCustomized: false };
+      appConfigs[pkg.packageName] = { agg: false, policy: globalPolicies[0] || 'stepwise', zone: '1', agghal: null, isCustomized: false };
     }
 
     /* baris aplikasi gaya preference miuix */
@@ -553,6 +558,11 @@ function openGameSettings(pkg, isChecked, iconSrc) {
 
   document.getElementById('as-main-switch').checked = isChecked;
   document.getElementById('as-agg-switch').checked = conf.agg;
+
+  /* AggHal row only exists under aggressive mode; unset = inherit global */
+  if (conf.agghal == null) conf.agghal = (globalAggHal === '1');
+  document.getElementById('as-agghal-switch').checked = !!conf.agghal;
+  setRowVisible('as-agghal-row', conf.agg);
 
   const customSwitch = document.getElementById('as-custom-switch');
   customSwitch.checked = conf.isCustomized;
@@ -961,7 +971,11 @@ async function init() {
   document.getElementById('dev-btn-github')?.addEventListener('click', (e) => window.openExternalLink('https://github.com/fuckyoustan', e));
   document.getElementById('dev-btn-telegram')?.addEventListener('click', (e) => window.openExternalLink('tg://resolve?domain=EverythingAboutArchive', e));
 
-  document.getElementById("hal-switch")?.addEventListener('change', (e) => setConfigValue("HAL", e.target.checked ? "1" : "0"));
+  document.getElementById("hal-switch")?.addEventListener('change', (e) => {
+    setConfigValue("HAL", e.target.checked ? "1" : "0");
+    setRowVisible('agghal-row', e.target.checked);
+  });
+  document.getElementById("agghal-switch")?.addEventListener('change', (e) => setConfigValue("AggHal", e.target.checked ? "1" : "0"));
   document.getElementById("charge-switch")?.addEventListener('change', (e) => setConfigValue("Charge", e.target.checked ? "1" : "0"));
 
   /* --- search bar miuix --- */
@@ -1050,8 +1064,18 @@ async function init() {
     appConfigs[currentEditingPkg].agg = e.target.checked;
     appConfigs[currentEditingPkg].isCustomized = true;
     await saveAppConfigs();
+    setRowVisible('as-agghal-row', e.target.checked);
     const modeText = currentTranslations.aggMode || "Aggressive Mode";
     toast(`${modeText} ${e.target.checked ? 'ON' : 'OFF'}`);
+  });
+
+  document.getElementById('as-agghal-switch')?.addEventListener('change', async (e) => {
+    if(!currentEditingPkg) return;
+    appConfigs[currentEditingPkg].agghal = e.target.checked;
+    appConfigs[currentEditingPkg].isCustomized = true;
+    await saveAppConfigs();
+    const halText = currentTranslations.aggressiveHal || "Disable Thermal HAL";
+    toast(`${halText} ${e.target.checked ? 'ON' : 'OFF'}`);
   });
 
   /* tutup dropdown saat overlay discroll */

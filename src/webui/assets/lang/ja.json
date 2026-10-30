@@ -4,6 +4,7 @@
   "navSettings": "設定",
   "thermalConfig": "熱設定",
   "aggMode": "アグレッシブモード",
+  "aggressiveHal": "サーマルHALを無効化",
   "disablePanic": "カーネルパニックを無効化",
   "fastCharge": "急速充電",
   "opMode": "動作モード",
@@ -37,6 +38,7 @@
   "asCustomConfig": "カスタム設定",
   "asCustomConfigDesc": "グローバル熱設定を上書きする",
   "asAggModeDesc": "限界までパフォーマンスを引き出す",
+  "asAggHalDesc": "ベンダーのサーマルHALをマスク",
   "asZoneDesc": "サーマルゾーン偽装制御",
   "asPolicyDesc": "熱に対するシステムの反応",
   "statusActive": "動作中 ✨",
@@ -62,6 +64,10 @@
     "aggressive": {
       "title": "アグレッシブモード",
       "text": "パフォーマンスを大幅に向上させるために強くお勧めします！プレイ中のゲームが熱による変化を検知した場合はオフにしてください "
+    },
+    "aggressiveHal": {
+      "title": "サーマルHALを無効化",
+      "text": "アグレッシブモード中にベンダーのサーマルHALライブラリをマスクします。ゲームやシステムのサーマルサービスが不調な場合（クラッシュ・フリーズ・温度表示の停滞）はオフにしてください。"
     },
     "fastCharge": {
       "title": "急速充電",

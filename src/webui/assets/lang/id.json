@@ -4,6 +4,7 @@
   "navSettings": "Pengaturan",
   "thermalConfig": "Konfigurasi Termal",
   "aggMode": "Mode Agresif",
+  "aggressiveHal": "Nonaktifkan Thermal HAL",
   "disablePanic": "Nonaktifkan Kernel Panic",
   "fastCharge": "Pengisian Cepat",
   "opMode": "Mode Operasi",
@@ -37,6 +38,7 @@
   "asCustomConfig": "Konfigurasi Khusus",
   "asCustomConfigDesc": "Timpa pengaturan termal global",
   "asAggModeDesc": "Dorong performa hingga batas maksimal",
+  "asAggHalDesc": "Nonaktifkan pustaka thermal HAL vendor",
   "asZoneDesc": "Kontrol manipulasi zona termal",
   "asPolicyDesc": "Reaksi sistem terhadap panas",
   "statusActive": "Aktif Bekerja ✨",
@@ -62,6 +64,10 @@
     "aggressive": {
       "title": "Mode Agresif",
       "text": "Sangat disarankan untuk mendongkrak performa secara maksimal! Matikan jika game yang anda mainkan mendeteksi modifikasi thermal"
+    },
+    "aggressiveHal": {
+      "title": "Nonaktifkan Thermal HAL",
+      "text": "Menutupi (mask) pustaka thermal HAL vendor selama Mode Agresif aktif. Matikan jika game atau layanan thermal sistem bermasalah (crash, freeze, atau pembacaan suhu macet)."
     },
     "modeOptions": {
       "title": "Mode Operasi",

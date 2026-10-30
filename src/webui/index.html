@@ -72,6 +72,17 @@
           </label>
         </div>
 
+        <div class="m-pref" id="agghal-row" style="display:none">
+          <div class="m-pref-text m-click-info" onclick="showInfo('aggressiveHal')">
+            <span class="m-pref-title"><span data-i18n="aggressiveHal">Disable Thermal HAL</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
+          </div>
+          <label class="m-switch">
+            <input type="checkbox" id="agghal-switch">
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
+          </label>
+        </div>
+
         <div class="m-pref">
           <div class="m-pref-text m-click-info" onclick="showInfo('kernelPanic')">
             <span class="m-pref-title"><span data-i18n="disablePanic">Disable Kernel Panic</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
@@ -339,6 +350,18 @@
             </div>
             <label class="m-switch">
               <input type="checkbox" id="as-agg-switch">
+              <span class="m-switch-track"></span>
+              <span class="m-switch-thumb"></span>
+            </label>
+          </div>
+
+          <div class="m-pref" id="as-agghal-row" style="display:none">
+            <div class="m-pref-text">
+              <span class="m-pref-title" data-i18n="aggressiveHal">Disable Thermal HAL</span>
+              <span class="m-pref-summary" data-i18n="asAggHalDesc">Mask vendor thermal HAL libraries</span>
+            </div>
+            <label class="m-switch">
+              <input type="checkbox" id="as-agghal-switch">
               <span class="m-switch-track"></span>
               <span class="m-switch-thumb"></span>
             </label>

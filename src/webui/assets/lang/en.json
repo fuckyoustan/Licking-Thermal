@@ -4,6 +4,7 @@
   "navSettings": "Settings",
   "thermalConfig": "Thermal Config",
   "aggMode": "Aggressive Mode",
+  "aggressiveHal": "Disable Thermal HAL",
   "disablePanic": "Disable Kernel Panic",
   "fastCharge": "Fast Charge",
   "opMode": "Operation Mode",
@@ -37,6 +38,7 @@
   "asCustomConfig": "Custom Config",
   "asCustomConfigDesc": "Override global thermal settings",
   "asAggModeDesc": "Push performance to the limit",
+  "asAggHalDesc": "Mask vendor thermal HAL libraries",
   "asZoneDesc": "Thermal zone spoof control",
   "asPolicyDesc": "System reaction to heat",
   "statusActive": "Working ✨",
@@ -62,6 +64,10 @@
     "aggressive": {
       "title": "Aggressive Mode",
       "text": "Highly recommended for a massive performance boost! turn it off if the game you are playing detects thermal modification."
+    },
+    "aggressiveHal": {
+      "title": "Disable Thermal HAL",
+      "text": "Masks vendor thermal HAL libraries while Aggressive Mode is active. Turn it off if the game or the system thermal service misbehaves (crash, freeze, or stuck temperature readings)."
     },
     "fastCharge": {
       "title": "Fast Charge",
