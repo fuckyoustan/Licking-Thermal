@@ -156,9 +156,6 @@ get_PornApp() {
         tr '\0' ' ' < /proc/"$pid"/cmdline
         echo ""
     done
-    # fallback: the sessions dump is missing or empty on some ROMs/Android
-    # versions; the resumed activity is a reliable foreground signal there.
-    dumpsys activity activities 2>/dev/null | grep -E 'm?ResumedActivity' | head -n 1 | sed -E 's/.* u[0-9]+ ([A-Za-z0-9._]+)\/.*/\1/' | grep -E '^[A-Za-z0-9._]+$'
 }
 
 description() {
@@ -194,10 +191,6 @@ kill_transitions() {
         [ -n "$OPID" ] && kill -9 "$OPID" 2>/dev/null
         rm -f "$TRANS_PIDFILE" 2>/dev/null
     fi
-    pkill -9 -f "$MODPATH/PornArchive/MILF.sh" 2>/dev/null
-    pkill -9 -f "$MODPATH/PornArchive/amature.sh" 2>/dev/null
-    pkill -9 -f "$MODPATH/PornArchive/anal.sh" 2>/dev/null
-    return 0
 }
 
 start_transition() {
