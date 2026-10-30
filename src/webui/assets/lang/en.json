@@ -45,6 +45,8 @@
   "statusBalanced": "Balanced 😴",
   "statusDisabled": "Disabled ❌",
   "toastSaved": "Saved successfully",
+  "toastInvalidValue": "Invalid value — not saved",
+  "toastFastChargeAutoOnly": "Fast Charge is only available in Auto mode",
   "toastAppEnabled": "Enabled for this app",
   "toastAppDisabled": "Disabled for this app",
   "toastCustomUnlocked": "Custom settings unlocked",
@@ -71,11 +73,11 @@
     },
     "fastCharge": {
       "title": "Fast Charge",
-      "text": "Turns off some temperature sensors to force maximum charging speed."
+      "text": "Auto mode only: boosts charging current while charging. Hidden while Static mode is active."
     },
     "modeOptions": {
       "title": "Operation Mode",
-      "text": "Auto: Thermal limits are only disabled for the apps you pick in the Apps tab.\nStatic: Permanently disabled all the time."
+      "text": "Auto: Thermal limits are only disabled for the apps you pick in the Apps tab.\nStatic: Permanently disabled all the time.\nFast Charge only runs in Auto mode."
     },
     "zonePolicy": {
       "title": "Thermal Policy",

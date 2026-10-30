@@ -45,6 +45,8 @@
   "statusBalanced": "Santai 😴",
   "statusDisabled": "Mati ❌",
   "toastSaved": "Sukses disimpen",
+  "toastInvalidValue": "Nilai ora valid — ora disimpen",
+  "toastFastChargeAutoOnly": "Fast Charge mung tersedia neng mode Otomatis",
   "toastAppEnabled": "Diuripke nggo aplikasi iki",
   "toastAppDisabled": "Dipateni nggo aplikasi iki",
   "toastCustomUnlocked": "Setelan dewe dibukak",
@@ -71,11 +73,11 @@
     },
     "fastCharge": {
       "title": "Ngecas Cepet",
-      "text": "Mateni sawetara sensor suhu ben kacepetan ngecas HP iso mentok terus masio panase ra karuan."
+      "text": "Mung mode Otomatis: nyepetna arus listrik nalika ngisi daya. Didhelikake nalika mode Statis aktif."
     },
     "modeOptions": {
       "title": "Mode Operasi",
-      "text": "Otomatis: Batesan suhu mung dipateni nggo aplikasi sing mbok pilih neng tab Aplikasi.\nStatis: Dipateni terus-terusan tanpa mandeg."
+      "text": "Otomatis: Batesan suhu mung dipateni nggo aplikasi sing mbok pilih neng tab Aplikasi.\nStatis: Dipateni terus-terusan tanpa mandeg.\nFast Charge mung mlaku neng mode Otomatis."
     },
     "zonePolicy": {
       "title": "Aturan Suhu",

@@ -26,11 +26,11 @@ function setHeaderTitle(text) {
 const infoContentFallback = {
   aggressive: { title: "Aggressive Mode", text: "Highly recommended for a performance boost." },
   aggressiveHal: { title: "Disable Thermal HAL", text: "Masks vendor thermal HAL libraries while Aggressive Mode is active. Turn it off if the game or the system thermal service misbehaves (crash, freeze, or stuck temperature readings)." },
-  modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on." },
+  modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on.\nFast Charge only runs in Auto mode." },
   zonePolicy: { title: "Thermal Policy", text: "Sets how the system reacts to temps." },
   thermalZone: { title: "Thermal Zone", text: "Disable: Disable thermal zone spoofing.\nSpoof to 30°C: Spoof thermal zone temperature to 30°C." },
   kernelPanic: { title: "Disable Kernel Panic", text: "Prevents random reboots by ignoring minor system crashes. Useful for fixing stability issues." },
-  fastCharge: { title: "Fast Charge", text: "Turns off some temperature sensors to force maximum charging speed." }
+  fastCharge: { title: "Fast Charge", text: "Auto mode only: boosts charging current while charging. Hidden while Static mode is active." }
 };
 
 async function loadLanguage(lang) {
@@ -53,7 +53,8 @@ function applyTranslations() {
       if (el.tagName === 'INPUT' && el.type === 'text') {
         el.placeholder = currentTranslations[key];
       } else {
-        el.innerHTML = currentTranslations[key];
+        /* translations carry plain text only - never trust them as HTML (P3-17) */
+        el.textContent = currentTranslations[key];
       }
     }
   });
@@ -159,14 +160,23 @@ async function updateBannerIndicators() {
 }
 
 async function setConfigValue(key, value) {
+  /* values are written into a shell-sourced config: validate the charset
+     client-side (P2-12) and rewrite the line with awk instead of sed so
+     '&' or '/' can never corrupt the file */
+  const KEY_RE = /^[A-Za-z0-9_]+$/;
+  const VALUE_RE = /^[A-Za-z0-9_. -]*$/;
+  if (!KEY_RE.test(key) || !VALUE_RE.test(String(value))) {
+    toast(tt('toastInvalidValue', 'Invalid value — not saved'));
+    return;
+  }
   try {
     const cmd = `
       if [ ! -f "${CONFIG_FILE_PATH}" ]; then touch "${CONFIG_FILE_PATH}"; fi;
-      if grep -q "^${key}=" "${CONFIG_FILE_PATH}"; then
-        sed -i "s/^${key}=.*/${key}=${value}/" "${CONFIG_FILE_PATH}"
-      else
-        echo "${key}=${value}" >> "${CONFIG_FILE_PATH}"
-      fi
+      awk -v k="${key}" -v v="${value}" '
+        index($0, k "=") == 1 { print k "=" v; done = 1; next }
+        { print }
+        END { if (!done) print k "=" v }
+      ' "${CONFIG_FILE_PATH}" > "${CONFIG_FILE_PATH}.tmp" && mv -f "${CONFIG_FILE_PATH}.tmp" "${CONFIG_FILE_PATH}"
     `;
     await exec(cmd);
     toast(currentTranslations.toastSaved || `Saved successfully`);
@@ -179,6 +189,18 @@ async function setConfigValue(key, value) {
 function setRowVisible(rowId, visible) {
   const row = document.getElementById(rowId);
   if (row) row.style.display = visible ? '' : 'none';
+}
+
+/* === FAST CHARGE VISIBILITY (auto-mode-only feature) ===
+   The daemon executes fast charge only in auto mode, so the WebUI hides the
+   row entirely while static mode is active (owner rule). */
+let fastChargeSupported = null;      /* null = unknown, true/false = device support */
+let currentModeIsAuto = true;
+
+function updateChargeRowVisibility() {
+  const row = document.getElementById('charge-row');
+  if (!row) return;
+  row.style.display = (fastChargeSupported === true && currentModeIsAuto) ? '' : 'none';
 }
 
 async function updateExtraCard() {
@@ -210,6 +232,8 @@ async function updateExtraCard() {
     if(agghalSwitch) agghalSwitch.checked = (agghal === "1");
     globalAggHal = agghal;
     setRowVisible('agghal-row', hal === "1");
+    currentModeIsAuto = (mode === "automatic");
+    updateChargeRowVisibility();
 
     if(zoneDd) {
       zoneDd.setValue(zone);
@@ -390,7 +414,7 @@ async function loadAppsData() {
     const t = await exec("pm list packages -3");
     let thirdPartyPkgs = new Set();
     if (t) {
-        t.split("\n").forEach(e => {
+      t.split("\n").forEach(e => {
             const pkg = e.replace("package:", "").trim();
             if (pkg) thirdPartyPkgs.add(pkg);
         });
@@ -402,7 +426,10 @@ async function loadAppsData() {
     if (allPkgsOut) {
         allPkgsOut.split("\n").forEach(line => {
             const match = line.match(/^package:(.+)\s+uid:(\d+)$/);
-            if (match) {
+            /* filter to third-party BEFORE the IPC round-trips: the old code
+               queried every package on the device (hundreds of WebView->KSU
+               IPCs) and only then filtered (P2-13) */
+            if (match && thirdPartyPkgs.has(match[1])) {
                 rawPackages.push({
                     packageName: match[1],
                     uid: match[2],
@@ -412,28 +439,42 @@ async function loadAppsData() {
         });
     }
 
-    await Promise.all(rawPackages.map(async (pkgObj) => {
-        try {
-            const query = JSON.stringify([pkgObj.packageName]);
-            let info = await getPackagesInfo(query);
-            if (typeof info === 'string') info = JSON.parse(info);
-            if (Array.isArray(info) && info.length > 0) {
-                const appData = info[0];
-                const label = appData.appLabel || appData.label || appData.appName;
+    /* resolve labels only for that subset, 20 IPCs at a time, cached in
+       localStorage so later opens skip the round-trips entirely */
+    const CHUNK = 20;
+    for (let i = 0; i < rawPackages.length; i += CHUNK) {
+        await Promise.all(rawPackages.slice(i, i + CHUNK).map(async (pkgObj) => {
+            try {
+                const cacheKey = 'licking_label_' + pkgObj.packageName;
+                let label = null;
+                try { label = localStorage.getItem(cacheKey); } catch (e) {}
+                if (!label) {
+                    const query = JSON.stringify([pkgObj.packageName]);
+                    let info = await getPackagesInfo(query);
+                    if (typeof info === 'string') info = JSON.parse(info);
+                    if (Array.isArray(info) && info.length > 0) {
+                        const appData = info[0];
+                        label = appData.appLabel || appData.label || appData.appName || null;
+                    }
+                    if (label) { try { localStorage.setItem(cacheKey, label); } catch (e) {} }
+                }
                 if (label) pkgObj.appLabel = label;
-            }
-        } catch (err) {}
-    }));
+            } catch (err) {}
+        }));
+    }
 
-    cachedApps = [];
-    rawPackages.forEach(pkg => {
-        if (thirdPartyPkgs.has(pkg.packageName)) cachedApps.push(pkg);
-    });
+    cachedApps = rawPackages.slice();
 
     renderAppList();
   } catch(e) {
     const container = document.getElementById("appList");
-    if(container) container.innerHTML = `<div class="m-state error">Error loading apps: ${e.message}</div>`;
+    if (container) {
+      container.replaceChildren();
+      const errDiv = document.createElement('div');
+      errDiv.className = 'm-state error';
+      errDiv.textContent = `Error loading apps: ${e.message}`;
+      container.appendChild(errDiv);
+    }
   }
 }
 
@@ -469,7 +510,11 @@ function renderAppList() {
 
   container.innerHTML = "";
   if (filtered.length === 0) {
-    container.innerHTML = `<div class="m-state">${currentTranslations.noApps || "No apps found."}</div>`;
+    container.replaceChildren();
+    const emptyDiv = document.createElement('div');
+    emptyDiv.className = 'm-state';
+    emptyDiv.textContent = currentTranslations.noApps || "No apps found.";
+    container.appendChild(emptyDiv);
     return;
   }
 
@@ -588,38 +633,25 @@ function openGameSettings(pkg, isChecked, iconSrc) {
 }
 
 async function checkFastChargeSupport() {
-  const chargeSwitch = document.getElementById("charge-switch");
-  if (!chargeSwitch) return;
-
-  const chargeRow = chargeSwitch.closest('.m-pref');
-  if (!chargeRow) return;
-
   const cachedSupport = localStorage.getItem("licking_fastcharge_support");
 
   if (cachedSupport === "true") {
-    chargeRow.style.display = "";
-    return;
+    fastChargeSupported = true;
   } else if (cachedSupport === "false") {
-    chargeRow.style.display = "none";
-    return;
-  }
-
-  try {
-    // Mengecek dukungan fast charge dengan path spesifik
-    const result = await exec("ls /sys/class/power_supply/*/constant_charge_current_max /sys/class/power_supply/*/input_current_limit /sys/class/power_supply/*/input_voltage_limit /sys/class/power_supply/*/siop_level /sys/class/power_supply/*/temp_warm /sys/class/power_supply/*/charge_control_limit 2>/dev/null || true");
-
-    if (result.trim() !== "") {
-      localStorage.setItem("licking_fastcharge_support", "true");
-      chargeRow.style.display = "";
-    } else {
+    fastChargeSupported = false;
+  } else {
+    try {
+      // Mengecek dukungan fast charge dengan path spesifik
+      const result = await exec("ls /sys/class/power_supply/*/constant_charge_current_max /sys/class/power_supply/*/input_current_limit /sys/class/power_supply/*/input_voltage_limit /sys/class/power_supply/*/siop_level /sys/class/power_supply/*/temp_warm /sys/class/power_supply/*/charge_control_limit 2>/dev/null || true");
+      fastChargeSupported = result.trim() !== "";
+      localStorage.setItem("licking_fastcharge_support", String(fastChargeSupported));
+    } catch (err) {
+      fastChargeSupported = false;
       localStorage.setItem("licking_fastcharge_support", "false");
-      chargeRow.style.display = "none";
+      console.warn("Gagal mengecek dukungan fast charge:", err);
     }
-  } catch (err) {
-    localStorage.setItem("licking_fastcharge_support", "false");
-    chargeRow.style.display = "none";
-    console.warn("Gagal mengecek dukungan fast charge:", err);
   }
+  updateChargeRowVisibility();
 }
 
 /* === SETTINGS: CUSTOM BANNER === */
@@ -818,6 +850,13 @@ async function init() {
   /* --- komponen dropdown miuix --- */
   dropdowns['mode-select'] = new MiuixDropdown('mode-select', async (value) => {
     await setConfigValue("MODE", value === "automatic" ? "auto" : "static");
+    /* fast charge is an auto-mode-only feature: hide the row the moment
+       static mode is selected (the daemon also stops executing it) */
+    currentModeIsAuto = (value === "automatic");
+    updateChargeRowVisibility();
+    if (!currentModeIsAuto) {
+      toast(tt('toastFastChargeAutoOnly', 'Fast Charge is only available in Auto mode'));
+    }
   });
   dropdowns['mode-select'].setOptions([
     { value: "automatic", label: "Auto (By App)" },
@@ -939,22 +978,39 @@ async function init() {
   /* --- switch konfigurasi global --- */
   document.getElementById("panic-switch")?.addEventListener('change', async (e) => {
     const isDisablePanic = e.target.checked;
-    const val = isDisablePanic ? "0" : "1";
-    const printkVal = isDisablePanic ? "0 0 0 0" : "1 1 1 1";
-    const devkmsgVal = isDisablePanic ? "off" : "on";
 
+    /* allowlist of boolean knobs + backup of the originals (P0-4): the old
+       blanket *panic* write hit heterogeneous nodes (panic_timeout is
+       seconds, panic_print a bitmask) and "restored" invented 1s, and it
+       also touched use_spi_crc which has nothing to do with panics */
     const panicScript = `
       (
       write_val() {
           [ -f "$1" ] && { chmod +w "$1" 2>/dev/null; echo "$2" > "$1" 2>/dev/null; }
       }
-
-      find /proc/sys /sys -type f \\( -name "*panic*" -o -name "exception-trace" -o -name "sched_schedstats" -o -name "tracing_on" -o -name "log_ecn_error" -o -name "snapshot_crashdumper" -o -name "use_spi_crc" \\) 2>/dev/null | while read -r path; do
-          write_val "$path" "${val}"
-      done
-
-      write_val "/proc/sys/kernel/printk" "${printkVal}"
-      write_val "/proc/sys/kernel/printk_devkmsg" "${devkmsgVal}"
+      BK=/data/adb/modules/LickingT/panicbackup.txt
+      NODES=$(find /proc/sys /sys -type f \\( -name panic_on_oops -o -name panic_on_warn -o -name hung_task_panic -o -name exception-trace -o -name sched_schedstats -o -name tracing_on \\) 2>/dev/null)
+      if [ "${isDisablePanic ? "1" : "0"}" = "1" ]; then
+          if [ ! -s "$BK" ]; then
+              : > "$BK.t"
+              for p in $NODES /proc/sys/kernel/printk /proc/sys/kernel/printk_devkmsg; do
+                  [ -f "$p" ] && echo "$p|$(cat "$p" 2>/dev/null)" >> "$BK.t"
+              done
+              mv -f "$BK.t" "$BK" 2>/dev/null
+          fi
+          for p in $NODES; do
+              write_val "$p" "0"
+          done
+          write_val "/proc/sys/kernel/printk" "0 0 0 0"
+          write_val "/proc/sys/kernel/printk_devkmsg" "off"
+      else
+          if [ -s "$BK" ]; then
+              while IFS='|' read -r p v; do
+                  write_val "$p" "$v"
+              done < "$BK"
+              rm -f "$BK"
+          fi
+      fi
       ) >/dev/null 2>&1 &
     `;
 
@@ -976,7 +1032,16 @@ async function init() {
     setRowVisible('agghal-row', e.target.checked);
   });
   document.getElementById("agghal-switch")?.addEventListener('change', (e) => setConfigValue("AggHal", e.target.checked ? "1" : "0"));
-  document.getElementById("charge-switch")?.addEventListener('change', (e) => setConfigValue("Charge", e.target.checked ? "1" : "0"));
+  document.getElementById("charge-switch")?.addEventListener('change', async (e) => {
+    /* defensive guard: the row is hidden in static mode, but if the toggle
+       ever fires there, refuse instead of writing a dead config key */
+    if (!currentModeIsAuto) {
+      e.target.checked = false;
+      toast(tt('toastFastChargeAutoOnly', 'Fast Charge is only available in Auto mode'));
+      return;
+    }
+    setConfigValue("Charge", e.target.checked ? "1" : "0");
+  });
 
   /* --- search bar miuix --- */
   const searchInput = document.getElementById("app-search");

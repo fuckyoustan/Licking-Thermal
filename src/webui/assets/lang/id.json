@@ -45,6 +45,8 @@
   "statusBalanced": "Mode Seimbang 😴",
   "statusDisabled": "Mati ❌",
   "toastSaved": "Berhasil disimpan",
+  "toastInvalidValue": "Nilai tidak valid — tidak disimpan",
+  "toastFastChargeAutoOnly": "Fast Charge hanya tersedia di mode Otomatis",
   "toastAppEnabled": "Diaktifkan untuk aplikasi ini",
   "toastAppDisabled": "Dinonaktifkan untuk aplikasi ini",
   "toastCustomUnlocked": "Pengaturan khusus dibuka",
@@ -71,11 +73,11 @@
     },
     "modeOptions": {
       "title": "Mode Operasi",
-      "text": "Otomatis: Batas termal hanya dimatikan untuk aplikasi yang Anda pilih di tab Aplikasi.\nStatis: Batas termal dinonaktifkan secara permanen sepanjang waktu."
+      "text": "Otomatis: Batas termal hanya dimatikan untuk aplikasi yang Anda pilih di tab Aplikasi.\nStatis: Batas termal dinonaktifkan secara permanen sepanjang waktu.\nFast Charge hanya berjalan di mode Otomatis."
     },
     "fastCharge": {
       "title": "Pengisian Cepat",
-      "text": "Mematikan beberapa sensor suhu untuk memaksa kecepatan pengisian daya maksimum tanpa henti."
+      "text": "Hanya mode Otomatis: mempercepat arus pengisian saat mengisi daya. Tersembunyi saat mode Statis aktif."
     },
     "zonePolicy": {
       "title": "Thermal Policy",
