@@ -1,7 +1,6 @@
 name: OpenCode Agent
 
 permissions:
-  id-token: write
   contents: write
   issues: write
   pull-requests: write
@@ -17,10 +16,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
-    if: |
-      (contains(github.event.comment.body, '/oc') || 
+    # public trigger hardening (P0-3): only the repo owner and collaborators
+    # may launch the agent; any other GitHub user commenting /oc is skipped.
+    if: >-
+      (contains(github.event.comment.body, '/oc') ||
        contains(github.event.comment.body, '/opencode')) &&
-      !contains(github.actor, '[bot]')
+      !contains(github.actor, '[bot]') &&
+      (github.event.comment.author_association == 'OWNER' ||
+       github.event.comment.author_association == 'COLLABORATOR')
 
     steps:
       - name: Checkout repository
@@ -35,8 +38,11 @@ jobs:
           git config --global user.email "opencode-agent[bot]@users.noreply.github.com"
 
       - name: Run OpenCode Agent
-        uses: anomalyco/opencode/github@latest
-        env: {} 
+        # pinned to a full commit SHA (tag github-v1.2.28) — a mutable tag
+        # like @latest is a supply-chain takeover vector for a workflow with
+        # write permissions
+        uses: anomalyco/opencode/github@17b79f4e0c16dcff200b0417567ed22aeb2d7166
+        env: {}
         with:
           model: opencode/big-pickle
           agent: general
@@ -48,8 +54,8 @@ jobs:
               "textVerbosity": "low",
               "top_p": 0.9
             }
-            You are a fast and precise coding agent. 
-            Think VERY briefly in <thinking> tags (max 100 words total). 
-            Stick strictly to files and request — no assumptions or invented code. 
-            If uncertain, say so immediately. 
+            You are a fast and precise coding agent.
+            Think VERY briefly in <thinking> tags (max 100 words total).
+            Stick strictly to files and request — no assumptions or invented code.
+            If uncertain, say so immediately.
             Output ONLY necessary changes/diffs — be ultra-concise, no extra explanations.
