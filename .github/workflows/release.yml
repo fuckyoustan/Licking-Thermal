@@ -1,0 +1,39 @@
+name: Release module zip
+
+permissions:
+  contents: write
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build module zip
+        run: sh build.sh dist/LickingT.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: LickingT
+          path: |
+            dist/LickingT.zip
+            dist/update.json
+
+      - name: Attach zip to the release
+        if: startsWith(github.ref, 'refs/tags/')
+        # pinned to a full commit SHA (v2.6.2) per the CI hardening policy
+        uses: softprops/action-gh-release@3bb12739c298aeb8a4eeaf626c5b8d85266b0e65
+        with:
+          files: |
+            dist/LickingT.zip
+            dist/update.json
