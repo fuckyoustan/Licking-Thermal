@@ -1,6 +1,3 @@
-@import url("https://mui.kernelsu.org/internal/insets.css");
-@import url("https://mui.kernelsu.org/internal/colors.css");
-
 :root {
   /* window insets (KernelSU WebUI) */
   --top-inset: var(--window-inset-top, 0px);
@@ -25,6 +22,9 @@
   --m-dim: rgba(0,0,0,0.60);                  /* windowDimming */
   --m-primary-press: #1E66D6;
   --m-badge-bg: rgba(39,122,247,0.16);         /* turunan primary (badge ENABLED) */
+  --m-error: #FF7A7A;                         /* error (teks destruktif / gagal) */
+  --m-press-overlay: rgba(255,255,255,0.08);  /* overlay ditekan (ikon/tombol) */
+  --m-secondary-press: #4C4C4C;               /* tombol sekunder ditekan */
 
   /* ---- Miuix metrics ---- */
   --m-radius-card: 16px;      /* CardDefaults.CornerRadius */
@@ -42,10 +42,40 @@
 
 /* ============ MONET / DYNAMIC COLOR ============ */
 html[data-monet="on"] {
+  /* primer */
   --m-primary: var(--primary, #277AF7);
   --m-on-primary: var(--onPrimary, #FFFFFF);
+  --m-primary-press: #1E66D6;
   --m-primary-press: color-mix(in srgb, var(--primary, #277AF7) 82%, #000000);
+  --m-badge-bg: rgba(39,122,247,0.16);
   --m-badge-bg: color-mix(in srgb, var(--primary, #277AF7) 16%, transparent);
+
+  /* permukaan: latar halaman, card, searchbar, area tekan */
+  --m-surface: var(--surface, var(--background, #000000));
+  --m-surface-container: var(--surfaceContainer, var(--surfaceContainerLow, #242424));
+  --m-surface-container-high: var(--surfaceContainerHigh, var(--surfaceContainer, #242424));
+  --m-surface-container-highest: var(--surfaceContainerHighest, var(--surfaceContainerHigh, #2D2D2D));
+
+  /* teks & ikon */
+  --m-on-surface: var(--onSurface, #F2F2F2);
+  --m-on-surface-container: var(--onSurface, rgba(255,255,255,0.90));
+  --m-summary: var(--onSurfaceVariant, rgba(255,255,255,0.50));
+  --m-actions: rgba(255,255,255,0.40);
+  --m-actions: color-mix(in srgb, var(--onSurfaceVariant, rgba(255,255,255,0.40)) 80%, transparent);
+  --m-smalltitle: var(--onSurfaceVariant, #787E96);
+
+  /* garis, kontrol & tombol */
+  --m-divider: var(--outlineVariant, #393939);
+  --m-switch-off: var(--surfaceVariant, #505050);
+  --m-secondary-variant: var(--secondaryContainer, #434343);
+  --m-on-secondary-variant: var(--onSecondaryContainer, #D9D9D9);
+  --m-secondary-press: #4C4C4C;
+  --m-secondary-press: color-mix(in srgb, var(--secondaryContainer, #434343) 88%, var(--onSecondaryContainer, #D9D9D9));
+
+  /* status & overlay tekan */
+  --m-error: var(--error, #FF7A7A);
+  --m-press-overlay: rgba(255,255,255,0.08);
+  --m-press-overlay: color-mix(in srgb, var(--onSurface, #F2F2F2) 8%, transparent);
 }
 
 /* ============ BASE ============ */
@@ -74,7 +104,7 @@ img { -webkit-user-drag: none; }
 /* Ikon dasar (SVG sprite via <use>) */
 .m-icon { width: 24px; height: 24px; fill: currentColor; flex-shrink: 0; display: inline-block; vertical-align: middle; }
 
-/* ============ TOPAPPBAR (miuix TopAppBar) ============ */
+/* ============ TOPAPPBAR ============ */
 .m-topappbar {
   position: sticky; top: 0; z-index: 100;
   background: var(--m-surface);
@@ -116,7 +146,7 @@ img { -webkit-user-drag: none; }
   transition: background .15s var(--m-ease), transform .15s var(--m-ease);
 }
 .m-iconbtn .m-icon { width: 22px; height: 22px; }
-.m-iconbtn:active { background: rgba(255,255,255,0.08); transform: scale(0.94); }
+.m-iconbtn:active { background: var(--m-press-overlay); transform: scale(0.94); }
 .m-avatar {
   width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
   margin-left: 8px; cursor: pointer; background: var(--m-surface-container-highest);
@@ -165,6 +195,12 @@ img { -webkit-user-drag: none; }
 }
 /* gaya card MIUI: antar baris dipisah ruang saja, tanpa divider */
 
+/* Tab Home menumpuk beberapa kartu tanpa SmallTitle — beri jarak konsisten
+   antar blok: banner, device info, save log, support.
+   (Tab lain tidak berubah: dipisah SmallTitle sesuai pola settings miuix.) */
+#mainMenu .m-banner { margin-bottom: 12px; }
+#mainMenu .m-card { margin-bottom: 12px; }
+
 /* ============ PREFERENCE ROW (miuix BasicComponent/SwitchPreference) ============ */
 .m-pref {
   min-height: 56px;
@@ -173,7 +209,7 @@ img { -webkit-user-drag: none; }
   position: relative;
   transition: background .18s var(--m-ease);
 }
-.m-pref:active { background: var(--m-surface-container-highest); }
+.m-pref:active:not(.m-pref-nonclickable) { background: var(--m-surface-container-highest); }
 .m-pref-text { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; align-self: stretch; }
 .m-pref-title {
   font-size: 17px; font-weight: 500; color: var(--m-on-surface);
@@ -186,6 +222,9 @@ img { -webkit-user-drag: none; }
   margin-top: 3px; line-height: 1.3;
   display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
 }
+/* Style for non-clickable items like device info */
+.m-pref-nonclickable { cursor: default; }
+
 .m-click-info { cursor: pointer; }
 .m-info-ic { width: 16px; height: 16px; color: var(--m-actions); }
 .m-pref-start { width: 24px; height: 24px; color: var(--m-primary); margin-right: 14px; align-self: center; }
@@ -216,7 +255,8 @@ img { -webkit-user-drag: none; }
 .m-switch input:active + .m-switch-track + .m-switch-thumb { transform: translateX(0) scale(1.127); }
 .m-switch input:active:checked + .m-switch-track + .m-switch-thumb { transform: translateX(21px) scale(1.127); }
 
-html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switch-thumb { background: #FFFFFF; }
+/* monet penuh: thumb OFF ikut skema host (terang di tema gelap, gelap di tema terang) */
+html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switch-thumb { background: var(--onSurfaceVariant, #FFFFFF); }
 
 /* ============ DROPDOWN PREFERENCE (miuix OverlayDropdownPreference) ============ */
 .m-dd {
@@ -225,7 +265,7 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
   padding: 8px 4px 8px 8px; border-radius: 10px;
   transition: background .15s var(--m-ease);
 }
-.m-dd:active { background: rgba(255,255,255,0.05); }
+.m-dd:active { background: var(--m-press-overlay); }
 .m-dd-val {
   font-size: 15px; color: var(--m-actions);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
@@ -291,7 +331,7 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
   display: flex; align-items: center; justify-content: center;
 }
 .m-search-clear .m-icon { width: 18px; height: 18px; }
-.m-search-clear:active { background: rgba(255,255,255,0.08); }
+.m-search-clear:active { background: var(--m-press-overlay); }
 
 /* ============ APP LIST ============ */
 .m-applist { margin-bottom: 4px; }
@@ -317,7 +357,7 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
   padding: 40px 16px; text-align: center;
   font-size: 14px; color: var(--m-summary);
 }
-.m-state.error { color: #FF6B6B; }
+.m-state.error { color: var(--m-error); }
 
 /* ============ FLOATING NAVIGATION BAR (miuix FloatingNavigationBar) ============ */
 .m-floatnav {
@@ -335,10 +375,15 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
   width: 48px; height: 48px; border-radius: 50%;
   display: flex; align-items: center; justify-content: center;
   color: rgba(255,255,255,0.36);              /* onSurfaceContainer * 0.4 */
+  color: color-mix(in srgb, var(--m-on-surface) 36%, transparent);
   transition: color .25s var(--m-ease), transform .15s var(--m-spring), background .25s var(--m-ease);
 }
 .m-floatnav-item .m-icon { width: 28px; height: 28px; }
-.m-floatnav-item:active { transform: scale(0.90); color: rgba(255,255,255,0.24); }
+.m-floatnav-item:active {
+  transform: scale(0.90);
+  color: rgba(255,255,255,0.24);
+  color: color-mix(in srgb, var(--m-on-surface) 24%, transparent);
+}
 .m-floatnav-item.active { color: var(--m-primary); }
 
 /* ============ DIALOG (miuix SuperDialog / OverlayDialog) ============ */
@@ -400,7 +445,7 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
   border-radius: var(--m-radius-btn);
   transition: background .15s var(--m-ease);
 }
-.m-textbtn:active { background: rgba(255,255,255,0.06); }
+.m-textbtn:active { background: var(--m-press-overlay); }
 .m-textbtn.primary { color: var(--m-primary); }
 
 /* ============ BUTTON (miuix Button) ============ */
@@ -413,7 +458,7 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
   padding: 10px 16px;
   transition: transform .12s var(--m-ease), background .15s var(--m-ease), opacity .15s;
 }
-.m-btn:active { transform: scale(0.96); background: #4C4C4C; }
+.m-btn:active { transform: scale(0.96); background: var(--m-secondary-press); }
 .m-btn.primary { background: var(--m-primary); color: var(--m-on-primary); font-weight: 500; }
 .m-btn.primary:active { background: var(--m-primary-press); }
 
@@ -467,7 +512,7 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
 .m-banner-pref:active img { transform: scale(1.04); }   /* press-zoom ala galeri HyperOS */
 
 /* baris aksi destruktif (reset banner) */
-.m-pref-danger .m-pref-title { color: #FF7A7A; }
+.m-pref-danger .m-pref-title { color: var(--m-error); }
 
 /* ============ SETTINGS: DEV CARD (card biasa) ============ */
 .m-devcard-head { display: flex; align-items: center; gap: 16px; padding: 18px 16px 14px; }
@@ -484,15 +529,17 @@ html[data-monet="on"] .m-switch input:not(:checked) + .m-switch-track + .m-switc
 .m-devcard-btns { display: flex; gap: 12px; padding: 14px 16px 16px; }
 
 /* ============ BLUR (miuix Backdrop: Gaussian / Progressive) ============ */
-/* mode Gaussian: blur seragam + bg translusen */
+/* mode Gaussian: blur seragam + bg translusen (turunan surface agar ikut monet) */
 body.blur-on.blur-gaussian .m-topappbar,
 body.blur-on.blur-gaussian .m-searchwrap {
   background: rgba(0,0,0,0.55);
+  background: color-mix(in srgb, var(--m-surface) 55%, transparent);
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
   backdrop-filter: blur(24px) saturate(1.5);
 }
 body.blur-on.blur-gaussian .m-floatnav {
   background: rgba(36,36,36,0.55);
+  background: color-mix(in srgb, var(--m-surface-container) 55%, transparent);
   -webkit-backdrop-filter: blur(24px) saturate(1.5);
   backdrop-filter: blur(24px) saturate(1.5);
 }
@@ -500,6 +547,7 @@ body.blur-on.blur-gaussian .m-floatnav {
 body.blur-on.blur-progressive .m-topappbar,
 body.blur-on.blur-progressive .m-searchwrap {
   background: rgba(0,0,0,0.30);
+  background: color-mix(in srgb, var(--m-surface) 30%, transparent);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 }
@@ -519,6 +567,7 @@ body.blur-on.blur-progressive .m-searchwrap::after {
 }
 body.blur-on.blur-progressive .m-floatnav {
   background: rgba(36,36,36,0.30);
+  background: color-mix(in srgb, var(--m-surface-container) 30%, transparent);
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);
 }
@@ -534,6 +583,41 @@ body.blur-on.blur-progressive .m-floatnav::after {
   -webkit-mask-image: linear-gradient(to top, #000 12%, transparent 50%);
   mask-image: linear-gradient(to top, #000 12%, transparent 50%);
 }
+
+/* ============ SPLASH LOADING (miuix) ============
+   Menutup UI selama script.js dimuat & diinisialisasi; spinner arc gaya
+   HyperOS (busur berputar + sweep memanjang) memakai warna primer tema. */
+#m-splash {
+  position: fixed; inset: 0; z-index: 400;
+  background: var(--m-surface);
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity .3s var(--m-ease), visibility .3s var(--m-ease);
+}
+#m-splash.hide { opacity: 0; visibility: hidden; pointer-events: none; }
+.m-splash-box {
+  display: flex; flex-direction: column; align-items: center;
+  animation: m-splash-in .5s var(--m-spring);
+}
+@keyframes m-splash-in { from { opacity: 0; transform: scale(0.82); } }
+.m-splash-spinner { width: 46px; height: 46px; color: var(--m-primary); }
+.m-splash-track { stroke: currentColor; opacity: 0.14; stroke-width: 4; }
+.m-splash-arc {
+  stroke: currentColor; stroke-width: 4; stroke-linecap: round;
+  stroke-dasharray: 12 114;
+  transform-origin: 50% 50%;
+  animation: m-splash-spin 1s linear infinite, m-splash-sweep 1.5s var(--m-ease) infinite;
+}
+@keyframes m-splash-spin { to { transform: rotate(360deg); } }
+@keyframes m-splash-sweep {
+  0%   { stroke-dasharray: 12 114; }
+  55%  { stroke-dasharray: 86 40; }
+  100% { stroke-dasharray: 12 114; }
+}
+.m-splash-name {
+  margin-top: 20px; font-size: 17px; font-weight: 500; color: var(--m-on-surface);
+  opacity: 0; animation: m-splash-name .45s var(--m-ease) .12s forwards;
+}
+@keyframes m-splash-name { from { opacity: 0; transform: translateY(8px); } to { opacity: 0.85; transform: none; } }
 
 /* responsive sempit */
 @media (max-width: 360px) {

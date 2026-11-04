@@ -1,4 +1,347 @@
-import { exec as ksuExec, toast, getPackagesInfo } from 'kernelsu';
+let callbackCounter = 0;
+function getUniqueCallbackName(prefix) {
+  return `${prefix}_callback_${Date.now()}_${callbackCounter++}`;
+}
+
+function ksuExec(command, options) {
+  if (typeof options === "undefined") {
+    options = {};
+  }
+
+  return new Promise((resolve, reject) => {
+    // Generate a unique callback function name
+    const callbackFuncName = getUniqueCallbackName("exec");
+
+    // Define the success callback function
+    window[callbackFuncName] = (errno, stdout, stderr) => {
+      resolve({ errno, stdout, stderr });
+      cleanup(callbackFuncName);
+    };
+
+    function cleanup(successName) {
+      delete window[successName];
+    }
+
+    try {
+      if (typeof ksu === "undefined" || typeof ksu.exec !== "function") {
+        throw new Error("ksu.exec bridge is not available on this manager");
+      }
+      ksu.exec(command, JSON.stringify(options), callbackFuncName);
+    } catch (error) {
+      reject(error);
+      cleanup(callbackFuncName);
+    }
+  });
+}
+
+function Stdio() {
+    this.listeners = {};
+  }
+
+  Stdio.prototype.on = function (event, listener) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(listener);
+  };
+
+  Stdio.prototype.emit = function (event, ...args) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach((listener) => listener(...args));
+    }
+  };
+
+  function ChildProcess() {
+    this.listeners = {};
+    this.stdin = new Stdio();
+    this.stdout = new Stdio();
+    this.stderr = new Stdio();
+  }
+
+  ChildProcess.prototype.on = function (event, listener) {
+    if (!this.listeners[event]) {
+      this.listeners[event] = [];
+    }
+    this.listeners[event].push(listener);
+  };
+
+  ChildProcess.prototype.emit = function (event, ...args) {
+    if (this.listeners[event]) {
+      this.listeners[event].forEach((listener) => listener(...args));
+    }
+  };
+
+  function spawn(command, args, options) {
+    if (typeof args === "undefined") {
+      args = [];
+    } else if (!(args instanceof Array)) {
+        // allow for (command, options) signature
+        options = args;
+        args = [];
+    }
+
+    if (typeof options === "undefined") {
+      options = {};
+    }
+
+    const child = new ChildProcess();
+    const childCallbackName = getUniqueCallbackName("spawn");
+    window[childCallbackName] = child;
+
+    function cleanup(name) {
+      delete window[name];
+    }
+
+    child.on("exit", code => {
+        cleanup(childCallbackName);
+    });
+
+    try {
+      ksu.spawn(
+        command,
+        JSON.stringify(args),
+        JSON.stringify(options),
+        childCallbackName
+      );
+    } catch (error) {
+      child.emit("error", error);
+      cleanup(childCallbackName);
+    }
+    return child;
+  }
+
+function fullScreen(isFullScreen) {
+  if (typeof ksu === "undefined" || typeof ksu.fullScreen !== "function") return false;
+  return ksu.fullScreen(isFullScreen);
+}
+
+function enableEdgeToEdge(enable) {
+  if (typeof ksu === "undefined" || typeof ksu.enableEdgeToEdge !== "function") return;
+  ksu.enableEdgeToEdge(enable);
+}
+
+function toast(message) {
+  try {
+    if (typeof ksu !== "undefined" && typeof ksu.toast === "function") {
+      ksu.toast(String(message));
+      return;
+    }
+  } catch (e) { /* manager aneh: lanjut ke fallback */ }
+  console.log("[toast]", message); /* fallback bila bridge toast tak ada */
+}
+
+function moduleInfo() {
+  try {
+    if (typeof ksu !== "undefined" && typeof ksu.moduleInfo === "function") {
+      return ksu.moduleInfo();
+    }
+  } catch (e) {}
+  return null;
+}
+
+function listPackages(type) {
+  try {
+    return JSON.parse(ksu.listPackages(type));
+  } catch (error) {
+    return [];
+  }
+}
+
+function getPackagesInfo(packages) {
+  try {
+    if (typeof packages !== "string") {
+      packages = JSON.stringify(packages);
+    }
+    return JSON.parse(ksu.getPackagesInfo(packages));
+  } catch (error) {
+    return [];
+  }
+}
+
+/* [HARDENING-3] probe bridge pm/io dengan aman: beberapa manager fork
+   (KOWSU dkk.) menyediakan ksu.pm() tetapi objek kembaliannya TIDAK punya
+   version() sebagai fungsi — panggilan langsung (gaya upstream) membuat
+   seluruh file gagal dimuat. Di sini: try/catch + typeof per metode. */
+function probeBridge(factory) {
+  try {
+    if (typeof ksu === "undefined" || typeof factory !== "function") return null;
+    const bridge = factory();
+    return bridge && typeof bridge === "object" ? bridge : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function bridgeVersion(bridge) {
+  try {
+    if (bridge && typeof bridge.version === "function") {
+      return Number(bridge.version()) || 0;
+    }
+  } catch (e) {}
+  return 0;
+}
+
+const pmBridge = probeBridge(() => ksu.pm());
+const pmSupported = !!(pmBridge && (
+  typeof pmBridge.version === "function" ||
+  typeof pmBridge.listPackages === "function" ||
+  typeof pmBridge.getPackagesInfo === "function"
+));
+
+const pm = {
+  support: pmSupported,
+  version: bridgeVersion(pmBridge),
+  listPackages(type) {
+    try {
+      return JSON.parse(ksu.pm().listPackages(type));
+    } catch (error) {
+      return [];
+    }
+  },
+  getPackagesInfo(packages) {
+    try {
+      if (typeof packages !== "string") {
+        packages = JSON.stringify(packages);
+      }
+      return JSON.parse(ksu.pm().getPackagesInfo(packages));
+    } catch (error) {
+      return [];
+    }
+  },
+};
+
+function exit() {
+  if (typeof ksu !== "undefined" && typeof ksu.exit === "function") {
+    ksu.exit();
+  }
+}
+
+const ioBridge = probeBridge(() => ksu.io());
+const ioSupported = !!(ioBridge && (
+  typeof ioBridge.version === "function" ||
+  typeof ioBridge.File === "function" ||
+  typeof ioBridge.FileInputStream === "function" ||
+  typeof ioBridge.FileOutputStream === "function" ||
+  typeof ioBridge.RandomAccessFile === "function"
+));
+
+const io = {
+  support: ioSupported,
+  version: bridgeVersion(ioBridge),
+
+  File(path) {
+    const impl = ksu.io().File(path);
+    return {
+      exists() { return impl.exists(); },
+      isFile() { return impl.isFile(); },
+      isDirectory() { return impl.isDirectory(); },
+      canRead() { return impl.canRead(); },
+      canWrite() { return impl.canWrite(); },
+      canExecute() { return impl.canExecute(); },
+      createNewFile() { return impl.createNewFile(); },
+      delete() { return impl.delete(); },
+      deleteRecursive() { return impl.deleteRecursive(); },
+      mkdir() { return impl.mkdir(); },
+      mkdirs() { return impl.mkdirs(); },
+      renameTo(destPath) { return impl.renameTo(destPath); },
+      list() {
+        try {
+          return JSON.parse(impl.list() || '[]');
+        } catch (error) {
+          return [];
+        }
+      },
+      listFiles() {
+        try {
+          return JSON.parse(impl.listFiles() || '[]');
+        } catch (error) {
+          return [];
+        }
+      },
+      length() { return impl.length(); },
+      lastModified() { return impl.lastModified(); },
+      setLastModified(time) { return impl.setLastModified(time); },
+      getAbsolutePath() { return impl.getAbsolutePath(); },
+      getCanonicalPath() { return impl.getCanonicalPath(); },
+      getParent() { return impl.getParent(); },
+      getPath() { return impl.getPath(); },
+      getName() { return impl.getName(); },
+      isHidden() { return impl.isHidden(); },
+      isBlock() { return impl.isBlock(); },
+      isCharacter() { return impl.isCharacter(); },
+      isSymlink() { return impl.isSymlink(); },
+      createNewSymlink(target) { return impl.createNewSymlink(target); },
+      createNewLink(existing) { return impl.createNewLink(existing); },
+      clear() { return impl.clear(); },
+      setReadOnly() { return impl.setReadOnly(); },
+      setReadable(readable, ownerOnly) { return impl.setReadable(readable, ownerOnly); },
+      setWritable(writable, ownerOnly) { return impl.setWritable(writable, ownerOnly); },
+      setExecutable(executable, ownerOnly) { return impl.setExecutable(executable, ownerOnly); },
+      getFreeSpace() { return impl.getFreeSpace(); },
+      getTotalSpace() { return impl.getTotalSpace(); },
+      getUsableSpace() { return impl.getUsableSpace(); },
+      newInputStream() { return impl.newInputStream(); },
+      newOutputStream(append) { return append !== undefined ? impl.newOutputStream(append) : impl.newOutputStream(); },
+      toString() { return impl.toString(); },
+    };
+  },
+
+  FileInputStream() {
+    const impl = ksu.io().FileInputStream();
+    return {
+      open(path) { return impl.open(path); },
+      read(id, maxBytes) { return maxBytes !== undefined ? impl.read(id, maxBytes) : impl.read(id); },
+      available(id) { return impl.available(id); },
+      close(id) { return impl.close(id); },
+    };
+  },
+
+  FileOutputStream() {
+    const impl = ksu.io().FileOutputStream();
+    return {
+      open(path, append) { return append !== undefined ? impl.open(path, append) : impl.open(path); },
+      write(id, data) { return impl.write(id, data); },
+      writeByte(id, b) { return impl.writeByte(id, b); },
+      flush(id) { return impl.flush(id); },
+      close(id) { return impl.close(id); },
+    };
+  },
+
+  RandomAccessFile() {
+    const impl = ksu.io().RandomAccessFile();
+    return {
+      open(path, mode) { return impl.open(path, mode); },
+      read(id) { return impl.read(id); },
+      readBytes(id, len) { return impl.readBytes(id, len); },
+      readBoolean(id) { return impl.readBoolean(id); },
+      readByte(id) { return impl.readByte(id); },
+      readInt(id) { return impl.readInt(id); },
+      readLong(id) { return impl.readLong(id); },
+      readShort(id) { return impl.readShort(id); },
+      readFloat(id) { return impl.readFloat(id); },
+      readDouble(id) { return impl.readDouble(id); },
+      readUTF(id) { return impl.readUTF(id); },
+      readLine(id) { return impl.readLine(id); },
+      write(id, b) { impl.write(id, b); },
+      writeBase64(id, data) { impl.writeBase64(id, data); },
+      writeBoolean(id, v) { impl.writeBoolean(id, v); },
+      writeByte(id, v) { impl.writeByte(id, v); },
+      writeInt(id, v) { impl.writeInt(id, v); },
+      writeLong(id, v) { impl.writeLong(id, v); },
+      writeShort(id, v) { impl.writeShort(id, v); },
+      writeFloat(id, v) { impl.writeFloat(id, v); },
+      writeDouble(id, v) { impl.writeDouble(id, v); },
+      writeUTF(id, str) { impl.writeUTF(id, str); },
+      seek(id, pos) { return impl.seek(id, pos); },
+      getFilePointer(id) { return impl.getFilePointer(id); },
+      length(id) { return impl.length(id); },
+      setLength(id, newLength) { return impl.setLength(id, newLength); },
+      close(id) { return impl.close(id); },
+    };
+  },
+};
+/* ================== AKHIR LIBRARY KERNELSU (BUNDLED) ================== */
+
 const CONFIG_FILE_PATH = "/data/adb/modules/LickingT/thermal.conf";
 const PORN_ARCHIVE_PATH = "/data/adb/modules/LickingT/PornArchive/PornCategories.txt";
 const APP_CONFIGS_PATH = "/data/adb/modules/LickingT/AppConfigs.txt";
@@ -25,12 +368,12 @@ function setHeaderTitle(text) {
 
 const infoContentFallback = {
   aggressive: { title: "Aggressive Mode", text: "Highly recommended for a performance boost." },
-  aggressiveHal: { title: "Disable Thermal HAL", text: "Masks vendor thermal HAL libraries while Aggressive Mode is active. Turn it off if the game or the system thermal service misbehaves (crash, freeze, or stuck temperature readings)." },
-  modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on.\nFast Charge only runs in Auto mode." },
+  modeOptions: { title: "Operation Mode", text: "Auto: Selected apps only.\nStatic: Always on." },
   zonePolicy: { title: "Thermal Policy", text: "Sets how the system reacts to temps." },
   thermalZone: { title: "Thermal Zone", text: "Disable: Disable thermal zone spoofing.\nSpoof to 30°C: Spoof thermal zone temperature to 30°C." },
   kernelPanic: { title: "Disable Kernel Panic", text: "Prevents random reboots by ignoring minor system crashes. Useful for fixing stability issues." },
-  fastCharge: { title: "Fast Charge", text: "Auto mode only: boosts charging current while charging. Hidden while Static mode is active." }
+  fastCharge: { title: "Fast Charge", text: "Turns off some temperature sensors to force maximum charging speed." },
+  disableHal: { title: "Disable Thermal HAL", text: "Stops hardware thermal services. Only available when Aggressive Mode is ON. Uses bind mounts (AvaAddams)." }
 };
 
 async function loadLanguage(lang) {
@@ -53,8 +396,7 @@ function applyTranslations() {
       if (el.tagName === 'INPUT' && el.type === 'text') {
         el.placeholder = currentTranslations[key];
       } else {
-        /* translations carry plain text only - never trust them as HTML (P3-17) */
-        el.textContent = currentTranslations[key];
+        el.innerHTML = currentTranslations[key];
       }
     }
   });
@@ -146,10 +488,10 @@ async function updateBannerIndicators() {
       statusEl.style.color = "var(--m-primary)";
     } else if (state.trim() === "NotHorny") {
       statusEl.innerText = currentTranslations.statusBalanced || "Balanced 😴";
-      statusEl.style.color = "white";
+      statusEl.style.color = "var(--m-on-surface)";
     } else {
       statusEl.innerText = currentTranslations.statusDisabled || "Disabled ❌";
-      statusEl.style.color = "#ff6b6b";
+      statusEl.style.color = "var(--m-error)";
     }
   } catch(e) {}
 
@@ -159,24 +501,42 @@ async function updateBannerIndicators() {
   } catch(e) {}
 }
 
+async function loadDeviceInfo() {
+  try {
+    const v = await exec("grep '^version=' /data/adb/modules/LickingT/module.prop 2>/dev/null || echo 'version=Unknown'");
+    document.getElementById("info-version").textContent = v.replace('version=', '').trim();
+  } catch(e) { document.getElementById("info-version").textContent = "Unknown"; }
+
+  try {
+    const d = await exec("getprop ro.product.model || echo 'Unknown'");
+    document.getElementById("info-device").textContent = d.trim();
+  } catch(e) { document.getElementById("info-device").textContent = "Unknown"; }
+
+  try {
+    const a = await exec("getprop ro.build.version.release || echo 'Unknown'");
+    document.getElementById("info-android").textContent = a.trim();
+  } catch(e) { document.getElementById("info-android").textContent = "Unknown"; }
+
+  try {
+    const c = await exec("getprop ro.board.platform || echo 'Unknown'");
+    document.getElementById("info-chipset").textContent = c.trim();
+  } catch(e) { document.getElementById("info-chipset").textContent = "Unknown"; }
+
+  try {
+    const k = await exec("uname -r || echo 'Unknown'");
+    document.getElementById("info-kernel").textContent = k.trim();
+  } catch(e) { document.getElementById("info-kernel").textContent = "Unknown"; }
+}
+
 async function setConfigValue(key, value) {
-  /* values are written into a shell-sourced config: validate the charset
-     client-side (P2-12) and rewrite the line with awk instead of sed so
-     '&' or '/' can never corrupt the file */
-  const KEY_RE = /^[A-Za-z0-9_]+$/;
-  const VALUE_RE = /^[A-Za-z0-9_. -]*$/;
-  if (!KEY_RE.test(key) || !VALUE_RE.test(String(value))) {
-    toast(tt('toastInvalidValue', 'Invalid value — not saved'));
-    return;
-  }
   try {
     const cmd = `
       if [ ! -f "${CONFIG_FILE_PATH}" ]; then touch "${CONFIG_FILE_PATH}"; fi;
-      awk -v k="${key}" -v v="${value}" '
-        index($0, k "=") == 1 { print k "=" v; done = 1; next }
-        { print }
-        END { if (!done) print k "=" v }
-      ' "${CONFIG_FILE_PATH}" > "${CONFIG_FILE_PATH}.tmp" && mv -f "${CONFIG_FILE_PATH}.tmp" "${CONFIG_FILE_PATH}"
+      if grep -q "^${key}=" "${CONFIG_FILE_PATH}"; then
+        sed -i "s/^${key}=.*/${key}=${value}/" "${CONFIG_FILE_PATH}"
+      else
+        echo "${key}=${value}" >> "${CONFIG_FILE_PATH}"
+      fi
     `;
     await exec(cmd);
     toast(currentTranslations.toastSaved || `Saved successfully`);
@@ -191,31 +551,32 @@ function setRowVisible(rowId, visible) {
   if (row) row.style.display = visible ? '' : 'none';
 }
 
-/* === FAST CHARGE VISIBILITY (auto-mode-only feature) ===
-   The daemon executes fast charge only in auto mode, so the WebUI hides the
-   row entirely while static mode is active (owner rule). */
-let fastChargeSupported = null;      /* null = unknown, true/false = device support */
-let currentModeIsAuto = true;
 
-function updateChargeRowVisibility() {
-  const row = document.getElementById('charge-row');
-  if (!row) return;
-  row.style.display = (fastChargeSupported === true && currentModeIsAuto) ? '' : 'none';
+function updateFastChargeVisibility(modeVal) {
+  const chargeRow = document.getElementById("charge-row");
+  if (!chargeRow) return;
+  const isSupported = localStorage.getItem("licking_fastcharge_support") === "true";
+  const isAuto = modeVal === "automatic" || modeVal === "auto";
+  if (isSupported && isAuto) {
+    chargeRow.style.display = "";
+  } else {
+    chargeRow.style.display = "none";
+  }
 }
 
 async function updateExtraCard() {
   try {
     const out = await exec(`cat ${CONFIG_FILE_PATH} || true`);
-    let mode = "automatic", hal = "0", disablePanic = "0", zone = "1", charge = "0", agghal = "1";
+    let mode = "automatic", hal = "0", aggHal = "0", disablePanic = "0", zone = "1", charge = "0";
 
     out.split("\n").forEach(l => {
       const t = l.trim();
       if(t.startsWith("MODE=")) mode = t.replace("MODE=","").trim().toLowerCase() === "auto" ? "automatic" : "static";
       if(t.startsWith("HAL=")) hal = t.replace("HAL=","").trim();
+      if(t.startsWith("AggHal=")) aggHal = t.replace("AggHal=","").trim();
       if(t.startsWith("DISABLE_PANIC=")) disablePanic = t.replace("DISABLE_PANIC=","").trim();
       if(t.startsWith("ZONE=")) zone = t.replace("ZONE=","").trim();
       if(t.startsWith("Charge=")) charge = t.replace("Charge=","").trim();
-      if(t.startsWith("AggHal=")) agghal = t.replace("AggHal=","").trim();
     });
 
     const modeDd = dropdowns['mode-select'];
@@ -223,17 +584,17 @@ async function updateExtraCard() {
     const panicSwitch = document.getElementById("panic-switch");
     const zoneDd = dropdowns['zone-select'];
     const chargeSwitch = document.getElementById("charge-switch");
-    const agghalSwitch = document.getElementById("agghal-switch");
+    const disableHalSwitch = document.getElementById("disable-hal-switch");
+    const disableHalRow = document.getElementById("disable-hal-row");
 
     if(modeDd) modeDd.setValue(mode);
     if(halSwitch) halSwitch.checked = (hal === "1");
     if(panicSwitch) panicSwitch.checked = (disablePanic === "1");
     if(chargeSwitch) chargeSwitch.checked = (charge === "1");
-    if(agghalSwitch) agghalSwitch.checked = (agghal === "1");
-    globalAggHal = agghal;
-    setRowVisible('agghal-row', hal === "1");
-    currentModeIsAuto = (mode === "automatic");
-    updateChargeRowVisibility();
+    if(disableHalSwitch) disableHalSwitch.checked = (aggHal === "1");
+    if(disableHalRow) disableHalRow.style.display = (hal === "1") ? "" : "none";
+
+    updateFastChargeVisibility(mode);
 
     if(zoneDd) {
       zoneDd.setValue(zone);
@@ -286,7 +647,18 @@ class MiuixDropdown {
     this.scrim.className = 'm-dd-scrim';
     document.body.appendChild(this.scrim);
     document.body.appendChild(this.menu);
-    this.scrim.addEventListener('click', () => this.close());
+    this.scrim.addEventListener('click', (e) => {
+      this.close();
+      /* bila tap jatuh pada tombol dropdown lain, buka dropdown itu
+         langsung — tanpa ini user harus mengetuk dua kali untuk berpindah */
+      const hit = document.elementsFromPoint(e.clientX, e.clientY)
+        .find(el => el !== this.scrim && !(el.closest && el.closest('.m-dd-menu')));
+      const btn = hit && hit.closest ? hit.closest('.m-dd') : null;
+      if (btn) {
+        const other = _allDd.find(d => d.root === btn);
+        if (other && other !== this) other.open();
+      }
+    });
     this.root.addEventListener('click', (e) => { e.stopPropagation(); this.open(); });
     _allDd.push(this);
   }
@@ -336,6 +708,9 @@ class MiuixDropdown {
 
   open() {
     closeAllDropdowns();
+    /* aktifkan scrim: tap di area mana pun di luar menu menutup dropdown,
+       meskipun tidak memilih opsi apa pun */
+    this.scrim.classList.add('open');
     // ukur dulu (tanpa animasi) lalu posisikan
     this.menu.style.visibility = 'hidden';
     this.menu.style.left = '0px';
@@ -366,15 +741,13 @@ let cachedApps = [];
 let activePackages = new Set();
 let appConfigs = {};
 let currentEditingPkg = null;
-/* global AggHal value from thermal.conf — used as the per-app default */
-let globalAggHal = '1';
 
 async function saveAppConfigs() {
   let customLines = [];
   for (const pkg of activePackages) {
     const conf = appConfigs[pkg];
     if (conf && conf.isCustomized) {
-      customLines.push(`${pkg}:${conf.agg ? '1' : '0'}:${conf.policy}:${conf.zone || '1'}:${conf.agghal == null ? '' : (conf.agghal ? '1' : '0')}`);
+      customLines.push(`${pkg}:${conf.agg ? '1' : '0'}:${conf.policy}:${conf.zone || '1'}:${conf.aggHal ? '1' : '0'}`);
     }
   }
 
@@ -397,15 +770,19 @@ async function loadAppsData() {
     const configContent = await exec(`cat ${APP_CONFIGS_PATH} || true`);
     configContent.split('\n').forEach(line => {
       const parts = line.trim().split(':');
-      if (parts.length >= 3) {
-        /* field 5 = AggHal ('1'/'0'); absent/empty = inherit the global value */
-        let agghal = null;
-        if (parts.length >= 5 && (parts[4] === '1' || parts[4] === '0')) agghal = parts[4] === '1';
+      if (parts.length === 3) {
         appConfigs[parts[0]] = {
           agg: parts[1] === '1',
           policy: parts[2],
-          zone: parts.length >= 4 ? parts[3] : '1',
-          agghal: agghal,
+          zone: '1',
+          isCustomized: true
+        };
+      } else if (parts.length >= 4) {
+        appConfigs[parts[0]] = {
+          agg: parts[1] === '1',
+          policy: parts[2],
+          zone: parts[3],
+          aggHal: parts.length > 4 ? (parts[4] === '1') : false,
           isCustomized: true
         };
       }
@@ -414,7 +791,7 @@ async function loadAppsData() {
     const t = await exec("pm list packages -3");
     let thirdPartyPkgs = new Set();
     if (t) {
-      t.split("\n").forEach(e => {
+        t.split("\n").forEach(e => {
             const pkg = e.replace("package:", "").trim();
             if (pkg) thirdPartyPkgs.add(pkg);
         });
@@ -426,10 +803,7 @@ async function loadAppsData() {
     if (allPkgsOut) {
         allPkgsOut.split("\n").forEach(line => {
             const match = line.match(/^package:(.+)\s+uid:(\d+)$/);
-            /* filter to third-party BEFORE the IPC round-trips: the old code
-               queried every package on the device (hundreds of WebView->KSU
-               IPCs) and only then filtered (P2-13) */
-            if (match && thirdPartyPkgs.has(match[1])) {
+            if (match) {
                 rawPackages.push({
                     packageName: match[1],
                     uid: match[2],
@@ -439,42 +813,28 @@ async function loadAppsData() {
         });
     }
 
-    /* resolve labels only for that subset, 20 IPCs at a time, cached in
-       localStorage so later opens skip the round-trips entirely */
-    const CHUNK = 20;
-    for (let i = 0; i < rawPackages.length; i += CHUNK) {
-        await Promise.all(rawPackages.slice(i, i + CHUNK).map(async (pkgObj) => {
-            try {
-                const cacheKey = 'licking_label_' + pkgObj.packageName;
-                let label = null;
-                try { label = localStorage.getItem(cacheKey); } catch (e) {}
-                if (!label) {
-                    const query = JSON.stringify([pkgObj.packageName]);
-                    let info = await getPackagesInfo(query);
-                    if (typeof info === 'string') info = JSON.parse(info);
-                    if (Array.isArray(info) && info.length > 0) {
-                        const appData = info[0];
-                        label = appData.appLabel || appData.label || appData.appName || null;
-                    }
-                    if (label) { try { localStorage.setItem(cacheKey, label); } catch (e) {} }
-                }
+    await Promise.all(rawPackages.map(async (pkgObj) => {
+        try {
+            const query = JSON.stringify([pkgObj.packageName]);
+            let info = await getPackagesInfo(query);
+            if (typeof info === 'string') info = JSON.parse(info);
+            if (Array.isArray(info) && info.length > 0) {
+                const appData = info[0];
+                const label = appData.appLabel || appData.label || appData.appName;
                 if (label) pkgObj.appLabel = label;
-            } catch (err) {}
-        }));
-    }
+            }
+        } catch (err) {}
+    }));
 
-    cachedApps = rawPackages.slice();
+    cachedApps = [];
+    rawPackages.forEach(pkg => {
+        if (thirdPartyPkgs.has(pkg.packageName)) cachedApps.push(pkg);
+    });
 
     renderAppList();
   } catch(e) {
     const container = document.getElementById("appList");
-    if (container) {
-      container.replaceChildren();
-      const errDiv = document.createElement('div');
-      errDiv.className = 'm-state error';
-      errDiv.textContent = `Error loading apps: ${e.message}`;
-      container.appendChild(errDiv);
-    }
+    if(container) container.innerHTML = `<div class="m-state error">Error loading apps: ${e.message}</div>`;
   }
 }
 
@@ -510,11 +870,7 @@ function renderAppList() {
 
   container.innerHTML = "";
   if (filtered.length === 0) {
-    container.replaceChildren();
-    const emptyDiv = document.createElement('div');
-    emptyDiv.className = 'm-state';
-    emptyDiv.textContent = currentTranslations.noApps || "No apps found.";
-    container.appendChild(emptyDiv);
+    container.innerHTML = `<div class="m-state">${currentTranslations.noApps || "No apps found."}</div>`;
     return;
   }
 
@@ -525,7 +881,7 @@ function renderAppList() {
     const labelText = pkg.appLabel || pkg.packageName;
 
     if (!appConfigs[pkg.packageName]) {
-      appConfigs[pkg.packageName] = { agg: false, policy: globalPolicies[0] || 'stepwise', zone: '1', agghal: null, isCustomized: false };
+      appConfigs[pkg.packageName] = { agg: false, policy: globalPolicies[0] || 'stepwise', zone: '1', aggHal: false, isCustomized: false };
     }
 
     /* baris aplikasi gaya preference miuix */
@@ -603,11 +959,11 @@ function openGameSettings(pkg, isChecked, iconSrc) {
 
   document.getElementById('as-main-switch').checked = isChecked;
   document.getElementById('as-agg-switch').checked = conf.agg;
-
-  /* AggHal row only exists under aggressive mode; unset = inherit global */
-  if (conf.agghal == null) conf.agghal = (globalAggHal === '1');
-  document.getElementById('as-agghal-switch').checked = !!conf.agghal;
-  setRowVisible('as-agghal-row', conf.agg);
+  
+  const asDisableHalSwitch = document.getElementById('as-disable-hal-switch');
+  const asDisableHalRow = document.getElementById('as-disable-hal-row');
+  if (asDisableHalSwitch) asDisableHalSwitch.checked = !!conf.aggHal;
+  if (asDisableHalRow) asDisableHalRow.style.display = conf.agg ? "" : "none";
 
   const customSwitch = document.getElementById('as-custom-switch');
   customSwitch.checked = conf.isCustomized;
@@ -633,25 +989,35 @@ function openGameSettings(pkg, isChecked, iconSrc) {
 }
 
 async function checkFastChargeSupport() {
+  const chargeSwitch = document.getElementById("charge-switch");
+  if (!chargeSwitch) return;
+
+  const chargeRow = chargeSwitch.closest('.m-pref');
+  if (!chargeRow) return;
+
   const cachedSupport = localStorage.getItem("licking_fastcharge_support");
 
-  if (cachedSupport === "true") {
-    fastChargeSupported = true;
-  } else if (cachedSupport === "false") {
-    fastChargeSupported = false;
-  } else {
-    try {
-      // Mengecek dukungan fast charge dengan path spesifik
-      const result = await exec("ls /sys/class/power_supply/*/constant_charge_current_max /sys/class/power_supply/*/input_current_limit /sys/class/power_supply/*/input_voltage_limit /sys/class/power_supply/*/siop_level /sys/class/power_supply/*/temp_warm /sys/class/power_supply/*/charge_control_limit 2>/dev/null || true");
-      fastChargeSupported = result.trim() !== "";
-      localStorage.setItem("licking_fastcharge_support", String(fastChargeSupported));
-    } catch (err) {
-      fastChargeSupported = false;
-      localStorage.setItem("licking_fastcharge_support", "false");
-      console.warn("Gagal mengecek dukungan fast charge:", err);
-    }
+  if (cachedSupport === "true" || cachedSupport === "false") {
+    updateFastChargeVisibility(dropdowns['mode-select']?.value || 'automatic');
+    return;
   }
-  updateChargeRowVisibility();
+
+  try {
+    // Mengecek dukungan fast charge dengan path spesifik
+    const result = await exec("ls /sys/class/power_supply/*/constant_charge_current_max /sys/class/power_supply/*/input_current_limit /sys/class/power_supply/*/input_voltage_limit /sys/class/power_supply/*/siop_level /sys/class/power_supply/*/temp_warm /sys/class/power_supply/*/charge_control_limit 2>/dev/null || true");
+
+    if (result.trim() !== "") {
+      localStorage.setItem("licking_fastcharge_support", "true");
+      updateFastChargeVisibility(dropdowns['mode-select']?.value || 'automatic');
+    } else {
+      localStorage.setItem("licking_fastcharge_support", "false");
+      updateFastChargeVisibility(dropdowns['mode-select']?.value || 'automatic');
+    }
+  } catch (err) {
+    localStorage.setItem("licking_fastcharge_support", "false");
+    updateFastChargeVisibility(dropdowns['mode-select']?.value || 'automatic');
+    console.warn("Gagal mengecek dukungan fast charge:", err);
+  }
 }
 
 /* === SETTINGS: CUSTOM BANNER === */
@@ -685,8 +1051,7 @@ async function detectBannerDir() {
 function setBannerSrc(src, isCustom) {
   bannerIsCustom = !!isCustom;
   const home = document.getElementById('home-banner-img');
-  const prev = document.getElementById('banner-preview');
-  [home, prev].forEach(el => { if (el) el.src = src; });
+  if (home) home.src = src;
   const resetRow = document.getElementById('banner-reset-row');
   if (resetRow) resetRow.style.display = isCustom ? '' : 'none';
 }
@@ -753,9 +1118,7 @@ async function writeBannerFile(b64, ext) {
    persisten; cache dataURL lokal hanya fallback terakhir. */
 async function initCustomBanner() {
   const home = document.getElementById('home-banner-img');
-  const prev = document.getElementById('banner-preview');
   attachBannerFallback(home);
-  attachBannerFallback(prev);
 
   try {
     const dir = await detectBannerDir();
@@ -850,13 +1213,7 @@ async function init() {
   /* --- komponen dropdown miuix --- */
   dropdowns['mode-select'] = new MiuixDropdown('mode-select', async (value) => {
     await setConfigValue("MODE", value === "automatic" ? "auto" : "static");
-    /* fast charge is an auto-mode-only feature: hide the row the moment
-       static mode is selected (the daemon also stops executing it) */
-    currentModeIsAuto = (value === "automatic");
-    updateChargeRowVisibility();
-    if (!currentModeIsAuto) {
-      toast(tt('toastFastChargeAutoOnly', 'Fast Charge is only available in Auto mode'));
-    }
+    updateFastChargeVisibility(value);
   });
   dropdowns['mode-select'].setOptions([
     { value: "automatic", label: "Auto (By App)" },
@@ -978,39 +1335,23 @@ async function init() {
   /* --- switch konfigurasi global --- */
   document.getElementById("panic-switch")?.addEventListener('change', async (e) => {
     const isDisablePanic = e.target.checked;
+    const val = isDisablePanic ? "0" : "1";
+    const printkVal = isDisablePanic ? "0 0 0 0" : "1 1 1 1";
+    const devkmsgVal = isDisablePanic ? "off" : "on";
 
-    /* allowlist of boolean knobs + backup of the originals (P0-4): the old
-       blanket *panic* write hit heterogeneous nodes (panic_timeout is
-       seconds, panic_print a bitmask) and "restored" invented 1s, and it
-       also touched use_spi_crc which has nothing to do with panics */
     const panicScript = `
       (
       write_val() {
           [ -f "$1" ] && { chmod +w "$1" 2>/dev/null; echo "$2" > "$1" 2>/dev/null; }
       }
-      BK=/data/adb/modules/LickingT/panicbackup.txt
-      NODES=$(find /proc/sys /sys -type f \\( -name panic_on_oops -o -name panic_on_warn -o -name hung_task_panic -o -name exception-trace -o -name sched_schedstats -o -name tracing_on \\) 2>/dev/null)
-      if [ "${isDisablePanic ? "1" : "0"}" = "1" ]; then
-          if [ ! -s "$BK" ]; then
-              : > "$BK.t"
-              for p in $NODES /proc/sys/kernel/printk /proc/sys/kernel/printk_devkmsg; do
-                  [ -f "$p" ] && echo "$p|$(cat "$p" 2>/dev/null)" >> "$BK.t"
-              done
-              mv -f "$BK.t" "$BK" 2>/dev/null
-          fi
-          for p in $NODES; do
-              write_val "$p" "0"
-          done
-          write_val "/proc/sys/kernel/printk" "0 0 0 0"
-          write_val "/proc/sys/kernel/printk_devkmsg" "off"
-      else
-          if [ -s "$BK" ]; then
-              while IFS='|' read -r p v; do
-                  write_val "$p" "$v"
-              done < "$BK"
-              rm -f "$BK"
-          fi
-      fi
+
+      IONICE=""; command -v ionice >/dev/null 2>&1 && IONICE="ionice -c3"
+      nice -n 19 $IONICE find /proc/sys/ /sys/ \\( -name '*panic*' -o -name 'exception-trace' -o -name 'sched_schedstats' -o -name 'tracing_on' -o -name 'log_ecn_error' -o -name 'snapshot_crashdumper' -o -name 'use_spi_crc' \\) 2>/dev/null | while read -r path; do
+          write_val "$path" "${val}"
+      done
+
+      write_val "/proc/sys/kernel/printk" "${printkVal}"
+      write_val "/proc/sys/kernel/printk_devkmsg" "${devkmsgVal}"
       ) >/dev/null 2>&1 &
     `;
 
@@ -1027,21 +1368,29 @@ async function init() {
   document.getElementById('dev-btn-github')?.addEventListener('click', (e) => window.openExternalLink('https://github.com/fuckyoustan', e));
   document.getElementById('dev-btn-telegram')?.addEventListener('click', (e) => window.openExternalLink('tg://resolve?domain=EverythingAboutArchive', e));
 
+  /* --- Home: Save Log — salin LickT.log dari folder module ke penyimpanan internal
+     (folder Download). File dicek dulu agar toast error lebih jelas. --- */
+  document.getElementById('btn-savelog')?.addEventListener('click', async (e) => {
+    e.preventDefault();
+    const src = `${MODULE_DIR}/LickT.log`;
+    const dest = '/sdcard/Download/LickT.log';
+    try {
+      const ada = await exec(`[ -f '${src}' ] && echo 1 || echo 0`);
+      if (ada.trim() !== '1') { toast(tt('toastLogNotFound', 'Log file not found')); return; }
+      await exec(`mkdir -p /sdcard/Download && cp '${src}' '${dest}'`);
+      toast(tt('toastLogSaved', 'Log saved to Download'));
+    } catch (err) {
+      toast(tt('toastLogSaveFailed', 'Failed to save log') + `: ${err.message}`);
+    }
+  });
+
   document.getElementById("hal-switch")?.addEventListener('change', (e) => {
     setConfigValue("HAL", e.target.checked ? "1" : "0");
-    setRowVisible('agghal-row', e.target.checked);
+    const row = document.getElementById("disable-hal-row");
+    if (row) row.style.display = e.target.checked ? "" : "none";
   });
-  document.getElementById("agghal-switch")?.addEventListener('change', (e) => setConfigValue("AggHal", e.target.checked ? "1" : "0"));
-  document.getElementById("charge-switch")?.addEventListener('change', async (e) => {
-    /* defensive guard: the row is hidden in static mode, but if the toggle
-       ever fires there, refuse instead of writing a dead config key */
-    if (!currentModeIsAuto) {
-      e.target.checked = false;
-      toast(tt('toastFastChargeAutoOnly', 'Fast Charge is only available in Auto mode'));
-      return;
-    }
-    setConfigValue("Charge", e.target.checked ? "1" : "0");
-  });
+  document.getElementById("disable-hal-switch")?.addEventListener('change', (e) => setConfigValue("AggHal", e.target.checked ? "1" : "0"));
+  document.getElementById("charge-switch")?.addEventListener('change', (e) => setConfigValue("Charge", e.target.checked ? "1" : "0"));
 
   /* --- search bar miuix --- */
   const searchInput = document.getElementById("app-search");
@@ -1060,7 +1409,6 @@ async function init() {
   /* --- SETTINGS: custom banner --- */
   const bannerFileInput = document.getElementById('banner-file');
   document.getElementById('banner-change-row')?.addEventListener('click', () => bannerFileInput?.click());
-  document.getElementById('banner-preview-row')?.addEventListener('click', () => bannerFileInput?.click());
   document.getElementById('banner-reset-row')?.addEventListener('click', resetCustomBanner);
   bannerFileInput?.addEventListener('change', async () => {
     const f = bannerFileInput.files && bannerFileInput.files[0];
@@ -1089,6 +1437,23 @@ async function init() {
   blurSwitch.checked = savedBlur !== 'off';
   dropdowns['blur-mode-select']?.setValue(savedBlurMode);
   applyBlurState(savedBlur !== 'off', savedBlurMode);
+
+  /* --- SETTINGS: full screen (immersive via ksu.fullScreen) --- */
+  const fullscreenSwitch = document.getElementById('fullscreen-switch');
+  const applyFullScreen = (on) => {
+    try {
+      if (typeof ksu === 'undefined' || typeof ksu.fullScreen !== 'function') throw new Error('unsupported');
+      fullScreen(!!on);   /* wrapper library kernelsu (bundled) */
+    } catch (e) {
+      if (fullscreenSwitch) fullscreenSwitch.checked = !on;
+      toast(tt('toastFullscreenUnsupported', 'Full screen is not supported by this manager'));
+      return;
+    }
+    try { localStorage.setItem('licking_fullscreen', on ? '1' : '0'); } catch (e) {}
+  };
+  fullscreenSwitch?.addEventListener('change', () => applyFullScreen(fullscreenSwitch.checked));
+  fullscreenSwitch.checked = localStorage.getItem('licking_fullscreen') === '1';
+  if (fullscreenSwitch.checked) applyFullScreen(true);
 
   /* --- overlay settings per aplikasi --- */
   document.getElementById('btn-close-settings')?.addEventListener('click', () => {
@@ -1126,25 +1491,30 @@ async function init() {
 
   document.getElementById('as-agg-switch')?.addEventListener('change', async (e) => {
     if(!currentEditingPkg) return;
-    appConfigs[currentEditingPkg].agg = e.target.checked;
+    const isOn = e.target.checked;
+    appConfigs[currentEditingPkg].agg = isOn;
     appConfigs[currentEditingPkg].isCustomized = true;
+    
+    const row = document.getElementById('as-disable-hal-row');
+    if (row) row.style.display = isOn ? "" : "none";
+    
     await saveAppConfigs();
-    setRowVisible('as-agghal-row', e.target.checked);
     const modeText = currentTranslations.aggMode || "Aggressive Mode";
-    toast(`${modeText} ${e.target.checked ? 'ON' : 'OFF'}`);
+    toast(`${modeText} ${isOn ? 'ON' : 'OFF'}`);
   });
 
-  document.getElementById('as-agghal-switch')?.addEventListener('change', async (e) => {
+  document.getElementById('as-disable-hal-switch')?.addEventListener('change', async (e) => {
     if(!currentEditingPkg) return;
-    appConfigs[currentEditingPkg].agghal = e.target.checked;
+    appConfigs[currentEditingPkg].aggHal = e.target.checked;
     appConfigs[currentEditingPkg].isCustomized = true;
     await saveAppConfigs();
-    const halText = currentTranslations.aggressiveHal || "Disable Thermal HAL";
-    toast(`${halText} ${e.target.checked ? 'ON' : 'OFF'}`);
   });
 
   /* tutup dropdown saat overlay discroll */
   document.querySelector('.m-overlay-scroll')?.addEventListener('scroll', closeAllDropdowns, { passive: true });
+  /* tutup juga saat halaman utama discroll — menu berposisi fixed akan
+     terlepas dari tombolnya bila konten bergulir */
+  window.addEventListener('scroll', closeAllDropdowns, { passive: true });
 
   await checkFastChargeSupport();
   updateExtraCard();
@@ -1152,11 +1522,27 @@ async function init() {
   updateThermalPoliciesUI();
 
   await initCustomBanner();
+  
+  // Call loadDeviceInfo here
+  await loadDeviceInfo();
 
   loadAppsData();
   updateBannerIndicators();
 
   setInterval(updateBannerIndicators, 5000);
+
+  /* UI siap -> tutup splash loading */
+  hideSplash();
+}
+
+/* === SPLASH LOADING ===
+   Ditampilkan sejak HTML pertama kali dirender; disembunyikan di akhir init()
+   (atau oleh timer pengaman di bawah bila init terhambat). */
+let splashHidden = false;
+function hideSplash() {
+  if (splashHidden) return;
+  splashHidden = true;
+  document.getElementById('m-splash')?.classList.add('hide');
 }
 
 if (document.readyState === 'loading') {
@@ -1164,3 +1550,6 @@ if (document.readyState === 'loading') {
 } else {
   init();
 }
+
+/* pengaman: init berat/berulir -> splash tetap hilang */
+setTimeout(hideSplash, 5000);
