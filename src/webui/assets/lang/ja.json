@@ -2,16 +2,24 @@
   "navHome": "ホーム",
   "navApps": "アプリ",
   "navSettings": "設定",
+  "infoVersionTitle": "バージョン",
+  "infoDeviceTitle": "デバイス",
+  "infoAndroidTitle": "Androidバージョン",
+  "infoChipsetTitle": "チップセット",
+  "infoKernelTitle": "カーネル",
+  "supportTitle": "サポートと感謝",
+  "supportDesc": "最新情報を受け取るには、ここをタップしてこのプロジェクトをサポートしてください。",
+  "saveLogTitle": "ログ",
+  "saveLogDesc": "内部ストレージにログを保存",
+  "devDescFull": "人間だけ",
   "thermalConfig": "熱設定",
   "aggMode": "アグレッシブモード",
-  "aggressiveHal": "サーマルHALを無効化",
+  "disableHal": "サーマルHALを無効化",
   "disablePanic": "カーネルパニックを無効化",
   "fastCharge": "急速充電",
   "opMode": "動作モード",
   "thermZone": "サーマルゾーン",
   "thermPolicy": "サーマルポリシー",
-  "supportTitle": "サポートと感謝",
-  "supportDesc": "最新情報を受け取るには、ここをタップしてこのプロジェクトをサポートしてください。",
   "searchPlaceholder": "アプリを検索...",
   "loadingApps": "アプリを探しています...",
   "noApps": "アプリが見つかりません。",
@@ -20,7 +28,7 @@
   "setBannerFormats": "PNG, JPG, GIF, WEBP, BMP・最大5 MB",
   "setBannerReset": "デフォルトのバナーに戻す",
   "setMonet": "Monetカラー",
-  "setMonetDesc": "システムのMaterial Youダイナミックカラーを適用",
+  "setMonetDesc": "システムのMaterial Youダイナミックカラー",
   "setBlur": "ブラー効果",
   "setBlurDesc": "ヘッダーとナビゲーションバーにブラーを適用",
   "setBlurMode": "ブラーモード",
@@ -28,8 +36,9 @@
   "blurProgressive": "プログレッシブ",
   "setSectionGeneral": "一般",
   "setLang": "言語",
+  "setFullscreen": "全画面表示",
+  "setFullscreenDesc": "システムバーを非表示にして没入型表示にします",
   "setSectionDev": "開発者",
-  "devDescFull": "人間だけ",
   "btnGotIt": "了解",
   "gameSettings": "ゲーム設定",
   "asSectionApp": "アプリケーション",
@@ -38,21 +47,22 @@
   "asCustomConfig": "カスタム設定",
   "asCustomConfigDesc": "グローバル熱設定を上書きする",
   "asAggModeDesc": "限界までパフォーマンスを引き出す",
-  "asAggHalDesc": "ベンダーのサーマルHALをマスク",
+  "asDisableHalDesc": "HALをバインドマウントで無効化",
   "asZoneDesc": "サーマルゾーン偽装制御",
   "asPolicyDesc": "熱に対するシステムの反応",
   "statusActive": "動作中 ✨",
   "statusBalanced": "バランス 😴",
   "statusDisabled": "無効 ❌",
   "toastSaved": "正常に保存されました",
-  "toastInvalidValue": "無効な値です — 保存しません",
-  "toastFastChargeAutoOnly": "高速充電は自動モードでのみ利用できます",
   "toastAppEnabled": "このアプリで有効にしました",
   "toastAppDisabled": "このアプリで無効にしました",
   "toastCustomUnlocked": "カスタム設定のロックを解除しました",
   "toastGlobalSettings": "グローバル設定を使用中",
   "toastPolicyUpdated": "ポリシーを更新しました",
   "toastFailed": "失敗しました",
+  "toastLogSaved": "ログをDownloadに保存しました",
+  "toastLogNotFound": "ログファイルが見つかりません",
+  "toastLogSaveFailed": "ログの保存に失敗しました",
   "bannerSaving": "バナーを保存中...",
   "bannerSaved": "バナーを更新しました",
   "bannerSaveFailed": "バナーの保存に失敗しました",
@@ -62,22 +72,19 @@
   "bannerReadFailed": "ファイルの読み込みに失敗しました",
   "toastMonetOn": "Monetカラーを有効にしました",
   "toastMonetOff": "Monetカラーを無効にしました",
+  "toastFullscreenUnsupported": "このマネージャーは全画面表示に対応していません",
   "infoModals": {
     "aggressive": {
       "title": "アグレッシブモード",
       "text": "パフォーマンスを大幅に向上させるために強くお勧めします！プレイ中のゲームが熱による変化を検知した場合はオフにしてください "
     },
-    "aggressiveHal": {
-      "title": "サーマルHALを無効化",
-      "text": "アグレッシブモード中にベンダーのサーマルHALライブラリをマスクします。ゲームやシステムのサーマルサービスが不調な場合（クラッシュ・フリーズ・温度表示の停滞）はオフにしてください。"
-    },
     "fastCharge": {
       "title": "急速充電",
-      "text": "自動モード限定: 充電中の充電電流をブーストします。静的モード中は非表示になります。"
+      "text": "一部の温度センサーを無効にして、最大充電速度を強制的に維持します。"
     },
     "modeOptions": {
       "title": "動作モード",
-      "text": "自動: 「アプリ」タブで選択したアプリのみ熱制限が無効になります。\n静的: 常に熱制限が完全に無効になります。\n高速充電は自動モードでのみ動作します。"
+      "text": "自動: 「アプリ」タブで選択したアプリのみ熱制限が無効になります。\n静的: 常に熱制限が完全に無効になります。"
     },
     "zonePolicy": {
       "title": "サーマルポリシー",
@@ -90,6 +97,10 @@
     "thermalZone": {
       "title": "サーマルゾーン",
       "text": "Kill thermal zone: サーマルゾーンの偽装を無効にします。\nSpoof to 30°C: サーマルゾーンの温度を30°Cに偽装します。"
+    },
+    "disableHal": {
+      "title": "サーマルHALを無効化",
+      "text": "ハードウェアのサーマルサービスを停止します。Aggressive Mode が有効なときのみ使用できます。バインドマウントを使用します (AvaAddams)。"
     }
   }
 }

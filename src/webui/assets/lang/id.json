@@ -2,16 +2,24 @@
   "navHome": "Utama",
   "navApps": "Aplikasi",
   "navSettings": "Pengaturan",
-  "thermalConfig": "Konfigurasi Termal",
+  "infoVersionTitle": "Versi",
+  "infoDeviceTitle": "Perangkat",
+  "infoAndroidTitle": "Versi Android",
+  "infoChipsetTitle": "Chipset",
+  "infoKernelTitle": "Kernel",
+  "supportTitle": "Dukungan",
+  "supportDesc": "Ketuk di sini untuk mendukung project ini agar selalu update!",
+  "saveLogTitle": "Log",
+  "saveLogDesc": "Simpan log ke penyimpanan internal",
+  "devDescFull": "Ahhh Ahhhhhhh Ahhhhhhh...",
+  "thermalConfig": "Konfigurasi Global",
   "aggMode": "Mode Agresif",
-  "aggressiveHal": "Nonaktifkan Thermal HAL",
+  "disableHal": "Nonaktifkan Thermal HAL",
   "disablePanic": "Nonaktifkan Kernel Panic",
   "fastCharge": "Pengisian Cepat",
   "opMode": "Mode Operasi",
   "thermZone": "Termal Zona",
   "thermPolicy": "Thermal Policy",
-  "supportTitle": "Dukungan & Terima Kasih",
-  "supportDesc": "Ketuk di sini untuk mendukung project ini agar selalu update!",
   "searchPlaceholder": "Cari aplikasi...",
   "loadingApps": "Mencari aplikasi...",
   "noApps": "Aplikasi tidak ditemukan.",
@@ -28,8 +36,9 @@
   "blurProgressive": "Progressive",
   "setSectionGeneral": "Umum",
   "setLang": "Bahasa",
+  "setFullscreen": "Layar Penuh",
+  "setFullscreenDesc": "Sembunyikan bilah sistem untuk tampilan imersif",
   "setSectionDev": "Pengembang",
-  "devDescFull": "Ahhh Ahhhhhhh Ahhhhhhh...",
   "btnGotIt": "Mengerti",
   "gameSettings": "Pengaturan Game",
   "asSectionApp": "Aplikasi",
@@ -38,21 +47,22 @@
   "asCustomConfig": "Konfigurasi Khusus",
   "asCustomConfigDesc": "Timpa pengaturan termal global",
   "asAggModeDesc": "Dorong performa hingga batas maksimal",
-  "asAggHalDesc": "Nonaktifkan pustaka thermal HAL vendor",
+  "asDisableHalDesc": "Bind mount HAL agresif",
   "asZoneDesc": "Kontrol manipulasi zona termal",
   "asPolicyDesc": "Reaksi sistem terhadap panas",
   "statusActive": "Aktif Bekerja ✨",
   "statusBalanced": "Mode Seimbang 😴",
   "statusDisabled": "Mati ❌",
   "toastSaved": "Berhasil disimpan",
-  "toastInvalidValue": "Nilai tidak valid — tidak disimpan",
-  "toastFastChargeAutoOnly": "Fast Charge hanya tersedia di mode Otomatis",
   "toastAppEnabled": "Diaktifkan untuk aplikasi ini",
   "toastAppDisabled": "Dinonaktifkan untuk aplikasi ini",
   "toastCustomUnlocked": "Pengaturan khusus dibuka",
   "toastGlobalSettings": "Menggunakan pengaturan global",
   "toastPolicyUpdated": "Policy diperbarui",
   "toastFailed": "Gagal",
+  "toastLogSaved": "Log disimpan ke Download",
+  "toastLogNotFound": "File log tidak ditemukan",
+  "toastLogSaveFailed": "Gagal menyimpan log",
   "bannerSaving": "Menyimpan banner...",
   "bannerSaved": "Banner diperbarui",
   "bannerSaveFailed": "Gagal menyimpan banner",
@@ -62,22 +72,19 @@
   "bannerReadFailed": "Gagal membaca file",
   "toastMonetOn": "Warna monet diaktifkan",
   "toastMonetOff": "Warna monet dinonaktifkan",
+  "toastFullscreenUnsupported": "Layar penuh tidak didukung oleh manager ini",
   "infoModals": {
     "aggressive": {
       "title": "Mode Agresif",
       "text": "Sangat disarankan untuk mendongkrak performa secara maksimal! Matikan jika game yang anda mainkan mendeteksi modifikasi thermal"
     },
-    "aggressiveHal": {
-      "title": "Nonaktifkan Thermal HAL",
-      "text": "Menutupi (mask) pustaka thermal HAL vendor selama Mode Agresif aktif. Matikan jika game atau layanan thermal sistem bermasalah (crash, freeze, atau pembacaan suhu macet)."
-    },
     "modeOptions": {
       "title": "Mode Operasi",
-      "text": "Otomatis: Batas termal hanya dimatikan untuk aplikasi yang Anda pilih di tab Aplikasi.\nStatis: Batas termal dinonaktifkan secara permanen sepanjang waktu.\nFast Charge hanya berjalan di mode Otomatis."
+      "text": "Otomatis: Batas termal hanya dimatikan untuk aplikasi yang Anda pilih di tab Aplikasi.\nStatis: Batas termal dinonaktifkan secara permanen sepanjang waktu."
     },
     "fastCharge": {
       "title": "Pengisian Cepat",
-      "text": "Hanya mode Otomatis: mempercepat arus pengisian saat mengisi daya. Tersembunyi saat mode Statis aktif."
+      "text": "Mematikan beberapa sensor suhu untuk memaksa kecepatan pengisian daya maksimum tanpa henti."
     },
     "zonePolicy": {
       "title": "Thermal Policy",
@@ -90,6 +97,10 @@
     "thermalZone": {
       "title": "Zona Termal",
       "text": "Kill thermal zone: Mematikan semua thermal zone.\nSpoof to 30°C: Memanipulasi suhu zona termal menjadi 30°C."
+    },
+    "disableHal": {
+      "title": "Nonaktifkan Thermal HAL",
+      "text": "Menghentikan layanan thermal hardware. Hanya tersedia saat Aggressive Mode aktif. Menggunakan bind mount (AvaAddams)."
     }
   }
 }

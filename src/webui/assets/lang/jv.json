@@ -2,16 +2,24 @@
   "navHome": "Ngarep",
   "navApps": "Aplikasi",
   "navSettings": "Setelan",
+  "infoVersionTitle": "Versi",
+  "infoDeviceTitle": "Piranti",
+  "infoAndroidTitle": "Versi Android",
+  "infoChipsetTitle": "Chipset",
+  "infoKernelTitle": "Kernel",
+  "supportTitle": "Dukungan & Suwun",
+  "supportDesc": "Tutul ing kene kanggo ndhukung proyek iki supaya tetep entuk kabar paling anyar!",
+  "saveLogTitle": "Log",
+  "saveLogDesc": "Simpen log menyang panyimpenan internal",
+  "devDescFull": "Mung manungsa biasa",
   "thermalConfig": "Setelan Termal",
   "aggMode": "Mode Agresif",
-  "aggressiveHal": "Matèni Thermal HAL",
+  "disableHal": "Pateni Thermal HAL",
   "disablePanic": "Pateni Kernel Panic",
   "fastCharge": "Ngecas Cepet",
   "opMode": "Mode Operasi",
   "thermZone": "Zona Termal",
   "thermPolicy": "Aturan Suhu",
-  "supportTitle": "Dukungan & Suwun",
-  "supportDesc": "Tutul ing kene kanggo ndhukung proyek iki supaya tetep entuk kabar paling anyar!",
   "searchPlaceholder": "Golek aplikasi...",
   "loadingApps": "Lagi nggoleki aplikasi...",
   "noApps": "Aplikasine ra ketemu.",
@@ -28,8 +36,9 @@
   "blurProgressive": "Progressive",
   "setSectionGeneral": "Umum",
   "setLang": "Basa",
+  "setFullscreen": "Layar Wanuh",
+  "setFullscreenDesc": "Ndhilikna bar sistem kanggo tampilan imersif",
   "setSectionDev": "Pangembang",
-  "devDescFull": "Mung manungsa biasa",
   "btnGotIt": "Oke, Paham",
   "gameSettings": "Setelan Game",
   "asSectionApp": "Aplikasi",
@@ -38,21 +47,22 @@
   "asCustomConfig": "Setelan Dewe",
   "asCustomConfigDesc": "Tumpuk setelan suhu global",
   "asAggModeDesc": "Genjot performa mentok",
-  "asAggHalDesc": "Mask pustaka thermal HAL vendor",
+  "asDisableHalDesc": "Bind mount HAL sing agresif",
   "asZoneDesc": "Kontrol ngapusi suhu zona termal",
   "asPolicyDesc": "Reaksi sistem pas panas",
   "statusActive": "Lagi Mlaku ✨",
   "statusBalanced": "Santai 😴",
   "statusDisabled": "Mati ❌",
   "toastSaved": "Sukses disimpen",
-  "toastInvalidValue": "Nilai ora valid — ora disimpen",
-  "toastFastChargeAutoOnly": "Fast Charge mung tersedia neng mode Otomatis",
   "toastAppEnabled": "Diuripke nggo aplikasi iki",
   "toastAppDisabled": "Dipateni nggo aplikasi iki",
   "toastCustomUnlocked": "Setelan dewe dibukak",
   "toastGlobalSettings": "Nganggo setelan global",
   "toastPolicyUpdated": "Policy wis dianyari",
   "toastFailed": "Gagal",
+  "toastLogSaved": "Log kasimpen menyang Download",
+  "toastLogNotFound": "File log ora ketemu",
+  "toastLogSaveFailed": "Gagal nyimpen log",
   "bannerSaving": "Lagi nyimpen banner...",
   "bannerSaved": "Banner wis dianyari",
   "bannerSaveFailed": "Gagal nyimpen banner",
@@ -62,22 +72,19 @@
   "bannerReadFailed": "Gagal maca file",
   "toastMonetOn": "Werna monet diuripke",
   "toastMonetOff": "Werna monet dipateni",
+  "toastFullscreenUnsupported": "Layar wanuh ora didhukung dening manager iki",
   "infoModals": {
     "aggressive": {
       "title": "Mode Agresif",
       "text": "Disaranake banget nggo dongkrak performa ben makin joss! Pateni yen game sing lagi kowe mainake ndeteksi modifikasi termal."
     },
-    "aggressiveHal": {
-      "title": "Matèni Thermal HAL",
-      "text": "Nutupi (mask) pustaka thermal HAL vendor nalika Mode Agresif aktif. Mateni yen game utawa layanan thermal sistem ana masalah (crash, freeze, utawa pamacaan suhu mandheg)."
-    },
     "fastCharge": {
       "title": "Ngecas Cepet",
-      "text": "Mung mode Otomatis: nyepetna arus listrik nalika ngisi daya. Didhelikake nalika mode Statis aktif."
+      "text": "Mateni sawetara sensor suhu ben kacepetan ngecas HP iso mentok terus masio panase ra karuan."
     },
     "modeOptions": {
       "title": "Mode Operasi",
-      "text": "Otomatis: Batesan suhu mung dipateni nggo aplikasi sing mbok pilih neng tab Aplikasi.\nStatis: Dipateni terus-terusan tanpa mandeg.\nFast Charge mung mlaku neng mode Otomatis."
+      "text": "Otomatis: Batesan suhu mung dipateni nggo aplikasi sing mbok pilih neng tab Aplikasi.\nStatis: Dipateni terus-terusan tanpa mandeg."
     },
     "zonePolicy": {
       "title": "Aturan Suhu",
@@ -90,6 +97,10 @@
     "thermalZone": {
       "title": "Zona Termal",
       "text": "Kill Thermal Zone: Mateni kabeh fitur zona termal.\nSpoof to 30°C: Ngapusi suhu zona termal dadi 30°C."
+    },
+    "disableHal": {
+      "title": "Pateni Thermal HAL",
+      "text": "Mandegake layanan thermal hardware. Mung bisa dienggo nalika Aggressive Mode urip. Nggunakake bind mount (AvaAddams)."
     }
   }
 }

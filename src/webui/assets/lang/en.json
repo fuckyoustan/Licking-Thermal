@@ -2,16 +2,24 @@
   "navHome": "Home",
   "navApps": "Apps",
   "navSettings": "Settings",
-  "thermalConfig": "Thermal Config",
+  "infoVersionTitle": "Version",
+  "infoDeviceTitle": "Device",
+  "infoAndroidTitle": "Android Version",
+  "infoChipsetTitle": "Chipset",
+  "infoKernelTitle": "Kernel",
+  "supportTitle": "Support",
+  "supportDesc": "Tap here to support this project to stay updated!",
+  "saveLogTitle": "Log",
+  "saveLogDesc": "save log to internal storage",
+  "devDescFull": "Just an ordinary human being",
+  "thermalConfig": "Global Config",
   "aggMode": "Aggressive Mode",
-  "aggressiveHal": "Disable Thermal HAL",
+  "disableHal": "Disable Thermal HAL",
   "disablePanic": "Disable Kernel Panic",
   "fastCharge": "Fast Charge",
   "opMode": "Operation Mode",
   "thermZone": "Thermal Zone",
   "thermPolicy": "Thermal Policy",
-  "supportTitle": "Support & Thanks",
-  "supportDesc": "Tap here to support this project to stay updated!",
   "searchPlaceholder": "Search apps...",
   "loadingApps": "Looking for apps...",
   "noApps": "No apps found.",
@@ -28,8 +36,9 @@
   "blurProgressive": "Progressive",
   "setSectionGeneral": "General",
   "setLang": "Language",
+  "setFullscreen": "Full Screen",
+  "setFullscreenDesc": "Hide system bars for an immersive view",
   "setSectionDev": "Developer",
-  "devDescFull": "Just an ordinary human being",
   "btnGotIt": "Got it",
   "gameSettings": "Game Settings",
   "asSectionApp": "Application",
@@ -38,21 +47,22 @@
   "asCustomConfig": "Custom Config",
   "asCustomConfigDesc": "Override global thermal settings",
   "asAggModeDesc": "Push performance to the limit",
-  "asAggHalDesc": "Mask vendor thermal HAL libraries",
+  "asDisableHalDesc": "Aggressive HAL bind mount",
   "asZoneDesc": "Thermal zone spoof control",
   "asPolicyDesc": "System reaction to heat",
   "statusActive": "Working ✨",
   "statusBalanced": "Balanced 😴",
   "statusDisabled": "Disabled ❌",
   "toastSaved": "Saved successfully",
-  "toastInvalidValue": "Invalid value — not saved",
-  "toastFastChargeAutoOnly": "Fast Charge is only available in Auto mode",
   "toastAppEnabled": "Enabled for this app",
   "toastAppDisabled": "Disabled for this app",
   "toastCustomUnlocked": "Custom settings unlocked",
   "toastGlobalSettings": "Using global settings",
   "toastPolicyUpdated": "Policy updated",
   "toastFailed": "Failed",
+  "toastLogSaved": "Log saved to Download",
+  "toastLogNotFound": "Log file not found",
+  "toastLogSaveFailed": "Failed to save log",
   "bannerSaving": "Saving banner...",
   "bannerSaved": "Banner updated",
   "bannerSaveFailed": "Failed to save banner",
@@ -62,22 +72,19 @@
   "bannerReadFailed": "Failed to read file",
   "toastMonetOn": "Monet colors enabled",
   "toastMonetOff": "Monet colors disabled",
+  "toastFullscreenUnsupported": "Full screen is not supported by this manager",
   "infoModals": {
     "aggressive": {
       "title": "Aggressive Mode",
       "text": "Highly recommended for a massive performance boost! turn it off if the game you are playing detects thermal modification."
     },
-    "aggressiveHal": {
-      "title": "Disable Thermal HAL",
-      "text": "Masks vendor thermal HAL libraries while Aggressive Mode is active. Turn it off if the game or the system thermal service misbehaves (crash, freeze, or stuck temperature readings)."
-    },
     "fastCharge": {
       "title": "Fast Charge",
-      "text": "Auto mode only: boosts charging current while charging. Hidden while Static mode is active."
+      "text": "Turns off some temperature sensors to force maximum charging speed."
     },
     "modeOptions": {
       "title": "Operation Mode",
-      "text": "Auto: Thermal limits are only disabled for the apps you pick in the Apps tab.\nStatic: Permanently disabled all the time.\nFast Charge only runs in Auto mode."
+      "text": "Auto: Thermal limits are only disabled for the apps you pick in the Apps tab.\nStatic: Permanently disabled all the time."
     },
     "zonePolicy": {
       "title": "Thermal Policy",
@@ -90,6 +97,10 @@
     "thermalZone": {
       "title": "Thermal Zone",
       "text": "Kill Thermal Zone: Kill all thermal zones.\nSpoof to 30°C: Spoof thermal zone temperature to 30°C."
+    },
+    "disableHal": {
+      "title": "Disable Thermal HAL",
+      "text": "Stops hardware thermal services. Only available when Aggressive Mode is ON. Uses bind mounts (AvaAddams)."
     }
   }
 }
