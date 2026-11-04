@@ -5,15 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Licking Thermal</title>
   <link rel="stylesheet" href="assets/style.css">
-  <script type="importmap">
-    {
-      "imports": {
-        "kernelsu": "https://esm.run/kernelsu"
-      }
-    }
-  </script>
+  <link rel="stylesheet" href="/internal/insets.css">
+  <link rel="stylesheet" href="/internal/colors.css">
 </head>
 <body>
+
+  <!-- ================= SPLASH LOADING ================= -->
+  <div id="m-splash" aria-hidden="true">
+    <div class="m-splash-box">
+      <svg class="m-splash-spinner" viewBox="0 0 48 48" fill="none">
+        <circle class="m-splash-track" cx="24" cy="24" r="20"/>
+        <circle class="m-splash-arc" cx="24" cy="24" r="20"/>
+      </svg>
+      <div class="m-splash-name">Loading...</div>
+    </div>
+  </div>
 
   <!-- ================= MIUIX ICON SPRITE ================= -->
   <svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
@@ -52,12 +58,92 @@
     <main id="mainMenu" class="m-page">
 
       <div class="m-banner">
-        <img id="home-banner-img" src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%23242424\'/></svg>'">
+        <img id="home-banner-img" src="assets/banner.jpg" alt="Banner" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100%' height='100%'><rect width='100%' height='100%' fill='%23242424'/></svg>'">
         <div id="status-indicator" class="banner-chip chip-left" style="color: var(--m-primary);">Loading...</div>
         <div id="pid-indicator" class="banner-chip chip-right">PID: NULL</div>
       </div>
 
-      <div class="m-smalltitle" data-i18n="thermalConfig">Thermal Config</div>
+
+      <div class="m-card">
+        <div class="m-pref m-pref-nonclickable">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="infoVersionTitle">Version</span>
+            <span class="m-pref-summary" id="info-version">Loading...</span>
+          </div>
+        </div>
+        <div class="m-pref m-pref-nonclickable">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="infoDeviceTitle">Device</span>
+            <span class="m-pref-summary" id="info-device">Loading...</span>
+          </div>
+        </div>
+        <div class="m-pref m-pref-nonclickable">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="infoAndroidTitle">Android Version</span>
+            <span class="m-pref-summary" id="info-android">Loading...</span>
+          </div>
+        </div>
+        <div class="m-pref m-pref-nonclickable">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="infoChipsetTitle">Chipset</span>
+            <span class="m-pref-summary" id="info-chipset">Loading...</span>
+          </div>
+        </div>
+        <div class="m-pref m-pref-nonclickable">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="infoKernelTitle">Kernel</span>
+            <span class="m-pref-summary" id="info-kernel">Loading...</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="m-card">
+        <div class="m-pref m-pref-click" id="btn-savelog">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="saveLogTitle">Log</span>
+            <span class="m-pref-summary" data-i18n="saveLogDesc">save log to internal storage</span>
+          </div>
+          <svg class="m-icon m-arrow"><use href="#i-arrowright"/></svg>
+        </div>
+      </div>
+
+      <div class="m-card">
+        <div class="m-pref m-pref-click" id="btn-support">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="supportTitle">Support</span>
+            <span class="m-pref-summary" data-i18n="supportDesc">Click here to support the project or get updates!</span>
+          </div>
+          <svg class="m-icon m-arrow"><use href="#i-arrowright"/></svg>
+        </div>
+      </div>
+
+      <div class="m-page-pad"></div>
+    </main>
+
+    <!-- ================= PAGE : APPS ================= -->
+    <main id="gameListMenu" class="m-page hidden">
+
+      <div class="m-searchwrap">
+        <div class="m-searchbar">
+          <svg class="m-icon m-search-ic"><use href="#i-search"/></svg>
+          <input type="text" id="app-search" data-i18n="searchPlaceholder" placeholder="Search apps..." autocomplete="off">
+          <button class="m-search-clear" id="app-search-clear" type="button" aria-label="Clear" hidden>
+            <svg class="m-icon"><use href="#i-searchcleanup"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div id="appList" class="m-card m-applist">
+        <div class="m-state" data-i18n="loadingApps">Looking for apps...</div>
+      </div>
+
+      <div class="m-page-pad"></div>
+    </main>
+
+    <!-- ================= PAGE : SETTINGS ================= -->
+    <main id="settingsMenu" class="m-page hidden">
+
+            <div class="m-smalltitle" data-i18n="thermalConfig">Global Config</div>
 
       <div class="m-card">
 
@@ -71,13 +157,13 @@
             <span class="m-switch-thumb"></span>
           </label>
         </div>
-
-        <div class="m-pref" id="agghal-row" style="display:none">
-          <div class="m-pref-text m-click-info" onclick="showInfo('aggressiveHal')">
-            <span class="m-pref-title"><span data-i18n="aggressiveHal">Disable Thermal HAL</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
+        
+        <div class="m-pref" id="disable-hal-row" style="display:none">
+          <div class="m-pref-text m-click-info" onclick="showInfo('disableHal')">
+            <span class="m-pref-title"><span data-i18n="disableHal">Disable Thermal HAL</span><svg class="m-icon m-info-ic"><use href="#i-info"/></svg></span>
           </div>
           <label class="m-switch">
-            <input type="checkbox" id="agghal-switch">
+            <input type="checkbox" id="disable-hal-switch">
             <span class="m-switch-track"></span>
             <span class="m-switch-thumb"></span>
           </label>
@@ -137,50 +223,8 @@
 
       </div>
 
-      <div class="m-smalltitle" data-i18n="supportTitle">Support &amp; Thanks</div>
-
-      <div class="m-card">
-        <div class="m-pref m-pref-click" id="btn-support">
-          <svg class="m-icon m-pref-start"><use href="#i-favorites"/></svg>
-          <div class="m-pref-text">
-            <span class="m-pref-title" data-i18n="supportTitle">Support &amp; Thanks</span>
-            <span class="m-pref-summary" data-i18n="supportDesc">Click here to support the project or get updates!</span>
-          </div>
-          <svg class="m-icon m-arrow"><use href="#i-arrowright"/></svg>
-        </div>
-      </div>
-
-      <div class="m-page-pad"></div>
-    </main>
-
-    <!-- ================= PAGE : APPS ================= -->
-    <main id="gameListMenu" class="m-page hidden">
-
-      <div class="m-searchwrap">
-        <div class="m-searchbar">
-          <svg class="m-icon m-search-ic"><use href="#i-search"/></svg>
-          <input type="text" id="app-search" data-i18n="searchPlaceholder" placeholder="Search apps..." autocomplete="off">
-          <button class="m-search-clear" id="app-search-clear" type="button" aria-label="Clear" hidden>
-            <svg class="m-icon"><use href="#i-searchcleanup"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div id="appList" class="m-card m-applist">
-        <div class="m-state" data-i18n="loadingApps">Looking for apps...</div>
-      </div>
-
-      <div class="m-page-pad"></div>
-    </main>
-
-    <!-- ================= PAGE : SETTINGS ================= -->
-    <main id="settingsMenu" class="m-page hidden">
-
       <div class="m-smalltitle" data-i18n="setSectionAppearance">Appearance</div>
       <div class="m-card m-banner-card">
-        <div class="m-banner-pref" id="banner-preview-row" role="button" aria-label="Change banner">
-          <img id="banner-preview" src="assets/banner.jpg" alt="Banner preview" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'100%\' height=\'100%\'><rect width=\'100%\' height=\'100%\' fill=\'%232D2D2D\'/></svg>'">
-        </div>
         <div class="m-pref m-pref-click" id="banner-change-row">
           <div class="m-pref-text">
             <span class="m-pref-title" data-i18n="setBannerChange">Change Banner</span>
@@ -241,17 +285,28 @@
             <svg class="m-icon m-dd-ic"><use href="#i-arrowupdown"/></svg>
           </button>
         </div>
+        <div class="m-pref">
+          <div class="m-pref-text">
+            <span class="m-pref-title" data-i18n="setFullscreen">Full Screen</span>
+            <span class="m-pref-summary" data-i18n="setFullscreenDesc">Hide system bars for an immersive view</span>
+          </div>
+          <label class="m-switch">
+            <input type="checkbox" id="fullscreen-switch">
+            <span class="m-switch-track"></span>
+            <span class="m-switch-thumb"></span>
+          </label>
+        </div>
       </div>
 
       <div class="m-smalltitle" data-i18n="setSectionDev">Developer</div>
 
-      <!-- Developer card (mantan popup, kini card biasa) -->
+      <!-- Developer card (kembali ke tab Settings, seperti semula) -->
       <div class="m-card m-devcard">
         <div class="m-devcard-head">
-          <img src="assets/shit.jpg" alt="Dev" class="m-devcard-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\' width=\'56\' height=\'56\'><circle cx=\'28\' cy=\'28\' r=\'28\' fill=\'%233A3A3C\'/></svg>'">
+          <img src="assets/shit.jpg" alt="Dev" class="m-devcard-avatar" onerror="this.src='data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='56' height='56'><circle cx='28' cy='28' r='28' fill='%233A3A3C'/></svg>'">
           <div class="m-devcard-info">
             <div class="m-devcard-name">@fuckyoustan</div>
-            <div class="m-devcard-role" data-i18n="devDescFull">System Modifier &amp; WebUI Developer. I create things that make your device run smoother and hotter.</div>
+            <div class="m-devcard-role" data-i18n="devDescFull">Just an ordinary human being</div>
           </div>
         </div>
         <div class="m-devcard-btns">
@@ -354,14 +409,14 @@
               <span class="m-switch-thumb"></span>
             </label>
           </div>
-
-          <div class="m-pref" id="as-agghal-row" style="display:none">
+          
+          <div class="m-pref" id="as-disable-hal-row" style="display:none">
             <div class="m-pref-text">
-              <span class="m-pref-title" data-i18n="aggressiveHal">Disable Thermal HAL</span>
-              <span class="m-pref-summary" data-i18n="asAggHalDesc">Mask vendor thermal HAL libraries</span>
+              <span class="m-pref-title" data-i18n="disableHal">Disable Thermal HAL</span>
+              <span class="m-pref-summary" data-i18n="asDisableHalDesc">Aggressive HAL bind mount</span>
             </div>
             <label class="m-switch">
-              <input type="checkbox" id="as-agghal-switch">
+              <input type="checkbox" id="as-disable-hal-switch">
               <span class="m-switch-track"></span>
               <span class="m-switch-thumb"></span>
             </label>
@@ -398,6 +453,8 @@
   <!-- input file tersembunyi untuk upload banner kustom -->
   <input type="file" id="banner-file" accept="image/png,image/jpeg,image/gif,image/webp,image/bmp,image/avif,image/x-icon,.png,.jpg,.jpeg,.gif,.webp,.bmp,.avif,.ico" hidden>
 
+  <!-- fallback: hilangkan splash bila script.js gagal/tidak tersedia -->
+  <script>setTimeout(function(){var e=document.getElementById('m-splash');if(e)e.classList.add('hide')},8000);</script>
   <script type="module" src="assets/script.js"></script>
 </body>
 </html>
